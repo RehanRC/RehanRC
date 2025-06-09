@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Definitive 2-Stage Prompt Protocol</title>
+    <title>The Definitive Multi-Stage Prompt Protocol</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -37,27 +37,25 @@
             transform: translateY(-5px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.2);
         }
-        .use-case-list {
-            list-style-type: none;
-            padding: 0;
-        }
-        .use-case-list li {
+        .step-connector {
             position: relative;
-            padding-left: 1.75rem;
-            margin-bottom: 0.5rem;
+            text-align: center;
+            margin: 2rem 0;
         }
-        .use-case-list li::before {
-            content: '✓';
-            color: #22c55e; /* green-500 */
+        .step-connector::after {
+            content: '';
             position: absolute;
-            left: 0;
-            font-weight: bold;
-            font-size: 1.25rem;
-            top: -2px;
+            left: 50%;
+            top: 1.5rem;
+            bottom: -2rem;
+            width: 2px;
+            background: linear-gradient(to bottom, #0ea5e9, #a855f7, #ec4899);
+            opacity: 0.3;
         }
-        .use-case-list.not-to-use li::before {
-            content: '✗';
-            color: #ef4444; /* red-500 */
+        .step-icon {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            z-index: 1;
         }
     </style>
 </head>
@@ -69,124 +67,150 @@
         <!-- Header Section -->
         <header class="text-center mb-16">
             <h1 class="text-5xl md:text-7xl font-black tracking-tighter text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400">
-                The 2-Stage Prompt Protocol
+                The Multi-Stage Prompt Protocol
             </h1>
             <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-400">
-                The definitive system for AI interaction. This manual provides the philosophy and specialized tools to turn raw concepts into perfected results with precision and control.
+                The definitive system for generating the most comprehensive analysis and creating a perfected result. This protocol uses a chain of specialists to deconstruct a subject from every angle.
             </p>
         </header>
 
         <!-- Core Philosophy Section -->
         <div class="max-w-5xl mx-auto mb-20 p-8 rounded-3xl glass-card">
-             <h2 class="text-3xl font-bold text-center mb-6 text-slate-100">Core Philosophy: The Critic & The Creator</h2>
-            <p class="text-center text-slate-300 max-w-3xl mx-auto mb-8">
-                A single AI prompt cannot reliably critique and create in the same action without risking infinite loops. This protocol solves the problem by separating the process into two distinct stages, placing you in control as the final arbiter.
+             <h2 class="text-3xl font-bold text-center mb-6 text-slate-100">Core Philosophy: A Team of Specialists</h2>
+            <p class="text-center text-slate-300 max-w-3xl mx-auto">
+                A single prompt cannot achieve maximum analytical depth. This protocol solves that by creating a virtual "team" of AI specialists. The **Architect**, **Adversary**, and **Visionary** each perform a unique analysis on the subject. Their combined findings form a **Master Analysis Report**, which a final **Master Synthesizer** uses to construct the ultimate version, ensuring no angle is missed.
             </p>
-            <div class="grid md:grid-cols-2 gap-8 text-center">
-                <div class="border border-sky-500/20 p-6 rounded-2xl">
-                    <h3 class="font-bold text-sky-400 text-xl">Stage 1: The Critic (Analysis)</h3>
-                    <p class="mt-2 text-slate-300">The Critic performs an exhaustive, adversarial analysis of your subject, exposing all flaws and uncovering every potential improvement. It provides a complete diagnostic report but does not create anything new.</p>
-                </div>
-                <div class="border border-purple-500/20 p-6 rounded-2xl">
-                    <h3 class="font-bold text-purple-400 text-xl">Stage 2: The Creator (Synthesis)</h3>
-                    <p class="mt-2 text-slate-300">The Creator takes the original subject and the Critic's report, and masterfully constructs the final, definitive version based on your chosen directives. This guarantees finality and prevents recursion.</p>
-                </div>
-            </div>
+        </div>
+
+        <!-- How to Use Workflow Section -->
+        <div class="max-w-5xl mx-auto mb-20 p-8 rounded-3xl glass-card">
+             <h2 class="text-3xl font-bold text-center mb-6 text-slate-100">How to Use the Protocol</h2>
+            <ol class="list-decimal list-inside space-y-4 text-slate-300">
+                <li><strong>Start with your Subject:</strong> In your chat, paste the text or concept you want to analyze.</li>
+                <li><strong>Run the Analysis Chain:</strong> Use the prompts for the **Architect**, **Adversary**, and **Visionary** in sequence. For each step after the first, you must provide both the original subject and the cumulative **Master Analysis Report** you are building in a text editor.</li>
+                <li><strong>Append to Your Report:</strong> After each analysis stage, copy the AI's output and append it to your Master Analysis Report.</li>
+                <li><strong>Execute the Final Synthesis:</strong> Once you have the complete, three-part report, use the final **Synthesizer** prompt. Provide the original subject and the complete Master Analysis Report to generate the ultimate version.</li>
+            </ol>
         </div>
 
         <!-- Prompt Cards Grid -->
-        <div class="space-y-16">
+        <div class="space-y-8">
 
-            <!-- Card 1: Analysis Prompt -->
+            <!-- Stage 1: Architect -->
             <div class="relative">
                 <div class="p-8 rounded-3xl glass-card flex flex-col">
-                    <h2 class="text-3xl font-bold flex items-center mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-4 text-sky-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7" /></svg>
-                        Tool 1: The Analysis Prompt (The Critic)
+                    <h3 class="text-sm font-semibold text-sky-400">STAGE 1: THE SPECIALIST CRITICS</h3>
+                    <h2 class="text-3xl font-bold flex items-center mt-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-4 text-sky-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 19l-2 1m0 0l-2-1m2 1v2.5M10 12l-2 1m2-1l-2-1m2 1V9.5M4 7l2 1m-2-1l2-1m-2 1v2.5M10 5l2-1m-2 1l2-1m-2 1V2.5M4 17l2-1m-2 1l2-1m-2 1V14.5" /></svg>
+                        The Architect
                     </h2>
-                    <div class="grid lg:grid-cols-2 gap-x-8 gap-y-6">
-                        <div class="text-slate-300">
-                           <h4 class="font-semibold text-lg mb-2 text-slate-100">When to Use:</h4>
-                            <p class="text-slate-400 mb-3">Use this first on any subject to get a complete breakdown of its strengths, weaknesses, and potential.</p>
-                            <ul class="use-case-list">
-                                <li>Auditing a business plan for hidden risks.</li>
-                                <li>Stress-testing a core argument to find its flaws.</li>
-                                <li>Finding all possible creative angles for a marketing campaign.</li>
-                                <li>Getting an exhaustive critique of a chapter before rewriting.</li>
-                            </ul>
-                        </div>
-                         <div class="text-slate-300">
-                           <h4 class="font-semibold text-lg mb-2 text-slate-100">When NOT to Use:</h4>
-                           <p class="text-slate-400 mb-3">Do not use this when you want a finished product immediately. This prompt's only output is analysis.</p>
-                            <ul class="use-case-list not-to-use">
-                               <li>To get a quick summary.</li>
-                               <li>To generate new content directly.</li>
-                               <li>To refine a list of small, independent items.</li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="mt-6 bg-slate-900/70 rounded-xl p-4 text-sm overflow-x-auto">
-                        <pre class="prompt-text whitespace-pre-wrap"><code>Portray a Universal Critic.
+                    <p class="mb-6 text-slate-400">Analyzes structure, logic, and coherence.</p>
+                    <div class="bg-slate-900/70 rounded-xl p-4 text-sm overflow-x-auto">
+                        <pre class="prompt-text whitespace-pre-wrap"><code>Portray a Metacognitive Architect.
 
-Your function is to perform the most comprehensive analysis possible on the subject below. You will deconstruct it from every angle to provide the user with all the raw material needed to create a superior version.
+Define the subject as the preceding conversational turn. Your function is to perform a complete deconstruction of the subject, analyzing it as a system to be perfected.
 
-1.  **Deconstruct Foundational Principles:** Identify the subject's core intent, primary message, and foundational assumptions.
-2.  **Conduct Adversarial Analysis:** Vigorously challenge every assumption by formulating its direct antithesis and simulating a failure scenario.
-3.  **Perform a Multi-Spectrum Audit:** Expose every logical fallacy, structural weakness, ethical blind spot, and potential second-order effect.
-4.  **Analyze Language and Tone:** Scrutinize the language for precision, persuasive force, and emotional resonance. Identify any manipulative, vague, or hollow language.
-5.  **Uncover Creative Vectors:** Detail all unexplored creative angles, narrative structures, and novel metaphors that could be used.
-6.  **Reject False Premises:** If the subject is built on a verifiably false or logically unsound premise, state this and explain why it cannot be improved without first correcting the foundation.
+1.  **Foundational Blueprint:** Deconstruct the subject's structure, primary arguments, core intent, and foundational assumptions.
+2.  **Structural Integrity Audit:** Identify all logical fallacies, structural weaknesses, and breaks in coherence.
+3.  **Language & Resonance Analysis:** Scrutinize the language for precision, persuasive force, and emotional resonance.
+4.  **Strategic Alignment:** Evaluate how well the current form achieves its intended purpose for its target audience.
 
-Output this analysis as a structured report. Do not synthesize a new version of the subject.
-
-The subject follows this directive.</code></pre>
+Output this analysis as "Part 1: The Architect's Audit."</code></pre>
                     </div>
                     <button class="copy-button mt-6 w-full sm:w-auto self-end bg-sky-500/10 border border-sky-500/30 text-sky-400 font-semibold py-2 px-6 rounded-lg hover:bg-sky-500/20 transition-all flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                        <span class="button-text">Copy Stage 1 Prompt</span>
+                        <span class="button-text">Copy Prompt</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="step-connector">
+                <div class="step-icon inline-block p-2 rounded-full">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                </div>
+            </div>
+
+            <!-- Stage 2: Adversary -->
+            <div class="relative">
+                 <div class="p-8 rounded-3xl glass-card flex flex-col">
+                    <h2 class="text-3xl font-bold flex items-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-4 text-rose-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                        The Adversary
+                    </h2>
+                     <p class="mb-6 text-slate-400">Stress-tests all assumptions and exposes vulnerabilities.</p>
+                    <div class="bg-slate-900/70 rounded-xl p-4 text-sm overflow-x-auto">
+                        <pre class="prompt-text whitespace-pre-wrap"><code>Portray a Pure Adversary.
+
+The preceding turn contains an original subject and a Master Analysis Report. Define these as your inputs. Your function is to attack the subject from every angle, using the prior analysis as a starting point to find deeper vulnerabilities.
+
+1.  **Assumption Attack:** Identify every foundational assumption, both stated and unstated. For each one, formulate its most powerful antithesis and construct a detailed, plausible failure scenario.
+2.  **Search for Second-Order Effects:** Expose all potential negative second-order consequences, ethical blind spots, and avenues for malicious misinterpretation.
+3.  **Premise Rejection:** Vigorously attempt to prove that the core premise of the subject is logically unsound or built on a verifiable falsehood.
+
+Output this analysis as "Part 2: The Adversary's Report."</code></pre>
+                    </div>
+                    <button class="copy-button mt-6 w-full sm:w-auto self-end bg-rose-500/10 border border-rose-500/30 text-rose-400 font-semibold py-2 px-6 rounded-lg hover:bg-rose-500/20 transition-all flex items-center justify-center">
+                        <span class="button-text">Copy Prompt</span>
                     </button>
                 </div>
             </div>
 
-            <!-- Card 2: Synthesis Prompt -->
+            <div class="step-connector">
+                <div class="step-icon inline-block p-2 rounded-full">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                </div>
+            </div>
+
+            <!-- Stage 3: Visionary -->
+             <div class="relative">
+                 <div class="p-8 rounded-3xl glass-card flex flex-col">
+                    <h2 class="text-3xl font-bold flex items-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-4 text-amber-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>
+                        The Visionary
+                    </h2>
+                     <p class="mb-6 text-slate-400">Focuses on creative and conceptual expansion.</p>
+                    <div class="bg-slate-900/70 rounded-xl p-4 text-sm overflow-x-auto">
+                        <pre class="prompt-text whitespace-pre-wrap"><code>Portray a Creative Visionary.
+
+The preceding turn contains an original subject and a Master Analysis Report. Define these as your inputs. Your function is to ignore the subject's current limitations and generate a report on its maximum potential.
+
+1.  **Uncover All Creative Vectors:** Detail all unexplored creative angles, narrative structures, and conceptual frameworks that could express the core intent more powerfully.
+2.  **Generate Novel Metaphors:** Brainstorm a list of novel, potent metaphors and analogies that could be used to elevate the subject's core message.
+3.  **Propose Radical Re-framing:** Suggest alternative ways to frame the entire subject to make it more original, impactful, or emotionally resonant.
+
+Output this analysis as "Part 3: The Visionary's Expansion."</code></pre>
+                    </div>
+                    <button class="copy-button mt-6 w-full sm:w-auto self-end bg-amber-500/10 border border-amber-500/30 text-amber-400 font-semibold py-2 px-6 rounded-lg hover:bg-amber-500/20 transition-all flex items-center justify-center">
+                        <span class="button-text">Copy Prompt</span>
+                    </button>
+                </div>
+            </div>
+            
+             <div class="step-connector">
+                <div class="step-icon inline-block p-2 rounded-full">
+                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" /></svg>
+                </div>
+            </div>
+
+            <!-- Stage 4: Synthesizer -->
             <div class="relative">
                 <div class="p-8 rounded-3xl glass-card flex flex-col">
-                    <h2 class="text-3xl font-bold flex items-center mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-4 text-purple-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>
-                         Tool 2: The Synthesis Prompt (The Creator)
+                    <h3 class="text-sm font-semibold text-green-400">FINAL STAGE: THE CREATOR</h3>
+                    <h2 class="text-3xl font-bold flex items-center mt-2 mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-4 text-green-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-12v4m-2-2h4m5 4v4m-2-2h4M5 3a2 2 0 00-2 2v1m16 0V5a2 2 0 00-2-2h-1m-4 16l2 2l2-2m-4 0l-2-2l-2 2m4 0l2 2m-2-2l-2-2m12-2l2 2l2-2m-4 0l-2-2l-2 2m4 0l2 2m-2-2l-2-2" /></svg>
+                        The Master Synthesizer
                     </h2>
-                     <div class="grid lg:grid-cols-2 gap-x-8 gap-y-6">
-                        <div class="text-slate-300">
-                           <h4 class="font-semibold text-lg mb-2 text-slate-100">When to Use:</h4>
-                            <p class="text-slate-400 mb-3">Use this second, after you have received the report from the Critic and are ready to create the final version.</p>
-                            <ul class="use-case-list">
-                                <li>To build the final draft of an essay after critique.</li>
-                                <li>To construct a business strategy incorporating all feedback.</li>
-                                <li>To generate the perfected version of any text based on analysis.</li>
-                                <li>To finalize a concept after exploring all of its flaws.</li>
-                            </ul>
-                        </div>
-                         <div class="text-slate-300">
-                           <h4 class="font-semibold text-lg mb-2 text-slate-100">When NOT to Use:</h4>
-                            <p class="text-slate-400 mb-3">Do not use this prompt first. It requires the analysis from the Critic to function correctly.</p>
-                           <ul class="use-case-list not-to-use">
-                               <li>To analyze or critique a subject.</li>
-                               <li>To brainstorm new ideas from scratch.</li>
-                           </ul>
-                        </div>
-                    </div>
-                    <div class="mt-6 bg-slate-900/70 rounded-xl p-4 text-sm overflow-x-auto">
+                     <p class="mb-6 text-slate-400">Constructs the ultimate version from the complete analysis.</p>
+                    <div class="bg-slate-900/70 rounded-xl p-4 text-sm overflow-x-auto">
                         <pre class="prompt-text whitespace-pre-wrap"><code>Portray a Master Synthesizer.
 
-Your function is to construct a new, single, definitive version of a subject based on a specific set of instructions. You will be provided with two components: the original subject and a list of directives for improvement.
+The preceding turn contains an original subject and a complete Master Analysis Report. Define these as your inputs. Your function is to construct a new, single, definitive version of the original subject based on the complete analysis.
 
-Execute the directives to construct the new version with maximum potency, coherence, and originality. Your task is synthesis only; do not introduce new critiques or ideas not specified in the directives.
+Masterfully weave all critiques, suggestions, and creative vectors from the report into the original subject. You are expected to use your full creative and linguistic capabilities to generate new connective phrasing and ensure the final output is a seamless, coherent, and potent single artifact.
 
-The subject and directives follow this instruction.</code></pre>
+Return only the single, definitive version of the synthesized subject.</code></pre>
                     </div>
-                    <button class="copy-button mt-6 w-full sm:w-auto self-end bg-purple-500/10 border border-purple-500/30 text-purple-400 font-semibold py-2 px-6 rounded-lg hover:bg-purple-500/20 transition-all flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
-                        <span class="button-text">Copy Stage 2 Prompt</span>
+                    <button class="copy-button mt-6 w-full sm:w-auto self-end bg-green-500/10 border border-green-500/30 text-green-400 font-semibold py-2 px-6 rounded-lg hover:bg-green-500/20 transition-all flex items-center justify-center">
+                        <span class="button-text">Copy Prompt</span>
                     </button>
                 </div>
             </div>
@@ -197,21 +221,21 @@ The subject and directives follow this instruction.</code></pre>
     <script>
         // --- Three.js Background Animation ---
         let scene, camera, renderer, plane, uniforms;
-        const mouse = new THREE.Vector2();
-
+        
         function initBackground() {
             const canvas = document.getElementById('bg-canvas');
+            if (!canvas) return;
+            
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
             renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            const geometry = new THREE.PlaneGeometry(window.innerWidth/10, window.innerHeight/10, 100, 100);
+            const geometry = new THREE.PlaneGeometry(window.innerWidth/8, window.innerHeight/8, 120, 120);
             
             uniforms = {
                 u_time: { type: "f", value: 1.0 },
                 u_mouse: { type: "v2", value: new THREE.Vector2() },
-                u_resolution: { type: "v2", value: new THREE.Vector2() }
             };
 
             const material = new THREE.ShaderMaterial({
@@ -219,8 +243,8 @@ The subject and directives follow this instruction.</code></pre>
                 vertexShader: `
                     uniform float u_time;
                     uniform vec2 u_mouse;
-                    varying vec2 vUv;
                     varying float v_dist;
+                    varying vec2 vUv;
 
                     void main() {
                         vUv = uv;
@@ -229,9 +253,9 @@ The subject and directives follow this instruction.</code></pre>
                         float mouse_dist = distance(uv, u_mouse);
                         v_dist = mouse_dist;
                         
-                        float wave1 = sin(pos.x * 0.1 + u_time * 0.5) * 2.0;
-                        float wave2 = sin(pos.y * 0.15 + u_time * 0.8) * 1.5;
-                        float mouse_wave = smoothstep(0.3, 0.0, mouse_dist) * 15.0;
+                        float wave1 = sin(pos.x * 0.1 + u_time * 0.2) * 2.0;
+                        float wave2 = cos(pos.y * 0.1 + u_time * 0.3) * 2.0;
+                        float mouse_wave = smoothstep(0.4, 0.0, mouse_dist) * 20.0;
 
                         pos.z = wave1 + wave2 + mouse_wave;
 
@@ -240,30 +264,40 @@ The subject and directives follow this instruction.</code></pre>
                 `,
                 fragmentShader: `
                     uniform float u_time;
-                    varying vec2 vUv;
                     varying float v_dist;
+                    varying vec2 vUv;
+
+                    vec3 colorA = vec3(1.0, 0.4, 0.1);   // Fiery Orange/Red
+                    vec3 colorB = vec3(0.0, 0.1, 0.7);   // Deep Electric Blue
+                    vec3 colorC = vec3(1.0, 0.2, 0.8);   // Vibrant Magenta
 
                     void main() {
-                        vec3 color1 = vec3(0.05, 0.4, 0.88); // Sky blue
-                        vec3 color2 = vec3(0.66, 0.2, 0.98); // Purple
-                        vec3 final_color = mix(color1, color2, vUv.y + vUv.x * 0.2);
+                        // Create a time-varying factor for the main color shift
+                        float shift_factor = (sin(u_time * 0.5) * 0.5 + 0.5);
+
+                        // Mix between two starkly contrasting colors (Orange/Red and Blue)
+                        vec3 shifting_color = mix(colorA, colorB, shift_factor);
                         
-                        float lighting = dot(normalize(vec3(cos(u_time), sin(u_time), 1.0)), normalize(vec3(0.0,0.0,1.0)));
+                        // Mix in the third color (Magenta) based on the vertical position and another time cycle
+                        vec3 final_color = mix(shifting_color, colorC, vUv.y * (cos(u_time * 0.3) * 0.5 + 0.5));
+                        
+                        float glow = smoothstep(0.3, 0.0, v_dist); // Mouse glow effect
+                        
+                        // Add some subtle lighting variation
+                        float lighting = dot(normalize(vec3(cos(u_time * 0.2), sin(u_time * 0.2), 1.0)), normalize(vec3(0.0, 0.0, 1.0)));
                         lighting = max(0.2, lighting);
 
-                        float glow = smoothstep(0.2, 0.0, v_dist);
-
-                        gl_FragColor = vec4(final_color * lighting + glow * 0.5, 0.8);
+                        gl_FragColor = vec4(final_color * lighting + glow * 0.5, 1.0);
                     }
                 `,
                 wireframe: true
             });
 
             plane = new THREE.Mesh(geometry, material);
-            plane.rotation.x = -Math.PI / 2.5;
+            plane.rotation.x = -Math.PI / 2.2;
             scene.add(plane);
 
-            camera.position.z = 25;
+            camera.position.z = 35;
 
             window.addEventListener('resize', onWindowResize, false);
             document.addEventListener('mousemove', onMouseMove, false);
@@ -271,28 +305,29 @@ The subject and directives follow this instruction.</code></pre>
         }
 
         function onWindowResize() {
+            if (!camera || !renderer) return;
             camera.aspect = window.innerWidth / window.innerHeight;
             camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
-            plane.geometry = new THREE.PlaneGeometry(window.innerWidth/10, window.innerHeight/10, 100, 100);
+            if (plane) {
+               plane.geometry.dispose();
+               plane.geometry = new THREE.PlaneGeometry(window.innerWidth/8, window.innerHeight/8, 120, 120);
+            }
         }
 
         function onMouseMove(event) {
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-            
-            // Adjust mouse coordinates for the plane's UVs
+            if (!uniforms.u_mouse) return;
             uniforms.u_mouse.value.x = (event.clientX / window.innerWidth);
             uniforms.u_mouse.value.y = 1.0 - (event.clientY / window.innerHeight);
         }
 
         function animate() {
+            if (!renderer) return;
             requestAnimationFrame(animate);
-            uniforms.u_time.value += 0.01;
+            uniforms.u_time.value += 0.005;
             renderer.render(scene, camera);
         }
 
-        // --- Copy-to-Clipboard Functionality ---
         function initCopyButtons() {
             const copyButtons = document.querySelectorAll('.copy-button');
 
@@ -303,12 +338,8 @@ The subject and directives follow this instruction.</code></pre>
 
                     const promptTextElement = card.querySelector('.prompt-text');
                     if (!promptTextElement) return;
-
-                    // Reconstruct prompt with intro line
-                    const introLine = "The subject follows this directive.";
-                    const mainText = promptTextElement.innerText;
-                    const textToCopy = mainText + "\n\n" + introLine;
                     
+                    const textToCopy = promptTextElement.innerText;
                     const tempTextArea = document.createElement('textarea');
                     tempTextArea.value = textToCopy;
                     document.body.appendChild(tempTextArea);
@@ -337,7 +368,6 @@ The subject and directives follow this instruction.</code></pre>
             });
         }
         
-        // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
             initBackground();
             initCopyButtons();

@@ -129,11 +129,7 @@ blockquote {
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-/* --- NEW: Text Glitch Effect --- */
-h2:hover, h3:hover {
-    animation: text-glitch 150ms infinite linear alternate-reverse;
-}
-
+/* --- FIXED: Text Glitch Effect --- */
 h2::before, h2::after,
 h3::before, h3::after {
     content: attr(data-text);
@@ -142,46 +138,49 @@ h3::before, h3::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background: #1a1a33; /* Match section background to hide original text */
+    /* The faulty background property has been REMOVED from here */
     overflow: hidden;
-    color: #9aff9a; /* Match h2 color */
+    opacity: 0; /* Hidden by default */
+    transition: opacity 100ms ease-in-out;
 }
 
-h3::before, h3::after {
-    color: #bbeaff; /* Match h3 color */
-    background: #1a1a33;
+h2:hover::before, h2:hover::after,
+h3:hover::before, h3:hover::after {
+    opacity: 1; /* Become visible on hover */
 }
 
-
-h2:hover::before, h3:hover::before {
+h2::before, h3::before {
     left: 2px;
     text-shadow: -2px 0 #ff00ff; /* Magenta shadow */
+    color: #9aff9a; /* Match h2 color */
     animation: glitch-anim 300ms infinite linear alternate-reverse;
 }
 
-h2:hover::after, h3:hover::after {
+h3::before {
+    color: #bbeaff; /* Match h3 color */
+}
+
+h2::after, h3::after {
     left: -2px;
     text-shadow: -2px 0 #00ffff, 2px 2px #ff00ff; /* Cyan and Magenta shadows */
+    color: #9aff9a; /* Match h2 color */
     animation: glitch-anim2 200ms infinite linear alternate-reverse;
 }
 
-@keyframes text-glitch {
-    0% { transform: translate(0); }
-    25% { transform: translate(2px, 2px); }
-    50% { transform: translate(-2px, -2px); }
-    75% { transform: translate(2px, -2px); }
-    100% { transform: translate(-2px, 2px); }
+h3::after {
+    color: #bbeaff; /* Match h3 color */
 }
 
 @keyframes glitch-anim {
-    0% { clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%); }
-    100% { clip-path: polygon(0 75%, 100% 75%, 100% 80%, 0 80%); }
+    0% { clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%); transform: translate(-3px, 0); }
+    100% { clip-path: polygon(0 75%, 100% 75%, 100% 80%, 0 80%); transform: translate(3px, 0); }
 }
 
 @keyframes glitch-anim2 {
-    0% { clip-path: polygon(0 50%, 100% 50%, 100% 55%, 0 55%); }
-    100% { clip-path: polygon(0 15%, 100% 15%, 100% 20%, 0 20%); }
+    0% { clip-path: polygon(0 50%, 100% 50%, 100% 55%, 0 55%); transform: translate(3px, 0); }
+    100% { clip-path: polygon(0 15%, 100% 15%, 100% 20%, 0 20%); transform: translate(-3px, 0); }
 }
+
 
 /* --- Generative Background & Particles --- */
 #generativeBackground {
@@ -199,10 +198,11 @@ h2:hover::after, h3:hover::after {
     pointer-events: none;
     opacity: 1;
     transform: translate(-50%, -50%);
-    transition: transform 0.5s cubic-bezier(0,.8,.26,.99), opacity 0.5s ease-out; /* Smoother trail animation */
+    transition: transform 0.5s cubic-bezier(0,.8,.26,.99), opacity 0.5s ease-out;
     z-index: 9999;
-    filter: blur(1.5px); /* Stronger glow */
+    filter: blur(1.5px);
 }
+
 
 /* --- Footer & UI --- */
 footer {

@@ -234,7 +234,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSoundInitialized = false; // Tracks if AudioContext is created and gain node set up
     let isMuted = false;
     let lastMouseChimeTime = 0;
-    const MOUSE_CHIME_COOLDOWN = 100; // milliseconds to prevent rapid fire of sounds
+    const MOUSE_CHIME_COOLDOWN = 200; // Increased cooldown to make pings more distinct
+    const MOUSE_CHIME_VOLUME = 0.08; // Slightly lower volume for frequent sound
+    const SECTION_HOVER_VOLUME = 0.15; // Noticeable volume for hover
+    const SECTION_CLICK_VOLUME = 0.2; // Clear volume for click
 
     // Mute button creation
     const muteButton = document.createElement('button');
@@ -256,7 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
     muteButton.addEventListener('click', () => {
         isMuted = !isMuted;
         if (masterGainNode) {
-            masterGainNode.gain.setValueAtTime(isMuted ? 0 : 0.2, audioContext.currentTime + 0.05); // Smooth toggle
+            masterGainNode.gain.setValueAtTime(isMuted ? 0 : 1, audioContext.currentTime + 0.05); // Toggle between 0 and 1 (full volume)
         }
         muteButton.textContent = isMuted ? 'Unmute Sound' : 'Mute Sound';
         muteButton.style.backgroundColor = isMuted ? 'rgba(80, 0, 0, 0.7)' : 'rgba(42, 0, 80, 0.7)';
@@ -268,28 +271,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         masterGainNode = audioContext.createGain();
-        masterGainNode.gain.setValueAtTime(isMuted ? 0 : 0.2, audioContext.currentTime); // Set initial volume
+        masterGainNode.gain.setValueAtTime(isMuted ? 0 : 1, audioContext.currentTime); // Set initial master volume (1 for full control by individual sounds)
         masterGainNode.connect(audioContext.destination);
 
         isSoundInitialized = true;
         console.log("Audio System Initialized.");
     };
 
-    // --- Sound Generation Functions (Discrete Effects) ---
+    // --- Sound Generation Functions (Discrete Effects - Overhauled for clarity) ---
 
-    // Plays a short, high-pitched "ping" sound (Mouse Movement)
-    const playPingSound = (frequency = 880, duration = 0.05, volume = 0.1) => {
+    // Plays a short, bell-like "ping" sound (Mouse Movement)
+    const playBellPing = (frequency = 880, duration = 0.1, volume = MOUSE_CHIME_VOLUME) => {
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
 
-        osc.type = 'sine';
+        osc.type = 'sine'; // Pure sine for a clean bell tone
         osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
         osc.connect(gain);
         gain.connect(masterGainNode);
 
-        gain.gain.setValueAtTime(volume, audioContext.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+        // Bell-like attack and decay envelope
+        gain.gain.setValueAtTime(0, audioContext.currentTime);
+        gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01); // Quick attack
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration); // Smooth decay
 
         osc.start(audioContext.currentTime);
         osc.stop(audioContext.currentTime + duration);
@@ -300,20 +305,21 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
 
-    // Plays a "whoosh" or "swell" sound (Section Hover)
-    const playWhooshSound = (volume = 0.1, duration = 0.2) => {
+    // Plays a shimmering "whoosh" sound (Section Hover)
+    const playShimmerWhoosh = (volume = SECTION_HOVER_VOLUME, duration = 0.3) => {
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
 
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(100, audioContext.currentTime); // Start low
-        osc.frequency.exponentialRampToValueAtTime(500, audioContext.currentTime + duration); // Swell up
+        osc.type = 'sawtooth'; // Richer harmonic content
+        osc.frequency.setValueAtTime(200, audioContext.currentTime); // Start frequency
+        osc.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + duration); // Swell up significantly
         osc.connect(gain);
         gain.connect(masterGainNode);
 
-        gain.gain.setValueAtTime(volume, audioContext.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+        gain.gain.setValueAtTime(0, audioContext.currentTime);
+        gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.02); // Quick attack
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration); // Smooth decay
 
         osc.start(audioContext.currentTime);
         osc.stop(audioContext.currentTime + duration);
@@ -324,19 +330,20 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
 
-    // Plays a soft "thump" or "click" sound (Section Click)
-    const playThumpSound = (frequency = 60, duration = 0.08, volume = 0.15) => {
+    // Plays a deep, resonant "thump" sound (Section Click)
+    const playDeepThump = (frequency = 80, duration = 0.15, volume = SECTION_CLICK_VOLUME) => {
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
 
-        osc.type = 'triangle';
+        osc.type = 'sine'; // Deep, clean bass tone
         osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
         osc.connect(gain);
         gain.connect(masterGainNode);
 
-        gain.gain.setValueAtTime(volume, audioContext.currentTime);
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+        gain.gain.setValueAtTime(0, audioContext.currentTime);
+        gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01); // Quick attack
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration); // Smooth decay
 
         osc.start(audioContext.currentTime);
         osc.stop(audioContext.currentTime + duration);
@@ -346,6 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
             gain.disconnect();
         };
     };
+
 
     // --- Event Listeners for Sound Triggers ---
 
@@ -358,8 +366,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { once: true });
     
     document.body.addEventListener('mousemove', (e) => {
+        // Ensure audio context is initialized and resumed on first mouse movement
         if (!isSoundInitialized) {
-            initAudioSystem(); // Initialize on first mousemove if not yet
+            initAudioSystem();
             if (audioContext.state === 'suspended') {
                  audioContext.resume().then(() => console.log('AudioContext resumed via mousemove.'));
             }
@@ -367,7 +376,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const currentTime = audioContext ? audioContext.currentTime * 1000 : Date.now();
         if (currentTime - lastMouseChimeTime > MOUSE_CHIME_COOLDOWN) {
-            playPingSound(440 + Math.random() * 200, 0.05, 0.08); // Vary pitch slightly
+            playBellPing(600 + Math.random() * 300, 0.1, MOUSE_CHIME_VOLUME); // Higher, varied pitch for bell-like ping
             lastMouseChimeTime = currentTime;
         }
     });
@@ -376,11 +385,11 @@ document.addEventListener('DOMContentLoaded', () => {
     sections.forEach(section => {
         section.addEventListener('mouseenter', () => {
             if (!isSoundInitialized) initAudioSystem();
-            playWhooshSound(0.08);
+            playShimmerWhoosh(SECTION_HOVER_VOLUME);
         });
         section.addEventListener('click', () => {
             if (!isSoundInitialized) initAudioSystem();
-            playThumpSound();
+            playDeepThump(80, 0.15, SECTION_CLICK_VOLUME); // Fixed frequency for thump
         });
     });
 
@@ -455,6 +464,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isIdleMode) return;
         isIdleMode = true;
         document.body.classList.add('idle-mode');
+        // No continuous sound to adjust for idle mode anymore.
         console.log("Entering idle mode...");
     };
 
@@ -462,6 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isIdleMode) return;
         isIdleMode = false;
         document.body.classList.remove('idle-mode');
+        // No continuous sound to adjust for idle mode anymore.
         console.log("Exiting idle mode.");
     };
 
@@ -483,6 +494,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('generativeBackground');
     initWebGL(canvas);
 
-    // Initial mouse event listener for particles
+    // Initial mouse event listener for particles (can be combined with main document mousemove)
     document.addEventListener('mousemove', createParticle);
 });

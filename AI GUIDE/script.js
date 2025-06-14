@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isMuted = false;
     let isSoundInitialized = false;
     let lastPingTime = 0;
-    const PING_COOLDOWN = 350; // Further increased cooldown for less frequent pings
+    const PING_COOLDOWN = 350;
 
     // --- GAME STATE ---
     const game = {
@@ -49,7 +49,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const now = performance.now();
         if (now - lastPingTime < PING_COOLDOWN) return;
         lastPingTime = now;
-
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
         osc.connect(gain);
@@ -79,13 +78,27 @@ document.addEventListener('DOMContentLoaded', () => {
         filter.connect(gain);
         gain.connect(masterGain);
         gain.gain.setValueAtTime(0, audioContext.currentTime);
-        gain.gain.linearRampToValueAtTime(0.5, audioContext.currentTime + 0.05); // More noticeable whoosh
+        gain.gain.linearRampToValueAtTime(0.6, audioContext.currentTime + 0.05); // More noticeable whoosh
         gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.4);
         noise.start(audioContext.currentTime);
         noise.stop(audioContext.currentTime + 0.4);
     }
     
-    function playDeepThump() { /* ... unchanged ... */ }
+    function playDeepThump() {
+        if (!isSoundInitialized || isMuted) return;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(100, audioContext.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, audioContext.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.5, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.3);
+    }
+
     function createGameSound(frequency) { /* ... unchanged ... */ }
     function playFailureSound() { /* ... unchanged ... */ }
     function createMuteButton() { /* ... unchanged ... */ }
@@ -139,7 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Assign a random depth to each paragraph for a more dynamic effect
             paragraphs.forEach(p => {
-                p.dataset.depth = Math.random() * 0.04 + 0.01; // Range from 0.01 to 0.05
+                p.dataset.depth = Math.random() * 0.04 + 0.02; // Range from 0.02 to 0.06
             });
 
             // Add sound triggers
@@ -171,6 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
     // --- MEMORY GAME AND OTHER SETUP FUNCTIONS (UNCHANGED) ---
     function setupMemoryGame() { /* ... unchanged ... */ }
     function startGame() { /* ... unchanged ... */ }
@@ -186,7 +200,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupFooter() { /* ... unchanged ... */ }
     
     // (Pasting unchanged functions for completeness)
-    function playDeepThump() { if (!isSoundInitialized || isMuted) return; const osc = audioContext.createOscillator(); const gain = audioContext.createGain(); osc.connect(gain); gain.connect(masterGain); osc.type = 'sine'; osc.frequency.setValueAtTime(100, audioContext.currentTime); osc.frequency.exponentialRampToValueAtTime(30, audioContext.currentTime + 0.2); gain.gain.setValueAtTime(0.5, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3); osc.start(audioContext.currentTime); osc.stop(audioContext.currentTime + 0.3); }
     function createGameSound(frequency) { return () => { if (!isSoundInitialized || isMuted) return; const osc = audioContext.createOscillator(); const soundGain = audioContext.createGain(); osc.connect(soundGain); soundGain.connect(masterGain); osc.type = 'sine'; osc.frequency.setValueAtTime(frequency, audioContext.currentTime); soundGain.gain.setValueAtTime(0.3, audioContext.currentTime); soundGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4); osc.start(audioContext.currentTime); osc.stop(audioContext.currentTime + 0.4); }; }
     function playFailureSound() { if (!isSoundInitialized || isMuted) return; const osc = audioContext.createOscillator(); const gain = audioContext.createGain(); osc.connect(gain); gain.connect(masterGain); osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, audioContext.currentTime); osc.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.6); gain.gain.setValueAtTime(0.2, audioContext.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.6); osc.start(audioContext.currentTime); osc.stop(audioContext.currentTime + 0.6); }
     function setupMemoryGame() { const startBtn = document.getElementById('start-game-btn'); const gameButtons = document.querySelectorAll('.game-button'); startBtn.addEventListener('click', startGame); gameButtons.forEach(button => { button.addEventListener('click', () => handlePlayerClick(button)); }); }

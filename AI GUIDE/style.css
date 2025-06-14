@@ -31,7 +31,7 @@ h1 {
 }
 
 h2, h3 {
-    position: relative; /* Crucial for the glitch effect */
+    position: relative; 
 }
 
 h2 {
@@ -77,6 +77,7 @@ section.ai-guide-section:hover {
 p {
     margin-bottom: 15px;
     font-size: 1.1em;
+    transition: transform 0.1s linear; /* ADDED: Ensures smooth text movement */
 }
 
 ul {
@@ -129,7 +130,11 @@ blockquote {
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-/* --- FIXED: Text Glitch Effect --- */
+/* --- Text Glitch Effect --- */
+h2:hover, h3:hover {
+    animation: text-glitch 150ms infinite linear alternate-reverse;
+}
+
 h2::before, h2::after,
 h3::before, h3::after {
     content: attr(data-text);
@@ -138,49 +143,44 @@ h3::before, h3::after {
     left: 0;
     width: 100%;
     height: 100%;
-    /* The faulty background property has been REMOVED from here */
     overflow: hidden;
-    opacity: 0; /* Hidden by default */
+    opacity: 0;
     transition: opacity 100ms ease-in-out;
 }
-
 h2:hover::before, h2:hover::after,
 h3:hover::before, h3:hover::after {
-    opacity: 1; /* Become visible on hover */
+    opacity: 1;
 }
-
 h2::before, h3::before {
     left: 2px;
-    text-shadow: -2px 0 #ff00ff; /* Magenta shadow */
-    color: #9aff9a; /* Match h2 color */
+    text-shadow: -2px 0 #ff00ff;
+    color: #9aff9a;
     animation: glitch-anim 300ms infinite linear alternate-reverse;
 }
-
-h3::before {
-    color: #bbeaff; /* Match h3 color */
-}
-
+h3::before { color: #bbeaff; }
 h2::after, h3::after {
     left: -2px;
-    text-shadow: -2px 0 #00ffff, 2px 2px #ff00ff; /* Cyan and Magenta shadows */
-    color: #9aff9a; /* Match h2 color */
+    text-shadow: -2px 0 #00ffff, 2px 2px #ff00ff;
+    color: #9aff9a;
     animation: glitch-anim2 200ms infinite linear alternate-reverse;
 }
+h3::after { color: #bbeaff; }
 
-h3::after {
-    color: #bbeaff; /* Match h3 color */
+@keyframes text-glitch {
+    0% { transform: translate(0); }
+    25% { transform: translate(2px, 2px); }
+    50% { transform: translate(-2px, -2px); }
+    75% { transform: translate(2px, -2px); }
+    100% { transform: translate(-2px, 2px); }
 }
-
 @keyframes glitch-anim {
     0% { clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%); transform: translate(-3px, 0); }
     100% { clip-path: polygon(0 75%, 100% 75%, 100% 80%, 0 80%); transform: translate(3px, 0); }
 }
-
 @keyframes glitch-anim2 {
     0% { clip-path: polygon(0 50%, 100% 50%, 100% 55%, 0 55%); transform: translate(3px, 0); }
     100% { clip-path: polygon(0 15%, 100% 15%, 100% 20%, 0 20%); transform: translate(-3px, 0); }
 }
-
 
 /* --- Generative Background & Particles --- */
 #generativeBackground {
@@ -203,7 +203,6 @@ h3::after {
     filter: blur(1.5px);
 }
 
-
 /* --- Footer & UI --- */
 footer {
     text-align: center;
@@ -219,7 +218,6 @@ footer {
 #mini-game-container {
     border-color: #9aff9a;
 }
-
 #game-board {
     display: flex;
     flex-direction: column;
@@ -229,7 +227,6 @@ footer {
     background-color: #0d0d1a;
     border-radius: 8px;
 }
-
 #game-status {
     font-family: 'Courier New', Courier, monospace;
     font-size: 1.2em;
@@ -237,13 +234,11 @@ footer {
     min-height: 2em;
     text-align: center;
 }
-
 .game-buttons-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 15px;
 }
-
 .game-button {
     width: 100px;
     height: 100px;
@@ -253,27 +248,20 @@ footer {
     opacity: 0.7;
     cursor: not-allowed;
 }
-
 .game-button.player-active {
     opacity: 1;
     cursor: pointer;
 }
-
-.game-button.player-active:hover {
-    transform: scale(1.05);
-}
-
-#btn-0 { background-color: #00a1b0; } /* Teal */
-#btn-1 { background-color: #b00000; } /* Red */
-#btn-2 { background-color: #b0a100; } /* Yellow */
-#btn-3 { background-color: #00b03b; } /* Green */
-
+.game-button.player-active:hover { transform: scale(1.05); }
+#btn-0 { background-color: #00a1b0; }
+#btn-1 { background-color: #b00000; }
+#btn-2 { background-color: #b0a100; }
+#btn-3 { background-color: #00b03b; }
 .game-button.lit {
     transform: scale(1.1);
     opacity: 1;
     box-shadow: 0 0 25px 5px currentColor;
 }
-
 #start-game-btn {
     padding: 12px 25px;
     font-size: 1.1em;
@@ -285,11 +273,7 @@ footer {
     cursor: pointer;
     transition: background-color 0.2s;
 }
-
-#start-game-btn:hover {
-    background-color: #fff;
-}
-
+#start-game-btn:hover { background-color: #fff; }
 #start-game-btn:disabled {
     background-color: #555;
     color: #888;

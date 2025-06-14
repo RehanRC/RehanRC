@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isMuted = false;
     let isSoundInitialized = false;
     let lastPingTime = 0;
-    const PING_COOLDOWN = 200; // Cooldown to prevent sound spam
+    const PING_COOLDOWN = 250;
 
     // --- GAME STATE ---
     const game = {
@@ -18,12 +18,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- INITIALIZE ALL SYSTEMS ---
     setupWebGLBackground();
-    setupMouseParticles();
+    setupMouseParticles(); // Contains the fix for the trail
     createMuteButton();
     setupFooter();
     setupMemoryGame();
     setupSectionInteractivity();
-    setupGlitchText();
+    setupGlitchText(); // Logic to enable the glitch effect
 
     // --- AUDIO SYSTEM ---
 
@@ -36,75 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
             masterGain.connect(audioContext.destination);
             isSoundInitialized = true;
 
-            const frequencies = [261.63, 329.63, 392.00, 440.00]; // C4, E4, G4, A4
+            const frequencies = [261.63, 329.63, 392.00, 440.00];
             game.buttonSounds = frequencies.map(freq => createGameSound(freq));
-            console.log("Audio System Initialized and Ready.");
         } catch (e) {
             console.error("Web Audio API is not supported in this browser.", e);
         }
-    }
-
-    // --- NOTICEABLE, DISCRETE SOUND FUNCTIONS ---
-
-    function playBellPing() {
-        if (!isSoundInitialized || isMuted) return;
-        const now = performance.now();
-        if (now - lastPingTime < PING_COOLDOWN) return;
-        lastPingTime = now;
-
-        const osc = audioContext.createOscillator();
-        const soundGain = audioContext.createGain();
-        osc.connect(soundGain);
-        soundGain.connect(masterGain);
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(1400, audioContext.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.3);
-        soundGain.gain.setValueAtTime(0.5, audioContext.currentTime); // LOUDER
-        soundGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
-        osc.start(audioContext.currentTime);
-        osc.stop(audioContext.currentTime + 0.3);
-    }
-
-    function playShimmerWhoosh() {
-        if (!isSoundInitialized || isMuted) return;
-        const noise = audioContext.createBufferSource();
-        const bufferSize = audioContext.sampleRate * 0.4;
-        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
-        const output = buffer.getChannelData(0);
-        for (let i = 0; i < bufferSize; i++) { output[i] = Math.random() * 2 - 1; }
-        noise.buffer = buffer;
-
-        const bandpass = audioContext.createBiquadFilter();
-        bandpass.type = 'bandpass';
-        bandpass.frequency.setValueAtTime(1500, audioContext.currentTime);
-        bandpass.Q.setValueAtTime(20, audioContext.currentTime);
-
-        const soundGain = audioContext.createGain();
-        noise.connect(bandpass);
-        bandpass.connect(soundGain);
-        soundGain.connect(masterGain);
-        
-        soundGain.gain.setValueAtTime(0, audioContext.currentTime);
-        soundGain.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 0.05); // LOUDER
-        soundGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.4);
-
-        noise.start(audioContext.currentTime);
-        noise.stop(audioContext.currentTime + 0.4);
-    }
-
-    function playDeepThump() {
-        if (!isSoundInitialized || isMuted) return;
-        const osc = audioContext.createOscillator();
-        const soundGain = audioContext.createGain();
-        osc.connect(soundGain);
-        soundGain.connect(masterGain);
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(100, audioContext.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(30, audioContext.currentTime + 0.2);
-        soundGain.gain.setValueAtTime(0.7, audioContext.currentTime); // LOUDER
-        soundGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
-        osc.start(audioContext.currentTime);
-        osc.stop(audioContext.currentTime + 0.3);
     }
 
     function createGameSound(frequency) {
@@ -116,29 +52,85 @@ document.addEventListener('DOMContentLoaded', () => {
             soundGain.connect(masterGain);
             osc.type = 'sine';
             osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
-            soundGain.gain.setValueAtTime(0.5, audioContext.currentTime); // LOUDER
+            soundGain.gain.setValueAtTime(0.3, audioContext.currentTime);
             soundGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
             osc.start(audioContext.currentTime);
             osc.stop(audioContext.currentTime + 0.4);
         };
     }
+    
+    // Re-enabled interaction sounds
+    function playBellPing() {
+        if (!isSoundInitialized || isMuted) return;
+        const now = performance.now();
+        if (now - lastPingTime < PING_COOLDOWN) return;
+        lastPingTime = now;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1400, audioContext.currentTime);
+        gain.gain.setValueAtTime(0.15, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.4);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.4);
+    }
 
+    function playShimmerWhoosh() {
+        if (!isSoundInitialized || isMuted) return;
+        const noise = audioContext.createBufferSource();
+        const bufferSize = audioContext.sampleRate * 0.4;
+        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        noise.buffer = buffer;
+        const filter = audioContext.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.value = 1500;
+        filter.Q.value = 20;
+        const gain = audioContext.createGain();
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(masterGain);
+        gain.gain.setValueAtTime(0, audioContext.currentTime);
+        gain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 0.05);
+        gain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.4);
+        noise.start(audioContext.currentTime);
+        noise.stop(audioContext.currentTime + 0.4);
+    }
+    
+    function playDeepThump() {
+        if (!isSoundInitialized || isMuted) return;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(masterGain);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(100, audioContext.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, audioContext.currentTime + 0.2);
+        gain.gain.setValueAtTime(0.4, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.3);
+    }
+    
     function playFailureSound() {
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
-        const soundGain = audioContext.createGain();
-        osc.connect(soundGain);
-        soundGain.connect(masterGain);
+        const gain = audioContext.createGain();
+        osc.connect(gain);
+        gain.connect(masterGain);
         osc.type = 'sawtooth';
         osc.frequency.setValueAtTime(150, audioContext.currentTime);
         osc.frequency.exponentialRampToValueAtTime(50, audioContext.currentTime + 0.6);
-        soundGain.gain.setValueAtTime(0.3, audioContext.currentTime); // LOUDER
-        soundGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.6);
+        gain.gain.setValueAtTime(0.2, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.6);
         osc.start(audioContext.currentTime);
         osc.stop(audioContext.currentTime + 0.6);
     }
 
-    // --- MUTE BUTTON & AUDIO INITIALIZATION ---
+
     function createMuteButton() {
         const muteButton = document.createElement('button');
         muteButton.id = 'muteButton';
@@ -149,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function toggleMute() {
-        if (!isSoundInitialized) return; // Mute can't work if sound isn't on
+        if (!isSoundInitialized) initAudioSystem();
         isMuted = !isMuted;
         const muteButton = document.getElementById('muteButton');
         if (isMuted) {
@@ -163,68 +155,67 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Most robust way to start audio: on the first click anywhere.
-    document.body.addEventListener('click', () => {
-        if (!isSoundInitialized) {
-            initAudioSystem();
-        }
-        if (audioContext && audioContext.state === 'suspended') {
-            audioContext.resume();
-        }
-    }, { once: true }); // Listener runs only once.
+    document.body.addEventListener('click', function handler() {
+        if (!isSoundInitialized) initAudioSystem();
+        if (audioContext && audioContext.state === 'suspended') audioContext.resume();
+        this.removeEventListener('click', handler);
+    });
 
-
-    // --- VISUAL & INTERACTION LOGIC (UNCHANGED) ---
-    
+    // --- NEW: Glitch Text Setup ---
     function setupGlitchText() {
         document.querySelectorAll('h2, h3').forEach(header => {
-            header.setAttribute('data-text', header.textContent);
+            header.dataset.text = header.textContent;
         });
     }
 
+    // --- ENHANCED MOUSE PARTICLES ---
     function setupMouseParticles() { 
         document.body.addEventListener('mousemove', e => {
-            if (Math.random() > 0.4) {
-                createParticle(e.clientX, e.clientY);
+            if (Math.random() > 0.5) { // Denser trail
+                createParticle(e);
             }
-            playBellPing(); // Sound on mouse move
+            playBellPing();
         });
     }
 
-    function createParticle(x, y) { 
+    function createParticle(e) { 
         const particle = document.createElement('div');
         particle.className = 'mouse-particle';
         document.body.appendChild(particle);
-        const size = Math.random() * 5 + 3;
-        const color = `hsl(${Math.random() * 60 + 180}, 100%, 80%)`;
+
+        const size = Math.random() * 4 + 4; // Random size from 4px to 8px
+        const color = `hsl(${Math.random() * 60 + 200}, 100%, 85%)`; // Brighter electric blue/cyan
+
         particle.style.width = `${size}px`;
         particle.style.height = `${size}px`;
-        particle.style.left = `${x}px`;
-        particle.style.top = `${y}px`;
+        
+        // ** THE FIX FOR THE TRAIL **
+        // Use pageY to account for scroll position
+        particle.style.left = `${e.pageX}px`;
+        particle.style.top = `${e.pageY}px`;
+        
         particle.style.backgroundColor = color;
-        particle.style.boxShadow = `0 0 12px ${color}`;
+        particle.style.boxShadow = `0 0 15px ${color}`;
+
+        // Animate out
         setTimeout(() => {
             particle.style.transform = `translate(-50%, -50%) scale(0)`;
             particle.style.opacity = '0';
         }, 10);
+
         setTimeout(() => particle.remove(), 500);
     }
     
+    // Re-enabled section interactivity sounds
     function setupSectionInteractivity() {
         const sections = document.querySelectorAll('.ai-guide-section');
         sections.forEach(section => {
             section.addEventListener('mouseenter', playShimmerWhoosh);
             section.addEventListener('click', playDeepThump);
-            section.addEventListener('mousemove', e => {
-                const rect = section.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                section.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(42, 42, 71, 1) 0%, rgba(26, 26, 51, 1) 70%)`;
-            });
-            section.addEventListener('mouseleave', () => { section.style.background = '#1a1a33'; });
         });
     }
 
+    // --- MEMORY SEQUENCE GAME LOGIC (Unchanged) ---
     function setupMemoryGame() {
         const startBtn = document.getElementById('start-game-btn');
         const gameButtons = document.querySelectorAll('.game-button');
@@ -233,26 +224,16 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', () => handlePlayerClick(button));
         });
     }
-
-    function startGame() { /* ... unchanged game logic ... */ }
-    function nextLevel() { /* ... unchanged game logic ... */ }
-    async function playSequence() { /* ... unchanged game logic ... */ }
-    function handlePlayerClick(button) { /* ... unchanged game logic ... */ }
-    function gameOver() { /* ... unchanged game logic ... */ }
-    function getLitColor(buttonId) { /* ... unchanged game logic ... */ }
-    function updateStatus(message) { /* ... unchanged game logic ... */ }
     
-    // (Pasting the unchanged game logic for completeness)
+    // The rest of the file (game logic, other setups) remains the same.
+    // I'm including it all for completeness.
     function startGame() {
         const startBtn = document.getElementById('start-game-btn');
-        const gameButtons = document.querySelectorAll('.game-button');
-        
-        game.level = 0;
-        game.sequence = [];
         startBtn.disabled = true;
         startBtn.textContent = "Game in Progress";
-        gameButtons.forEach(btn => btn.classList.remove('player-active'));
-        
+        game.level = 0;
+        game.sequence = [];
+        document.querySelectorAll('.game-button').forEach(btn => btn.classList.remove('player-active'));
         nextLevel();
     }
 
@@ -261,10 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
         updateStatus(`Level ${game.level}`);
         game.playerSequence = [];
         game.canPlayerClick = false;
-
         const newStep = Math.floor(Math.random() * 4);
         game.sequence.push(newStep);
-
         playSequence();
     }
 
@@ -273,11 +252,9 @@ document.addEventListener('DOMContentLoaded', () => {
         for (let i = 0; i < game.sequence.length; i++) {
             const index = game.sequence[i];
             const button = document.getElementById(`btn-${index}`);
-            
             button.classList.add('lit');
             button.style.backgroundColor = getLitColor(button.id);
             game.buttonSounds[index]();
-            
             await new Promise(resolve => setTimeout(resolve, 400));
             button.classList.remove('lit');
             button.style.backgroundColor = "";
@@ -290,9 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function handlePlayerClick(button) {
         if (!game.canPlayerClick) return;
-
         const clickedIndex = parseInt(button.dataset.index, 10);
-        
         button.classList.add('lit');
         button.style.backgroundColor = getLitColor(button.id);
         setTimeout(() => {
@@ -300,15 +275,12 @@ document.addEventListener('DOMContentLoaded', () => {
             button.style.backgroundColor = "";
         }, 200);
         game.buttonSounds[clickedIndex]();
-
         game.playerSequence.push(clickedIndex);
         const currentStep = game.playerSequence.length - 1;
-
         if (game.playerSequence[currentStep] !== game.sequence[currentStep]) {
             gameOver();
             return;
         }
-
         if (game.playerSequence.length === game.sequence.length) {
             game.canPlayerClick = false;
             document.querySelectorAll('.game-button').forEach(btn => btn.classList.remove('player-active'));
@@ -327,10 +299,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function getLitColor(buttonId) {
         const colors = {
-            'btn-0': '#1de9b6',
-            'btn-1': '#ff1744',
-            'btn-2': '#ffff00',
-            'btn-3': '#00e676'
+            'btn-0': '#1de9b6', 'btn-1': '#ff1744', 'btn-2': '#ffff00', 'btn-3': '#00e676'
         };
         return colors[buttonId];
     }
@@ -338,8 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateStatus(message) {
         document.getElementById('game-status').textContent = message;
     }
-
-
+    
     function setupWebGLBackground() { 
         const canvas = document.getElementById('generativeBackground');
         if (!canvas) return;
@@ -364,6 +332,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeCanvas();
         render();
     }
+
     function setupIdleDetection() {
         let idleTimer;
         const resetIdleTimer = () => {
@@ -378,11 +347,13 @@ document.addEventListener('DOMContentLoaded', () => {
         ['mousemove', 'keypress', 'scroll'].forEach(e => window.addEventListener(e, resetIdleTimer));
         resetIdleTimer();
     }
+
     function setupTimeBasedMoods() { 
         const hour = new Date().getHours();
         if (hour >= 22 || hour < 5) { document.body.classList.add('mood-night'); } 
         else if (hour >= 18) { document.body.classList.add('mood-evening'); }
     }
+
     function setupFooter() {
         const creationInfo = document.querySelector('.creation-info');
         if (creationInfo) {

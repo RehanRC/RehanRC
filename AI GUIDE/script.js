@@ -228,16 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Audio System Overhaul (No Ambient Oscillators) ---
+    // --- Audio System Overhaul ---
     let audioContext;
     let masterGainNode; // Main gain node for all sounds
-    let isSoundInitialized = false; // Tracks if AudioContext is created and gain node set up
+    let ambientOscillators = []; // For the continuous ambient hum
+    let ambientLFOs = []; // For subtle modulation of ambient hum
+    let isSoundInitialized = false;
     let isMuted = false;
     let lastMouseChimeTime = 0;
-    const MOUSE_CHIME_COOLDOWN = 200; // Increased cooldown to make pings more distinct
-    const MOUSE_CHIME_VOLUME = 0.08; // Slightly lower volume for frequent sound
-    const SECTION_HOVER_VOLUME = 0.15; // Noticeable volume for hover
-    const SECTION_CLICK_VOLUME = 0.2; // Clear volume for click
+    const MOUSE_CHIME_COOLDOWN = 150; // Milliseconds to prevent rapid fire of pings
 
     // Mute button creation
     const muteButton = document.createElement('button');
@@ -259,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     muteButton.addEventListener('click', () => {
         isMuted = !isMuted;
         if (masterGainNode) {
-            masterGainNode.gain.setValueAtTime(isMuted ? 0 : 1, audioContext.currentTime + 0.05); // Toggle between 0 and 1 (full volume)
+            masterGainNode.gain.setValueAtTime(isMuted ? 0 : 1, audioContext.currentTime + 0.05); // Smooth toggle
         }
         muteButton.textContent = isMuted ? 'Unmute Sound' : 'Mute Sound';
         muteButton.style.backgroundColor = isMuted ? 'rgba(80, 0, 0, 0.7)' : 'rgba(42, 0, 80, 0.7)';
@@ -274,14 +273,49 @@ document.addEventListener('DOMContentLoaded', () => {
         masterGainNode.gain.setValueAtTime(isMuted ? 0 : 1, audioContext.currentTime); // Set initial master volume (1 for full control by individual sounds)
         masterGainNode.connect(audioContext.destination);
 
+        // --- Reinstating and refining the ambient hum ("buzz") ---
+        const createAmbientHum = () => {
+            const humGain = audioContext.createGain();
+            humGain.gain.setValueAtTime(0.2, audioContext.currentTime); // Set specific volume for ambient hum
+            humGain.connect(masterGainNode);
+
+            const osc1 = audioContext.createOscillator();
+            osc1.type = 'sine'; // Pure sine for a clean, non-oscillating hum
+            osc1.frequency.setValueAtTime(30, audioContext.currentTime); // Very low frequency for deep hum
+            osc1.start();
+            ambientOscillators.push(osc1);
+            osc1.connect(humGain);
+
+            const osc2 = audioContext.createOscillator();
+            osc2.type = 'sine'; // Another sine, slightly higher, for richness without harshness
+            osc2.frequency.setValueAtTime(60, audioContext.currentTime);
+            osc2.start();
+            ambientOscillators.push(osc2);
+            osc2.connect(humGain);
+
+            // Subtle LFO for very slow, almost imperceptible volume pulsation of the ambient hum
+            const lfoAmb = audioContext.createOscillator();
+            lfoAmb.type = 'sine';
+            lfoAmb.frequency.setValueAtTime(0.01, audioContext.currentTime); // Extremely slow cycle (e.g., 100 seconds)
+            lfoAmb.start();
+            lfoAmb.connect(humGain.gain); // Modulate humGain
+            ambientLFOs.push(lfoAmb);
+
+            // Initial fade-in for ambient hum
+            humGain.gain.setValueAtTime(0, audioContext.currentTime);
+            humGain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 10); // Fade in over 10 seconds to 0.2 volume
+        };
+
+        createAmbientHum(); // Start the ambient hum when audio system initializes
+
         isSoundInitialized = true;
-        console.log("Audio System Initialized.");
+        console.log("Audio System Initialized, Ambient Hum Started.");
     };
 
-    // --- Sound Generation Functions (Discrete Effects - Overhauled for clarity) ---
+    // --- Sound Generation Functions (Discrete Effects - Overhauled for clarity and pleasantness) ---
 
     // Plays a short, bell-like "ping" sound (Mouse Movement)
-    const playBellPing = (frequency = 880, duration = 0.1, volume = MOUSE_CHIME_VOLUME) => {
+    const playBellPing = (frequency = 880, duration = 0.1, volume = 0.3) => { // Increased volume for noticeable ping
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -306,7 +340,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Plays a shimmering "whoosh" sound (Section Hover)
-    const playShimmerWhoosh = (volume = SECTION_HOVER_VOLUME, duration = 0.3) => {
+    const playShimmerWhoosh = (volume = 0.5, duration = 0.3) => { // Increased volume for noticeable whoosh
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -331,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Plays a deep, resonant "thump" sound (Section Click)
-    const playDeepThump = (frequency = 80, duration = 0.15, volume = SECTION_CLICK_VOLUME) => {
+    const playDeepThump = (frequency = 80, duration = 0.15, volume = 0.6) => { // Increased volume for noticeable thump
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -358,6 +392,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Listeners for Sound Triggers ---
 
     // Global listener for first user interaction to initialize audio context
+    // This will now ALSO trigger the ambient hum
     document.body.addEventListener('click', () => {
         initAudioSystem();
         if (audioContext.state === 'suspended') {
@@ -376,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const currentTime = audioContext ? audioContext.currentTime * 1000 : Date.now();
         if (currentTime - lastMouseChimeTime > MOUSE_CHIME_COOLDOWN) {
-            playBellPing(600 + Math.random() * 300, 0.1, MOUSE_CHIME_VOLUME); // Higher, varied pitch for bell-like ping
+            playBellPing(600 + Math.random() * 300, 0.1, MOUSE_CHIME_VOLUME); // Varied pitch for bell-like ping
             lastMouseChimeTime = currentTime;
         }
     });
@@ -389,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         section.addEventListener('click', () => {
             if (!isSoundInitialized) initAudioSystem();
-            playDeepThump(80, 0.15, SECTION_CLICK_VOLUME); // Fixed frequency for thump
+            playDeepThump(80, 0.15, SECTION_CLICK_VOLUME);
         });
     });
 
@@ -464,7 +499,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isIdleMode) return;
         isIdleMode = true;
         document.body.classList.add('idle-mode');
-        // No continuous sound to adjust for idle mode anymore.
+        // Reduce ambient hum volume when idle
+        if (masterGainNode && audioContext && !isMuted) {
+            masterGainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 5); // Quieter
+        }
         console.log("Entering idle mode...");
     };
 
@@ -472,7 +510,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isIdleMode) return;
         isIdleMode = false;
         document.body.classList.remove('idle-mode');
-        // No continuous sound to adjust for idle mode anymore.
+        // Restore ambient hum volume when active
+        if (masterGainNode && audioContext && !isMuted) {
+            masterGainNode.gain.exponentialRampToValueAtTime(0.2, audioContext.currentTime + 2); // Louder
+        }
         console.log("Exiting idle mode.");
     };
 
@@ -494,6 +535,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('generativeBackground');
     initWebGL(canvas);
 
-    // Initial mouse event listener for particles (can be combined with main document mousemove)
+    // Initial mouse event listener for particles
     document.addEventListener('mousemove', createParticle);
 });

@@ -77,7 +77,6 @@ section.ai-guide-section:hover {
 p, ul li {
     margin-bottom: 15px;
     font-size: 1.1em;
-    /* ADDED: Ensures smooth parallax movement for paragraphs and list items */
     transition: transform 0.1s linear; 
 }
 
@@ -131,9 +130,6 @@ blockquote {
 }
 
 /* --- Text Glitch Effect --- */
-h2:hover, h3:hover {
-    animation: text-glitch 150ms infinite linear alternate-reverse;
-}
 h2::before, h2::after,
 h3::before, h3::after {
     content: attr(data-text);
@@ -162,13 +158,6 @@ h2::after, h3::after {
     text-shadow: -2px 0 #00ffff, 2px 2px #ff00ff;
     color: inherit;
     animation: glitch-anim2 200ms infinite linear alternate-reverse;
-}
-@keyframes text-glitch {
-    0% { transform: translate(0); }
-    25% { transform: translate(2px, 2px); }
-    50% { transform: translate(-2px, -2px); }
-    75% { transform: translate(2px, -2px); }
-    100% { transform: translate(-2px, 2px); }
 }
 @keyframes glitch-anim {
     0% { clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%); transform: translate(-3px, 0); }

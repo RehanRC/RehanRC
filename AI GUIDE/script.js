@@ -299,24 +299,25 @@ document.addEventListener('DOMContentLoaded', () => {
         gainNode = audioContext.createGain();
         gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime); // Start extremely subtle, almost silent
 
-        // Oscillator 1: Deep, long drone - low frequency for ambient hum
+        // FIX: Changed oscillator types for a softer, less buzzing sound
+        // Oscillator 1: Very deep sine wave for a smooth base hum
         const osc1 = audioContext.createOscillator();
-        osc1.type = 'sine'; // Smooth waveform
-        osc1.frequency.setValueAtTime(40, audioContext.currentTime); // Low frequency for a deep hum
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(30, audioContext.currentTime); // Even lower frequency
         osc1.start();
         oscillators.push(osc1);
 
-        // Oscillator 2: Slightly higher frequency, very subtle saw for texture
+        // Oscillator 2: Another sine wave, slightly higher, blended for richness
         const osc2 = audioContext.createOscillator();
-        osc2.type = 'sawtooth';
-        osc2.frequency.setValueAtTime(80, audioContext.currentTime); // A bit higher for texture
+        osc2.type = 'sine'; 
+        osc2.frequency.setValueAtTime(60, audioContext.currentTime); 
         osc2.start();
         oscillators.push(osc2);
 
-        // Oscillator 3: Adding a very subtle high-frequency shimmer/noise
+        // Oscillator 3: Very subtle triangle wave at a higher, but still smooth, frequency
         const osc3 = audioContext.createOscillator();
-        osc3.type = 'triangle'; // Triangle for a slightly softer high tone
-        osc3.frequency.setValueAtTime(200, audioContext.currentTime); // Higher for a subtle shimmer
+        osc3.type = 'triangle'; // Triangle is softer than sawtooth
+        osc3.frequency.setValueAtTime(120, audioContext.currentTime); // Mid-range for subtle texture
         osc3.start();
         oscillators.push(osc3);
 
@@ -326,17 +327,17 @@ document.addEventListener('DOMContentLoaded', () => {
         // LFOs for subtle, slow modulation of frequencies and overall gain
         const lfo1 = audioContext.createOscillator();
         lfo1.type = 'sine';
-        lfo1.frequency.setValueAtTime(0.03, audioContext.currentTime); // Very slow frequency modulation (e.g., 0.03 Hz means it completes a cycle every ~33 seconds)
-        lfo1.connect(osc1.frequency); // Modulate osc1 frequency
-        lfo1.connect(osc2.frequency); // Modulate osc2 frequency
-        lfo1.start(); // Start LFOs after connecting
+        lfo1.frequency.setValueAtTime(0.02, audioContext.currentTime); // Very slow frequency modulation (even slower)
+        lfo1.connect(osc1.frequency);
+        lfo1.connect(osc2.frequency);
+        lfo1.start(); 
         lfos.push(lfo1);
 
         const lfo2 = audioContext.createOscillator();
         lfo2.type = 'triangle';
-        lfo2.frequency.setValueAtTime(0.08, audioContext.currentTime); // Subtle volume modulation (e.g., 0.08 Hz means a cycle every ~12.5 seconds)
-        lfo2.connect(gainNode.gain); // Modulate overall gain
-        lfo2.start(); // Start LFOs after connecting
+        lfo2.frequency.setValueAtTime(0.05, audioContext.currentTime); // Subtle volume modulation (even slower)
+        lfo2.connect(gainNode.gain); 
+        lfo2.start(); 
         lfos.push(lfo2);
 
         gainNode.connect(audioContext.destination);

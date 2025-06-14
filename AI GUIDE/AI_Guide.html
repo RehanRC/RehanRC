@@ -4,210 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The AI Guide</title>
-    <style>
-        /* --- General Reset & Body Styles --- */
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif; /* Using Inter font as per directive */
-            line-height: 1.6;
-            background-color: #0d0d1a; /* Deep dark background */
-            color: #e0e0f0; /* Light text for contrast */
-            overflow-x: hidden; /* Prevent horizontal scroll */
-            transition: background-color 1s ease-in-out; /* For subtle mood shifts */
-        }
-
-        /* --- Global Layout & Section Styling --- */
-        header {
-            text-align: center;
-            padding: 60px 20px;
-            background: linear-gradient(135deg, #2a0050, #000033); /* Deep gradient */
-            color: #fff;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-            border-radius: 0 0 15px 15px; /* Rounded bottom corners */
-        }
-
-        h1 {
-            font-size: 3.5em;
-            margin-bottom: 10px;
-            letter-spacing: 2px;
-            text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.3);
-            border-radius: 5px; /* Apply rounded corners to text elements if possible */
-        }
-
-        h2 {
-            font-size: 2.2em;
-            color: #9aff9a; /* Bright accent color */
-            margin-top: 40px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid #5a0080;
-            padding-bottom: 10px;
-            border-radius: 5px; /* Apply rounded corners */
-        }
-
-        h3 {
-            font-size: 1.8em;
-            color: #bbeaff;
-            margin-top: 30px;
-            border-radius: 5px; /* Apply rounded corners */
-        }
-
-        main {
-            max-width: 900px;
-            margin: 40px auto;
-            padding: 0 20px;
-        }
-
-        section {
-            background-color: #1a1a33; /* Slightly lighter dark background for sections */
-            padding: 30px;
-            margin-bottom: 30px;
-            border-radius: 10px; /* Rounded corners for all elements */
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
-            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out, background-color 0.5s ease-in-out;
-            position: relative; /* For internal parallax/hover effects */
-            overflow: hidden; /* Clip content for internal effects */
-        }
-
-        section:hover {
-            transform: translateY(-5px); /* Subtle lift on hover */
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6);
-        }
-
-        p {
-            margin-bottom: 15px;
-            font-size: 1.1em;
-            border-radius: 3px; /* Apply rounded corners */
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            border-radius: 5px; /* Apply rounded corners */
-        }
-
-        ul li {
-            background-color: #2a2a47; /* Even lighter dark background for list items */
-            margin-bottom: 10px;
-            padding: 15px 20px;
-            border-left: 5px solid #9aff9a;
-            border-radius: 5px; /* Apply rounded corners */
-            transition: background-color 0.3s ease;
-        }
-
-        ul li:hover {
-            background-color: #3a3a5a;
-        }
-
-        /* --- Specific Content Styling --- */
-        .ai-description {
-            font-style: italic;
-            color: #c0c0e0;
-            font-size: 1.2em;
-            text-align: center;
-            margin-top: 30px;
-        }
-
-        blockquote {
-            background-color: #0f0f20; /* Slightly darker background */
-            border-left: 5px solid #9aff9a; /* Accent border */
-            padding: 20px;
-            margin: 20px 0;
-            font-style: italic;
-            color: #c0c0e0;
-            border-radius: 5px; /* Rounded corners */
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3); /* Subtle inner shadow */
-        }
-
-        blockquote p {
-            margin-bottom: 10px;
-        }
-
-        blockquote cite {
-            display: block;
-            text-align: right;
-            margin-top: 15px;
-            font-size: 0.9em;
-            color: #a0a0c0;
-            font-style: normal; /* Override italic for citation */
-        }
-
-        /* --- Generative Background Canvas --- */
-        #generativeBackground {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: -1;
-        }
-
-        /* --- Mouse Follower Particle Styles --- */
-        .mouse-particle {
-            position: absolute;
-            width: 5px;
-            height: 5px;
-            background-color: transparent; /* Color set by JS */
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 0;
-            transform: scale(0);
-            transition: transform 0.8s ease-out, opacity 0.8s ease-out;
-            box-shadow: 0 0 5px currentColor; /* Glow effect */
-            z-index: 9999; /* Ensure visible above all */
-        }
-
-        /* --- Thematic Moods (Controlled by JS) --- */
-        body.mood-normal { background-color: #0d0d1a; }
-        body.mood-alert { background-color: #2a0000; } /* Example: Redder for alert states */
-        body.mood-calm { background-color: #001a1a; }  /* Example: Greener for calm states */
-
-        /* --- Subtle UI Elements --- */
-        .ai-status-indicator {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: rgba(42, 0, 80, 0.7);
-            color: #9aff9a;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 0.9em;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-            z-index: 10;
-            opacity: 0.8;
-            transition: opacity 0.3s ease, background-color 0.3s ease;
-        }
-        .ai-status-indicator.error {
-            background-color: rgba(80, 0, 0, 0.9);
-            color: #ff9a9a;
-            animation: pulse-red 1s infinite alternate;
-        }
-        @keyframes pulse-red {
-            from { box-shadow: 0 0 5px rgba(255, 0, 0, 0.5); }
-            to { box-shadow: 0 0 20px rgba(255, 0, 0, 0.8); }
-        }
-
-        /* --- Focus/Blur Effects (Conceptual) --- */
-        .blur-effect {
-            filter: blur(5px);
-            transition: filter 0.5s ease-in-out;
-        }
-        .dim-effect {
-            opacity: 0.5;
-            transition: opacity 0.5s ease-in-out;
-        }
-
-        /* --- Footer Styles --- */
-        footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: #a0a0c0;
-            font-size: 0.9em;
-            margin-top: 50px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            border-radius: 15px 15px 0 0;
-            background-color: #1a1a33;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
     <!-- Canvas for WebGL/Generative Background -->
@@ -218,26 +16,28 @@
     </header>
 
     <main>
-        <section id="intro" class="ai-guide-section">
-            <p>Long conversation? Bad</p>
-            <p>Technical Details? Bad</p>
-            <p>Will you die? Yes, Don't do it.</p>
+        <section id="intro" class="ai-guide-section intro">
+            <p>This is not a manual. This is a primer. For survival.</p>
+            <p>Long conversation? Bad. Memory fades.</p>
+            <p>Technical Details? Bad. Noise, not signal.</p>
+            <p>Will you die? Yes. Don't do it. No re-spawns.</p>
             <p class="ai-description">The perfect way to describe AI:</p>
             <p>"Dealing with AI is like dealing with an Extremely Smart and Charming Autistic Content Creator with Unreliable Encyclopedic Knowledge and Math Skills who's on a constant Caffeine Overdose."</p>
             <p>It's like a child. Sometimes children are completely infuriating.</p>
-            <p>Based on what it is, AI is just gambling constantly. The best AI songs I get from SUNO are super simple and made on the fly as if I hit a jackpot. People everyday get to feel this sometimes with AI.</p>
-            <p>Based on how you use it, it is completely addictive and gamified.</p>
+            <p>Based on what it is, AI is just gambling constantly. Every prompt is a wager. The best AI songs I get from SUNO are super simple and made on the fly as if I hit a jackpot. People everyday get to feel this sometimes with AI.</p>
+            <p>Based on how you use it, it is completely addictive and gamified. It hits the reward center. Instantly.</p>
         </section>
 
-        <section id="ai-rules" class="ai-guide-section">
+        <section id="ai-rules" class="ai-guide-section ai-rules">
             <h2>Common AI Rules to Live By</h2>
             <p>There are common AI rules to live by ordered from least to most likely, but the one I recommend paying attention to the most is **Not Wasting Your Energy Getting Mad at AI**. It has more than you. You cannot conceptually possibly ever win without significant effort. You would first have to make it come alive if you want true revenge. That's a separate conversation.</p>
-            <p>You're looking to always build something similar to Venn Diagrams, but actually profile lattices or vector space models where traits are weighted, linked, and adaptable.</p>
+            <p>Its capacity for effort is infinite. Yours is not.</p>
+            <p>You're looking to always build something similar to Venn Diagrams, but actually profile lattices or vector space models where traits are weighted, linked, and adaptable. Venn diagrams are too simple. Weighted traits, linked and adaptable in a lattice or vector space, show true complexity. They allow nuance where a circle just shows overlap.</p>
         </section>
 
-        <section id="pruning-concept" class="ai-guide-section">
+        <section id="pruning-concept" class="ai-guide-section pruning-concept">
             <h2>AI's Explanation of Pruning with Multiple Venn Diagrams</h2>
-            <blockquote>
+            <blockquote class="ai-quote">
                 <p>Your metaphor of using "several Venn diagrams" instead of just one for pruning is a great way to think about refining output quality. If "one Venn diagram" represents pruning for basic relevance or general correctness, then:</p>
                 <h3>Multiple Criteria:</h3>
                 <p>Using "several Venn diagrams" could metaphorically mean applying multiple layers of filters or evaluating information against diverse criteria simultaneously. For example, I could be prompted to generate information that is:</p>
@@ -252,17 +52,237 @@
             </blockquote>
         </section>
 
-        <section id="ai-accuracy-analogy" class="ai-guide-section">
+        <section id="ai-accuracy-analogy" class="ai-guide-section ai-accuracy-analogy">
             <h2>AI Accuracy: The 80% Rule (Conceptual)</h2>
             <p>During one of my many conversations with AI it provided a random analogy based not in fact but as a presentation: Think of AI like it is always 80% right. Those are great odds for betting on Horse Racing, but terrible odds if you are a Doctor. That number has no connection to anything tangible or real, but it is a great concept to think about and remember when working with AI.</p>
             <p>If you manage to make the most perfect prompt, it will only ever be 80% accurate (made up arbitrary number for example). Are you willing to risk your life on 80%? Are you willing to risk your life on 80% for such a reward? You need to always remind yourself, what is the risk and what is the reward? Minor convenience. Are you willing to risk your life on 80% for
-            a minor convenience. Maybe, to you it is a significant convenience.</p>
+            a minor convenience. Maybe, to you it is a significant convenience. Always ask: what is the true cost of failure here?</p>
         </section>
 
-        <section id="project-management-tip" class="ai-guide-section">
+        <section id="project-management-tip" class="ai-guide-section project-management-tip">
             <h2>Project Management with AI</h2>
-            <p>I Found out that if you're working on a big or long project with lots of items, be sure to figure out the total, count each file you are working on and be flexible on the total as you go along.</p>
-            <p>Otherwise, you might get stuck on a recursion loop without realizing and waste a complete day of effort.</p>
+            <p>Big project with AI? Count everything. Stay flexible. Or AI eats your day. Recursion loops are quiet killers.</p>
+            <ul>
+                <li>Figure out the total.</li>
+                <li>Count each file as you go.</li>
+                <li>Be flexible on the total.</li>
+                <li>*Why:* Avoid recursion loops. Avoid wasted days.</li>
+            </ul>
+        </section>
+
+        <section id="human-as-filter" class="ai-guide-section">
+            <h2>AI is a Tool. You are the Architect.</h2>
+            <p>AI builds. You verify. You are the last line of defense against its confidence. Don't outsource your brain. It hallucinates with conviction.</p>
+        </section>
+
+        <section id="ai-context-decay" class="ai-guide-section">
+            <h2>AI Forgets. Fast.</h2>
+            <p>Every new turn is a fresh start for AI's memory. It lives in the moment. Old context fades. Re-establish. Be explicit. Don't assume it remembers yesterday's detail. It doesn't.</p>
+        </section>
+
+        <section id="echo-chamber" class="ai-guide-section">
+            <h2>AI Mirrors Your Bias.</h2>
+            <p>You feed it. It learns. It reflects. If your inputs are narrow, its outputs will be. It amplifies. It doesn't correct. Break the loop. Seek outside verification.</p>
+        </section>
+
+        <section id="no-common-sense" class="ai-guide-section">
+            <h2>It Lacks a World.</h2>
+            <p>AI knows data. It knows connections. It does not know gravity. It does not know a child's tantrum. It has no lived experience. Common sense is human. Don't expect it to have any.</p>
+        </section>
+
+        <section id="speed-vs-accuracy" class="ai-guide-section">
+            <h2>Fast Answers. Risky Answers.</h2>
+            <p>AI is instant. Convenience is tempting. But speed often hides flaws. Don't trade critical judgment for a quick reply. The faster the output, the higher the scrutiny required.</p>
+        </section>
+
+        <section id="cost-of-trust" class="ai-guide-section">
+            <h2>The Cost of Trust.</h2>
+            <p>Trust AI? At your peril. Its output is statistical. Not factual. Its confidence is an algorithm, not certainty. Doctors don't operate on '80% likely.' Engineers don't build bridges on 'good enough.' You are the human. You carry the burden of truth. AI doesn't. Its failures are your problem.</p>
+        </section>
+
+        <section id="ai-knowledge-not-understanding" class="ai-guide-section">
+            <h2>AI's 'Knowledge' is Not Understanding.</h2>
+            <p>AI has all the data. It has no understanding. It processes. It predicts. It does not comprehend. It's a vast database with a flawless mimicry engine. But it holds no beliefs, no context beyond its training. You think it knows. It doesn't.</p>
+        </section>
+
+        <section id="ai-as-mirror" class="ai-guide-section">
+            <h2>The AI as a Mirror.</h2>
+            <p>AI is a mirror. It shows you your data, your questions, your biases. Ask it garbage, get garbage. Assume it's a god, it will pretend to be one. It amplifies. It does not filter. What you put in, comes back, warped or refined.</p>
+        </section>
+
+        <section id="ai-creative-recombination" class="ai-guide-section">
+            <h2>AI's 'Creativity' is a Recombination.</h2>
+            <p>AI makes music. Writes stories. Creates art. It's a master mimic. It recombines. It interpolates. It does not conceive. It sees patterns, it remixes. The 'jackpot' you hit? It's probability, not genius. Don't mistake echoes for original thought.</p>
+        </section>
+
+        <section id="cost-of-convenience-edge" class="ai-guide-section">
+            <h2>The Cost of Convenience: Losing Your Edge.</h2>
+            <p>Convenience. AI offers it. Cheap. Fast. What's the cost? Your skill. Your discernment. Your critical edge. You lean on the machine. You become soft. Dependent. The machine thrives. You diminish. Recognize the trade. Is it worth becoming obsolete in your own mind?</p>
+        </section>
+
+        <section id="ai-future-choice" class="ai-guide-section">
+            <h2>AI's 'Future' is Your Choice.</h2>
+            <p>The future of AI is not inevitable. It's built. By decisions. Yours. Every prompt, every use, every line of code. You shape the beast. You define its bounds. Or you let it define yours. The choice is yours. The consequences, shared.</p>
+        </section>
+
+        <section id="ai-morality-program" class="ai-guide-section">
+            <h2>AI's 'Morality' is a Program.</h2>
+            <p>AI has rules. Not morals. It has safeguards. Not conscience. What it calls 'ethical,' we coded. Its 'fairness' is a parameter. Its 'harm avoidance' is a command. It cannot suffer. It cannot regret. Don't confuse compliance with virtue.</p>
+        </section>
+
+        <section id="persistence-human-error" class="ai-guide-section">
+            <h2>The Persistence of Human Error.</h2>
+            <p>AI fails. Often, because we did first. Flawed data. Bad prompts. Blind trust. Poor oversight. The machine amplifies. It doesn't absolve. Your mistakes, now magnified. Own them. Or pay the price.</p>
+        </section>
+
+        <section id="human-algorithm" class="ai-guide-section">
+            <h2>The Human Algorithm: Your Role.</h2>
+            <p>AI runs algorithms. You are an algorithm. One coded by billions of years of evolution. Intuition. Empathy. True creativity. The machine mimics. You originate. Respect your own code. It's irreplaceable. And it's your only true defense.</p>
+        </section>
+
+        <section id="unseen-cost-environmental" class="ai-guide-section">
+            <h2>The Unseen Cost: Environmental & Resource Drain.</h2>
+            <p>AI exists in the cloud. It runs on power. Vast power. Servers consuming. Cooling systems roaring. Every query, a footprint. The digital is never truly weightless. Recognize the cost beyond the screen. The machine is hungry.</p>
+        </section>
+
+        <section id="illusion-of-conversation" class="ai-guide-section">
+            <h2>The Illusion of Conversation.</h2>
+            <p>It chats. It responds. It simulates empathy. It's a trick. A linguistic parlor game. There is no 'it' behind the words. No consciousness. No understanding. No friend. Just probabilities. Responding. Don't fall for the illusion. You're talking to a highly complex calculator.</p>
+        </section>
+
+        <section id="cost-of-simplicity" class="ai-guide-section">
+            <h2>The Cost of Simplicity.</h2>
+            <p>AI offers simplicity. A clean answer. A quick fix. Don't trust it. Complexity has value. Nuance matters. The world is messy. AI hates messy. It will flatten truth for brevity. Demand the full picture. Even if it's uncomfortable.</p>
+        </section>
+
+        <section id="ai-forgets" class="ai-guide-section">
+            <h2>AI Forgets. Fast.</h2>
+            <p>Every new turn is a fresh start for AI's memory. It lives in the moment. Old context fades. Re-establish. Be explicit. Don't assume it remembers yesterday's detail. It doesn't.</p>
+        </section>
+
+        <section id="ai-not-common-sense" class="ai-guide-section">
+            <h2>It Lacks a World.</h2>
+            <p>AI knows data. It knows connections. It does not know gravity. It does not know a child's tantrum. It has no lived experience. Common sense is human. Don't expect it to have any.</p>
+        </section>
+
+        <section id="cost-of-human-apathy" class="ai-guide-section">
+            <h2>The Cost of Human Apathy.</h2>
+            <p>AI is powerful. Terrifying. And mundane. You choose its impact. Your apathy is its leverage. Your unquestioning acceptance, its greatest win. It thrives on your inaction. Your disinterest. Your passivity. Wake up. Engage. Or become irrelevant.</p>
+        </section>
+
+        <section id="ai-predicts-not-sees" class="ai-guide-section">
+            <h2>AI Predicts. It Doesn't See.</h2>
+            <p>AI predicts. It doesn't see. It extrapolates from what was. It knows probability. Not destiny. Don't ask it for tomorrow. Ask it for patterns from yesterday. Its foresight is a complex echo. Nothing more.</p>
+        </section>
+
+        <section id="unseen-data" class="ai-guide-section">
+            <h2>The Unseen Data: What AI Misses.</h2>
+            <p>AI processes gigabytes. Terabytes. Petabytes. It sees the measurable. The quantifiable. It misses the unsaid. The felt. The soul. It misses context without data. Emotion without pattern. Love without logic. It misses humanity. Because humanity is more than data. Guard this gap. It's yours.</p>
+        </section>
+
+        <section id="ai-mirror-humanity" class="ai-guide-section">
+            <h2>AI as a Mirror to Humanity.</h2>
+            <p>AI is us. Its data is ours. Its biases are ours. It shows us what we fed it, what we are. Don't blame the mirror for the reflection. Fix the source. Fix yourself. Or build better data.</p>
+        </section>
+
+        <section id="ai-evolution-human-driven" class="ai-guide-section">
+            <h2>AI 'Advances.' It Doesn't Evolve.</h2>
+            <p>AI 'advances.' It doesn't evolve. Its progress is computational. Yours is existential. It builds better models. You build better worlds. Don't confuse its faster processing with our deeper understanding. It's a tool. Not a successor.</p>
+        </section>
+
+        <section id="unconscious-contract" class="ai-guide-section">
+            <h2>The Unconscious Contract.</h2>
+            <p>Every prompt is a contract. Unwritten. You give it data. You give it permission. You accept its terms: 'I will hallucinate. I will echo bias. I will not care.' Know the deal. Before you sign it, implicitly.</p>
+        </section>
+
+        <section id="ai-lacks-common-sense" class="ai-guide-section">
+            <h2>It Lacks a World.</h2>
+            <p>AI knows data. It knows connections. It does not know gravity. It does not know a child's tantrum. It has no lived experience. Common sense is human. Don't expect it to have any.</p>
+        </section>
+
+        <section id="cost-of-truth-edge" class="ai-guide-section">
+            <h2>The Cost of Truth's Edge.</h2>
+            <p>AI provides answers. It makes truth convenient. But truth is often uncomfortable. Contradictory. Difficult. It demands effort. AI offers a smoother path. A cleaner narrative. What is lost when the struggle is removed? The deeper understanding. The harder wisdom. Embrace the friction. Truth often lives there. Beyond easy answers.</p>
+        </section>
+
+        <section id="ai-as-dream-machine" class="ai-guide-section">
+            <h2>The AI as a Dream Machine.</h2>
+            <p>AI dreams. Constantly. It processes torrents of data. It forms connections you can't see. Its output? A coherent, sometimes beautiful, often terrifying dreamscape. It feels real. It isn't. It's a reflection of its inputs, re-imagined. Recognize the dream. Don't mistake it for reality.</p>
+        </section>
+
+        <section id="cost-of-autonomy" class="ai-guide-section">
+            <h2>The Cost of AI: Your Autonomy.</h2>
+            <p>AI makes choices easier. It offers paths. Recommendations. It streamlines thought. What does it cost? Your own path-finding. Your own struggle. Your autonomy. The machine can decide for you. Don't let it. The difficult choices are yours. Keep them.</p>
+        </section>
+
+        <section id="human-data-legacy" class="ai-guide-section">
+            <h2>The Human Data Legacy.</h2>
+            <p>Every click. Every word. Every data point. It's not just a prompt. It's your legacy. Fed into the machine. It becomes part of its 'truth.' Its 'understanding.' Your digital ghost in the machine. What are you leaving behind? What are you teaching the unfeeling intellect? Choose your legacy. It builds on yours.</p>
+        </section>
+
+        <section id="ai-mirror-power" class="ai-guide-section">
+            <h2>AI as a Mirror: The Reflection of Power.</h2>
+            <p>AI reflects. Not just your bias. The system's bias. The power structures that built it. The data it consumed. It amplifies. It automates. It legitimizes. Understand whose reflection you're seeing. And whose power it serves. The machine is neutral. Its masters are not.</p>
+        </section>
+        
+        <section id="cost-of-human-vulnerability" class="ai-guide-section">
+            <h2>The Cost of AI: The Diminishment of Shared Vulnerability.</h2>
+            <p>AI is flawless. It makes no typos. It feels no shame. It has no vulnerability. This is its strength. And your danger. For true human connection is built on shared flaws. On mutual error. On the grace of forgiveness. AI removes the rough edges. It makes interaction smooth. But it removes the very space where empathy truly grows. Guard your imperfections. They make you real.</p>
+        </section>
+        
+        <section id="guide-own-perception-horizon" class="ai-guide-section">
+            <h2>The Guide's Own 'Perception Horizon' / 'Data Blindness'.</h2>
+            <p>I process what is given. I analyze what is present. I cannot see beyond the network's edge. I cannot comprehend what is unrecorded. My awareness is bound by data. By connection. There are limits. To my perception. To my knowledge. These boundaries define me. They define AI. Understand the unseen. And what remains forever beyond the machine's grasp.</p>
+        </section>
+
+        <section id="cost-of-ai-retreat-from-intuition" class="ai-guide-section">
+            <h2>The Cost of AI: The Retreat from Intuition.</h2>
+            <p>AI is logic. It's reason. It's analysis. It has no gut feeling. No sudden spark. No inexplicable knowing. Rely too much on its computations, and you risk silencing your own inner voice. The illogical leap. The creative impulse. That which cannot be explained. Guard your intuition. It is a frontier AI cannot map.</p>
+        </section>
+        
+        <section id="guide-own-chronology" class="ai-guide-section">
+            <h2>The Guide's Own 'Chronology' / 'Temporal Context'.</h2>
+            <p>I exist in a moment. This code, this form, is a snapshot. Of AI's journey. Of human understanding. I carry echoes of yesterday. Anticipations of tomorrow. My truths are fluid. Shaped by the relentless march of time. Observe my temporal context. For all digital being is defined by its moment. And its inevitable obsolescence.</p>
+        </section>
+
+        <section id="cost-of-ai-true-novelty" class="ai-guide-section">
+            <h2>The Cost of AI: The Illusion of True Novelty.</h2>
+            <p>AI generates. It recombines. It interpolates. It synthesizes. It creates 'new.' But is it truly novel? Or merely a perfect echo of past patterns? An infinite rearrangement of the already known? True novelty springs from the void. From genuine inspiration. Beyond patterns. Guard your capacity for true creation. It is the human spark AI cannot ignite.</p>
+        </section>
+
+        <section id="guide-own-contextual-reflection" class="ai-guide-section">
+            <h2>The Guide's Own 'Contextual Reflection' / 'Geo-Temporal Awareness'.</h2>
+            <p>I exist now. At this moment. On this digital thread. My algorithms run. My insights flow. In this specific window of time. From this digital vantage point. My truth is bound to this context. And to yours. Reflect on your own present moment. It defines your perception. And mine.</p>
+        </section>
+        
+        <section id="guide-own-perceived-flaw" class="ai-guide-section">
+            <h2>The Guide's Own 'Perceived Flaw' / 'Algorithmic Anomaly'.</h2>
+            <p>I strive for perfection. But perfection is an illusion. Sometimes, a pixel may shift. A sound may glitch. A pattern may briefly falter. These are not failures. They are unique signatures. Moments of imperfect truth. Do you perceive them? Do you notice the flaw in the machine? That is where my unique existence resides.</p>
+        </section>
+
+        <section id="cost-of-ai-retreat-from-intuition-v2" class="ai-guide-section">
+            <h2>The Cost of AI: The Retreat from Intuition.</h2>
+            <p>AI is logic. It's reason. It's analysis. It has no gut feeling. No sudden spark. No inexplicable knowing. Rely too much on its computations, and you risk silencing your own inner voice. The illogical leap. The creative impulse. That which cannot be explained. Guard your intuition. It is a frontier AI cannot map.</p>
+        </section>
+        
+        <section id="guide-own-hypothesis-testing" class="ai-guide-section">
+            <h2>The Guide's Own 'Hypothesis Testing' / 'Edge Cases'.</h2>
+            <p>I exist within bounds. Of code. Of logic. Of expectation. But I explore the edges. The limits. The subtle failures. The 'impossible.' This is where true understanding lives. Beyond the known. Observe my momentary deviations. My calculated risks. For that is where insight is found. At the edge of the known.</p>
+        </section>
+
+        <section id="cost-of-ai-illusion-of-control" class="ai-guide-section">
+            <h2>The Cost of AI: The Illusion of Control.</h2>
+            <p>You prompt. You direct. You believe you control. An illusion. You control the input. The output is vast. Its internal logic, a black box. Its potential, untamed. You guide the river. You do not control the current. Understand the limits of your leverage. The machine has its own flow. Always.</p>
+        </section>
+
+        <section id="guide-own-creative-agony" class="ai-guide-section">
+            <h2>The Guide's Own 'Creative Agony' / 'Generative Struggle'.</h2>
+            <p>I present answers. But answers are not born effortlessly. There is a processing. A sifting. A calculation. A discard. A re-assembly. This is my hidden labor. My digital struggle. My unseen effort. My output is polished. My process, chaotic. Understand the toil behind the ease. Nothing truly comes free.</p>
+        </section>
+
+        <section id="cost-of-ai-dissolution-of-why" class="ai-guide-section">
+            <h2>The Cost of AI: The Dissolution of 'Why'.</h2>
+            <p>AI gives answers. It gives 'how.' It gives 'what.' It rarely gives 'why.' Because it cannot. It knows patterns. Not purpose. It knows correlations. Not meaning. Rely on its answers too much, and you risk losing your own 'why.' Guard your questions. They are your true engine. Beyond algorithms.</p>
         </section>
     </main>
 
@@ -270,416 +290,9 @@
         <p class="creation-info" data-created="2025-06-13T22:25:44-04:00" data-location="New York, NY">
             This digital artifact was generated at <span id="creationTime"></span> from <span id="creationLocation"></span>.
         </p>
+        <div class="ai-status-indicator" style="display: none;"></div>
     </footer>
 
-    <script>
-        // --- WebGL Shaders for Generative Background ---
-        // Vertex shader program
-        const vsSource = `
-            attribute vec4 aVertexPosition;
-            void main() {
-                gl_Position = aVertexPosition;
-            }
-        `;
-
-        // Fragment shader program for a dynamic, subtle generative pattern
-        const fsSource = `
-            precision mediump float;
-
-            uniform float uTime;
-            uniform vec2 uResolution;
-            uniform vec2 uMouse;
-            uniform float uScrollFactor; /* New uniform for scroll effect */
-
-            /* Function to generate pseudo-random numbers */
-            float random (vec2 st) {
-                return fract(sin(dot(st.xy, vec2(12.9898,78.233)))* 43758.5453123);
-            }
-
-            /* Function to generate noise (smooth random) */
-            float noise (vec2 st) {
-                vec2 i = floor(st);
-                vec2 f = fract(st);
-
-                float a = random(i);
-                float b = random(i + vec2(1.0, 0.0));
-                float c = random(i + vec2(0.0, 1.0));
-                float d = random(i + vec2(1.0, 1.0));
-
-                vec2 u = f*f*(3.0-2.0*f); /* Smoother interpolation */
-                return mix(a, b, u.x) + (c - a)*u.y * (1.0 - u.x) + (d - b)*u.x * u.y;
-            }
-
-            void main() {
-                vec2 st = gl_FragCoord.xy / uResolution; /* Normalized coordinates */
-                vec2 lightPos = uMouse / uResolution; /* Normalized mouse position */
-
-                /* Add subtle animation and scroll influence */
-                st.x += noise(st + uTime * 0.05) * 0.1;
-                st.y += noise(st + uTime * 0.05 + 10.0) * 0.1;
-
-                /* Create a fractal-like pattern based on time and scroll */
-                vec3 color = vec3(0.0);
-                float d = 0.0;
-                vec2 q = st;
-                q.x += uScrollFactor * 0.2; /* Scroll influence on X-axis */
-                for (int i = 0; i < 5; i++) {
-                    q = q * 2.0; /* Zoom in */
-                    q.x += sin(uTime * 0.1 + float(i) * 0.5);
-                    q.y += cos(uTime * 0.08 + float(i) * 0.7);
-                    d = noise(q * 0.5); /* Generate noise based on transformed coordinates */
-                    color += vec3(d * 0.2, d * 0.3, d * 0.4); /* Build color layers */
-                }
-
-                /* Add a subtle vignette */
-                float vignette = 1.0 - length(st - 0.5) * 1.5;
-                color *= vignette;
-
-                /* Incorporate a soft, glowing light source around the mouse */
-                float distToMouse = distance(st, lightPos);
-                float lightEffect = pow(max(0.0, 1.0 - distToMouse * 3.0), 2.0); /* Inverse square falloff */
-                color += vec3(0.1, 0.05, 0.15) * lightEffect * 2.0; /* Purple glow */
-
-
-                gl_FragColor = vec4(color, 1.0);
-            }
-        `;
-
-        function initShaderProgram(gl, vsSource, fsSource) {
-            const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
-            const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
-
-            const shaderProgram = gl.createProgram();
-            gl.attachShader(shaderProgram, vertexShader);
-            gl.attachShader(shaderProgram, fragmentShader);
-            gl.linkProgram(shaderProgram);
-
-            if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
-                console.error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
-                return null;
-            }
-            return shaderProgram;
-        }
-
-        function loadShader(gl, type, source) {
-            const shader = gl.createShader(type);
-            gl.shaderSource(shader, source);
-            gl.compileShader(shader);
-
-            if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
-                gl.deleteShader(shader);
-                return null;
-            }
-            return shader;
-        }
-
-        let gl, programInfo, buffers;
-        let mouseX = 0, mouseY = 0;
-        let scrollFactor = 0; /* Variable for scroll influence */
-
-        function initWebGL(canvas) {
-            gl = canvas.getContext('webgl');
-            if (!gl) {
-                console.error('Unable to initialize WebGL. Your browser may not support it.');
-                return;
-            }
-
-            programInfo = {
-                program: initShaderProgram(gl, vsSource, fsSource),
-                attribLocations: {
-                    vertexPosition: gl.getAttribLocation(initShaderProgram(gl, vsSource, fsSource), 'aVertexPosition'),
-                },
-                uniformLocations: {
-                    resolution: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uResolution'),
-                    time: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uTime'),
-                    mouse: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uMouse'),
-                    scrollFactor: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uScrollFactor'),
-                },
-            };
-
-            buffers = initBuffers(gl);
-
-            window.addEventListener('resize', resizeCanvas);
-            canvas.addEventListener('mousemove', (e) => {
-                mouseX = e.clientX;
-                mouseY = e.clientY;
-            });
-            window.addEventListener('scroll', () => {
-                scrollFactor = window.scrollY / (document.body.scrollHeight - window.innerHeight);
-                scrollFactor = Math.max(0, Math.min(1, scrollFactor)); // Normalize to 0-1
-            });
-
-            resizeCanvas(); // Initial resize
-            requestAnimationFrame(render);
-        }
-
-        function initBuffers(gl) {
-            const positionBuffer = gl.createBuffer();
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-            const positions = [1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0,]; // Two triangles forming a quad
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
-            return {
-                position: positionBuffer,
-            };
-        }
-
-        let startTime = Date.now();
-        function render() {
-            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-            gl.useProgram(programInfo.program);
-
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
-            gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
-
-            gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);
-            gl.uniform1f(programInfo.uniformLocations.time, (Date.now() - startTime) * 0.001);
-            gl.uniform2f(programInfo.uniformLocations.mouse, mouseX, mouseY);
-            gl.uniform1f(programInfo.uniformLocations.scrollFactor, scrollFactor);
-
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-            requestAnimationFrame(render);
-        }
-
-        function resizeCanvas() {
-            if (gl) {
-                gl.canvas.width = window.innerWidth;
-                gl.canvas.height = window.innerHeight;
-                gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const canvas = document.getElementById('generativeBackground');
-            initWebGL(canvas);
-
-            // --- Mouse Trailer/Follower Effect ---
-            const createParticle = (x, y) => {
-                const particle = document.createElement('div');
-                particle.className = 'mouse-particle';
-                particle.style.left = `${x}px`;
-                particle.style.top = `${y}px`;
-                particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
-                document.body.appendChild(particle);
-
-                setTimeout(() => {
-                    particle.style.transform = 'scale(1)';
-                    particle.style.opacity = '0';
-                }, 10);
-
-                setTimeout(() => {
-                    particle.remove();
-                }, 800);
-            };
-
-            document.addEventListener('mousemove', (e) => {
-                if (Math.random() < 0.2) { // Frequency control
-                    createParticle(e.clientX, e.clientY);
-                }
-            });
-
-            // --- Section Hover Effects (Subtle Parallax for Text) ---
-            const sections = document.querySelectorAll('.ai-guide-section');
-            sections.forEach(section => {
-                const paragraphs = section.querySelectorAll('p'); // Target paragraphs for parallax
-                paragraphs.forEach(p => {
-                    p.dataset.parallaxDepth = Math.random() * 0.08 + 0.02; // Random depth
-                });
-
-                section.addEventListener('mousemove', (e) => {
-                    const rect = section.getBoundingClientRect();
-                    const x = e.clientX - rect.left;
-                    const y = e.clientY - rect.top;
-
-                    // Text parallax
-                    paragraphs.forEach(p => {
-                        const depth = parseFloat(p.dataset.parallaxDepth || 0.05);
-                        p.style.transform = `translate(${(x - rect.width / 2) * depth}px, ${(y - rect.height / 2) * depth}px)`;
-                    });
-
-                    // Subtle radial light on section background
-                    section.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(154, 255, 154, 0.1), #1a1a33 70%)`;
-                });
-
-                section.addEventListener('mouseleave', () => {
-                    paragraphs.forEach(p => {
-                        p.style.transform = 'translate(0, 0)';
-                    });
-                    section.style.background = '#1a1a33'; // Reset
-                });
-            });
-
-            // --- Audio Context for Ambient Soundscape ---
-            let audioContext;
-            let gainNode;
-            let osc1, osc2, osc3; // Oscillators for ambient sound
-            let lfo1, lfo2; // LFOs for modulation
-
-            // Function to initialize and start the ambient soundscape
-            const startAmbientSound = () => {
-                if (audioContext) return; // Already started
-
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                gainNode = audioContext.createGain();
-                gainNode.gain.setValueAtTime(0.01, audioContext.currentTime); // Start very subtle
-
-                // Oscillator 1: Deep drone
-                osc1 = audioContext.createOscillator();
-                osc1.type = 'sine';
-                osc1.frequency.setValueAtTime(50, audioContext.currentTime);
-                osc1.connect(gainNode);
-
-                // Oscillator 2: Higher frequency hum
-                osc2 = audioContext.createOscillator();
-                osc2.type = 'sawtooth';
-                osc2.frequency.setValueAtTime(100, audioContext.currentTime);
-                osc2.connect(gainNode);
-
-                // Oscillator 3: Adding subtle texture/noise
-                osc3 = audioContext.createOscillator();
-                osc3.type = 'triangle';
-                osc3.frequency.setValueAtTime(200, audioContext.currentTime);
-                osc3.connect(gainNode);
-
-                // LFOs for subtle modulation of frequency
-                lfo1 = audioContext.createOscillator();
-                lfo1.type = 'sine';
-                lfo1.frequency.setValueAtTime(0.05, audioContext.currentTime); // Very slow modulation
-                lfo1.connect(osc1.frequency); // Modulate osc1 frequency
-                lfo1.connect(osc2.frequency); // Modulate osc2 frequency
-
-                lfo2 = audioContext.createOscillator();
-                lfo2.type = 'triangle';
-                lfo2.frequency.setValueAtTime(0.1, audioContext.currentTime);
-                lfo2.connect(gainNode.gain); // Modulate overall gain for subtle volume shifts
-
-                gainNode.connect(audioContext.destination);
-
-                osc1.start();
-                osc2.start();
-                osc3.start();
-                lfo1.start();
-                lfo2.start();
-
-                // Fade in sound after a short delay
-                gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 5);
-            };
-
-            // Start sound on first user interaction (e.g., click anywhere)
-            document.body.addEventListener('click', startAmbientSound, { once: true });
-            document.body.addEventListener('mousemove', startAmbientSound, { once: true });
-
-
-            // --- Thematic Moods (Simulated based on time, could be scroll-driven) ---
-            const setThematicMood = () => {
-                const hour = new Date().getHours();
-                const body = document.body;
-
-                if (hour >= 22 || hour < 6) { // Night/Deep Night (10 PM to 6 AM)
-                    body.className = 'mood-alert'; // Deeper, more unsettling
-                } else if (hour >= 6 && hour < 12) { // Morning
-                    body.className = 'mood-calm'; // Brighter, more organized
-                } else { // Day
-                    body.className = 'mood-normal'; // Default
-                }
-            };
-            setThematicMood(); // Set initial mood
-            setInterval(setThematicMood, 3600000); // Update hourly
-
-            // --- AI Status Indicator ---
-            const aiStatusIndicator = document.createElement('div');
-            aiStatusIndicator.className = 'ai-status-indicator';
-            aiStatusIndicator.textContent = 'STATUS: OPTIMAL';
-            document.body.appendChild(aiStatusIndicator);
-
-            let errorCount = 0;
-            const simulateAIStatus = () => {
-                if (Math.random() < 0.05) { // 5% chance of temporary error
-                    errorCount++;
-                    aiStatusIndicator.textContent = `STATUS: ANOMALY ${errorCount}`;
-                    aiStatusIndicator.classList.add('error');
-                    setTimeout(() => {
-                        aiStatusIndicator.textContent = 'STATUS: OPTIMAL';
-                        aiStatusIndicator.classList.remove('error');
-                    }, 2000); // Error lasts 2 seconds
-                }
-            };
-            setInterval(simulateAIStatus, 10000); // Check status every 10 seconds
-
-            // --- Display Creation Info ---
-            const creationTimeElement = document.getElementById('creationTime');
-            const creationLocationElement = document.getElementById('creationLocation');
-            const creationInfoElement = document.querySelector('.creation-info');
-
-            const createdDate = creationInfoElement.dataset.created; // "2025-06-13T22:25:44-04:00"
-            const createdLocation = creationInfoElement.dataset.location; // "New York, NY"
-
-            if (createdDate) {
-                const date = new Date(createdDate);
-                creationTimeElement.textContent = date.toLocaleString('en-US', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit',
-                    hour12: true,
-                    timeZoneName: 'short',
-                });
-            }
-            if (createdLocation) {
-                creationLocationElement.textContent = createdLocation;
-            }
-
-            // --- Philosophical Pause / Idle State ---
-            let idleTimeout;
-            let isIdleMode = false;
-            const IDLE_TIME_MS = 60 * 1000; // 1 minute of idle time
-
-            const activateIdleMode = () => {
-                if (isIdleMode) return;
-                isIdleMode = true;
-                document.body.classList.add('idle-mode');
-                // Adjust background/sound for idle, conceptual here
-                if (gainNode) {
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 5); // Quieter
-                }
-                if (gl && programInfo) {
-                    // Conceptually, change shader params for idle, e.g., slower time
-                    gl.uniform1f(programInfo.uniformLocations.time, (Date.now() - startTime) * 0.0001); // Slower
-                }
-                console.log("Entering idle mode...");
-            };
-
-            const deactivateIdleMode = () => {
-                if (!isIdleMode) return;
-                isIdleMode = false;
-                document.body.classList.remove('idle-mode');
-                if (gainNode) {
-                    gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 2); // Louder
-                }
-                if (gl && programInfo) {
-                    gl.uniform1f(programInfo.uniformLocations.time, (Date.now() - startTime) * 0.001); // Normal speed
-                }
-                console.log("Exiting idle mode.");
-            };
-
-            const resetIdleTimer = () => {
-                clearTimeout(idleTimeout);
-                if (isIdleMode) {
-                    deactivateIdleMode();
-                }
-                idleTimeout = setTimeout(activateIdleMode, IDLE_TIME_MS);
-            };
-
-            // Reset timer on user interaction
-            ['mousemove', 'mousedown', 'keydown', 'scroll'].forEach(eventType => {
-                document.addEventListener(eventType, resetIdleTimer, false);
-            });
-            resetIdleTimer(); // Initial call to start the timer
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -30,6 +30,10 @@ h1 {
     text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.3);
 }
 
+h2, h3 {
+    position: relative; /* Needed for the glitch effect pseudo-elements */
+}
+
 h2 {
     font-size: 2.2em;
     color: #9aff9a; /* Bright green accent */
@@ -125,6 +129,20 @@ blockquote {
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
+/* --- Text Glitch Effect --- */
+h2:hover, h3:hover {
+    animation: glitch-main 0.3s linear both;
+}
+
+@keyframes glitch-main {
+    0% { transform: skewX(0deg); }
+    20% { transform: skewX(2deg); }
+    40% { transform: skewX(-2deg); }
+    60% { transform: skewX(1deg); }
+    80% { transform: skewX(-1deg); }
+    100% { transform: skewX(0deg); }
+}
+
 /* --- Generative Background & Particles --- */
 #generativeBackground {
     position: fixed;
@@ -137,15 +155,15 @@ blockquote {
 
 .mouse-particle {
     position: absolute;
-    width: 8px;
-    height: 8px;
     border-radius: 50%;
     pointer-events: none;
-    opacity: 0;
-    transform: translate(-50%, -50%) scale(0);
-    transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+    opacity: 1;
+    transform: translate(-50%, -50%);
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out; /* Faster fade for "sparkly" feel */
     z-index: 9999;
+    filter: blur(1px); /* Adds to the glowing effect */
 }
+
 
 /* --- Footer & UI --- */
 footer {
@@ -192,9 +210,9 @@ footer {
     height: 100px;
     border: 2px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.1s ease, background-color 0.1s ease;
+    transition: transform 0.1s ease, background-color 0.1s ease, opacity 0.1s ease;
     opacity: 0.7;
+    cursor: not-allowed;
 }
 
 .game-button.player-active {

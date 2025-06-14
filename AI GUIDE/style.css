@@ -92,14 +92,8 @@ ul li:hover {
 
 /* Cool visual effects ideas */
 
-/* Pulsating shadow for interactive elements */
-.ai-rules p, .pruning-concept ul li, .ai-accuracy-analogy p {
-    position: relative;
-    overflow: hidden;
-    /* This will be enabled/controlled by JS for dynamic effects */
-    /* animation: pulse-shadow 2s infinite alternate; */
-}
-
+/* Pulsating shadow for interactive elements (controlled by JS if needed) */
+/* animation: pulse-shadow 2s infinite alternate; */
 @keyframes pulse-shadow {
     from { box-shadow: 0 0 5px rgba(154, 255, 154, 0.5); }
     to { box-shadow: 0 0 20px rgba(154, 255, 154, 0.8); }
@@ -118,4 +112,149 @@ body::before {
     /* background-image: radial-gradient(#2a0050 1px, transparent 1px); */
     /* background-size: 20px 20px; */
     /* opacity: 0.2; */
+}
+
+
+/* Style for blockquote to visually distinguish quotes */
+blockquote {
+    background-color: #0f0f20; /* Slightly darker background */
+    border-left: 5px solid #9aff9a; /* Accent border */
+    padding: 20px;
+    margin: 20px 0;
+    font-style: italic;
+    color: #c0c0e0;
+    border-radius: 5px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3); /* Subtle inner shadow */
+}
+
+blockquote p {
+    margin-bottom: 10px;
+}
+
+blockquote cite {
+    display: block;
+    text-align: right;
+    margin-top: 15px;
+    font-size: 0.9em;
+    color: #a0a0c0;
+    font-style: normal; /* Override italic for citation */
+}
+
+
+/* Styling for the Infographic Rules List */
+.ai-rules-list {
+    list-style: none; /* Remove default numbering */
+    padding: 0;
+    margin-top: 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Space between rule items */
+}
+
+.rule-item {
+    background-color: #2a2a47; /* Default background color for each rule box */
+    padding: 15px 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden; /* For pseudo-elements */
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.rule-item:hover {
+    transform: translateY(-3px); /* Subtle lift on hover */
+    background-color: #3a3a5a;
+}
+
+.rule-item h3 {
+    margin-top: 0;
+    margin-bottom: 5px;
+    font-size: 1.3em;
+    color: #9aff9a; /* Bright color for rule titles */
+    position: relative;
+    padding-left: 40px; /* Space for the numbered circle */
+}
+
+.rule-item h3::before {
+    content: attr(data-rule-number); /* Use the data-rule-number for the content */
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #5a0080; /* Circle background */
+    color: #fff;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1em;
+    font-weight: bold;
+    border: 2px solid #9aff9a; /* Border for the circle */
+}
+
+.rule-item p {
+    font-size: 1em;
+    color: #e0e0f0;
+    margin-bottom: 0;
+    padding-left: 40px; /* Align text with title after number */
+}
+
+/* Specific background colors for each rule item based on the infographic's bands */
+.rule-item[data-rule-number="10"],
+.rule-item[data-rule-number="6"],
+.rule-item[data-rule-number="2"] {
+    background-color: #3d0073; /* Purple band color */
+}
+
+.rule-item[data-rule-number="9"],
+.rule-item[data-rule-number="5"],
+.rule-item[data-rule-number="1"] {
+    background-color: #503d00; /* Yellow/orange band color */
+}
+
+.rule-item[data-rule-number="8"],
+.rule-item[data-rule-number="4"] {
+    background-color: #33004c; /* Darker purple band color */
+}
+
+.rule-item[data-rule-number="7"],
+.rule-item[data-rule-number="3"] {
+    background-color: #332100; /* Darker yellow/orange band color */
+}
+
+
+/* Styling for the Foundational Rule */
+.foundational-rule {
+    background-color: #ffcc00; /* Yellow background from infographic */
+    color: #333; /* Dark text for contrast */
+    padding: 20px;
+    margin-top: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    text-align: center;
+}
+
+.foundational-rule h3 {
+    color: #333; /* Ensure dark text */
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.5em;
+    letter-spacing: 1px;
+}
+
+.foundational-rule p {
+    color: #555;
+    font-weight: bold;
+    font-size: 1.1em;
+    line-height: 1.4;
+    margin-bottom: 0;
+}
+
+.infographic-intro {
+    font-size: 1.1em;
+    color: #c0c0e0;
+    margin-bottom: 25px;
+    text-align: center;
 }

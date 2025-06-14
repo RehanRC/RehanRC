@@ -158,13 +158,6 @@ footer {
     background-color: #1a1a33;
 }
 
-#muteButton { /* This style is a backup if JS fails, but JS sets it directly now */
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 10000;
-}
-
 /* --- MEMORY SEQUENCE MINI-GAME --- */
 #mini-game-container {
     border-color: #9aff9a;
@@ -201,19 +194,26 @@ footer {
     border-radius: 8px;
     cursor: pointer;
     transition: transform 0.1s ease, background-color 0.1s ease;
+    opacity: 0.7;
 }
 
-.game-button:hover {
+.game-button.player-active {
+    opacity: 1;
+    cursor: pointer;
+}
+
+.game-button.player-active:hover {
     transform: scale(1.05);
 }
 
-#btn-0 { background-color: #3b8d99; } /* Teal */
-#btn-1 { background-color: #993b3b; } /* Red */
-#btn-2 { background-color: #998a3b; } /* Yellow */
-#btn-3 { background-color: #4d993b; } /* Green */
+#btn-0 { background-color: #00a1b0; } /* Teal */
+#btn-1 { background-color: #b00000; } /* Red */
+#btn-2 { background-color: #b0a100; } /* Yellow */
+#btn-3 { background-color: #00b03b; } /* Green */
 
 .game-button.lit {
     transform: scale(1.1);
+    opacity: 1;
     box-shadow: 0 0 25px 5px currentColor;
 }
 
@@ -235,5 +235,6 @@ footer {
 
 #start-game-btn:disabled {
     background-color: #555;
+    color: #888;
     cursor: not-allowed;
 }

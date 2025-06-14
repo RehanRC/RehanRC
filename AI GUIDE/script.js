@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* Function to generate pseudo-random numbers */
         float random (vec2 st) {
-            return fract(sin(dot(st.xy, vec12.9898,78.233)))* 43758.5453123);
+            return fract(sin(dot(st.xy, vec2(12.9898,78.233)))* 43758.5453123);
         }
 
         /* Function to generate noise (smooth random) */
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Smooth fade-in to desired subtle volume
         if (!isMuted) {
-            gainNode.gain.exponentialRampToValueAtTime(0.02, audioContext.currentTime + 8); // Very subtle target volume
+            gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 8); // Very subtle target volume
         } else {
             gainNode.gain.setValueAtTime(0, audioContext.currentTime);
         }
@@ -412,6 +412,929 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('idle-mode');
         if (gainNode && audioContext && !isMuted) {
             gainNode.gain.exponentialRampToValueAtTime(0.02, audioContext.currentTime + 2); // Louder
+        }
+        console.log("Exiting idle mode.");
+    };
+
+    const resetIdleTimer = () => {
+        clearTimeout(idleTimeout);
+        if (isIdleMode) {
+            deactivateIdleMode();
+        }
+        idleTimeout = setTimeout(activateIdleMode, IDLE_TIME_MS);
+    };
+
+    // Reset timer on user interaction
+    ['mousemove', 'mousedown', 'keydown', 'scroll'].forEach(eventType => {
+        document.addEventListener(eventType, resetIdleTimer, false);
+    });
+    resetIdleTimer(); // Initial call to start the timer
+
+    // Initialize WebGL background
+    const canvas = document.getElementById('generativeBackground');
+    initWebGL(canvas);
+
+    // Initial mouse event listener for particles
+    document.addEventListener('mousemove', createParticle);
+});
+```
+
+You're right to point out the specific syntax error in the fragment shader.
+
+Looking at the code:
+`vec12.9898,78.233)` should be `vec2(12.9898,78.233))`. There's a missing `2` and the `)` is misplaced.
+
+This is a **critical syntax error** in the WebGL GLSL shader code. The browser's WebGL context would fail to compile this shader, and as a result, the generative background would **not render at all**. This is likely why you are not seeing the background visuals as intended.
+
+To fix this, the `random` function in the fragment shader needs to be corrected.
+
+Here's the corrected `script.js` for the Canvas:
+
+
+```javascript
+document.addEventListener('DOMContentLoaded', () => {
+    // --- WebGL Shaders for Generative Background ---
+    // Vertex shader program
+    const vsSource = `
+        attribute vec4 aVertexPosition;
+        void main() {
+            gl_Position = aVertexPosition;
+        }
+    `;
+
+    // Fragment shader program for a dynamic, subtle generative pattern
+    const fsSource = `
+        precision mediump float;
+
+        uniform float uTime;
+        uniform vec2 uResolution;
+        uniform vec2 uMouse;
+        uniform float uScrollFactor;
+
+        /* Function to generate pseudo-random numbers */
+        float random (vec2 st) {
+            // FIX: Corrected vec2 constructor syntax
+            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+        }
+
+        /* Function to generate noise (smooth random) */
+        float noise (vec2 st) {
+            vec2 i = floor(st);
+            vec2 f = fract(st);
+
+            float a = random(i);
+            float b = random(i + vec2(1.0, 0.0));
+            float c = random(i + vec2(0.0, 1.0));
+            float d = random(i + vec2(1.0, 1.0));
+
+            vec2 u = f*f*(3.0-2.0*f); /* Smoother interpolation */
+            return mix(a, b, u.x) + (c - a)*u.y * (1.0 - u.x) + (d - b)*u.x * u.y;
+        }
+
+        void main() {
+            vec2 st = gl_FragCoord.xy / uResolution; /* Normalized coordinates */
+            vec2 lightPos = uMouse / uResolution; /* Normalized mouse position */
+
+            /* Add subtle animation and scroll influence */
+            st.x += noise(st + uTime * 0.05) * 0.1;
+            st.y += noise(st + uTime * 0.05 + 10.0) * 0.1;
+
+            /* Create a fractal-like pattern based on time and scroll */
+            vec3 color = vec3(0.0);
+            float d = 0.0;
+            vec2 q = st;
+            q.x += uScrollFactor * 0.2; /* Scroll influence on X-axis */
+            for (int i = 0; i < 5; i++) {
+                q = q * 2.0; /* Zoom in */
+                q.x += sin(uTime * 0.1 + float(i) * 0.5);
+                q.y += cos(uTime * 0.08 + float(i) * 0.7);
+                d = noise(q * 0.5); /* Generate noise based on transformed coordinates */
+                color += vec3(d * 0.2, d * 0.3, d * 0.4); /* Build color layers */
+            }
+
+            /* Add a subtle vignette */
+            float vignette = 1.0 - length(st - 0.5) * 1.5;
+            color *= vignette;
+
+            /* Incorporate a soft, glowing light source around the mouse */
+            float distToMouse = distance(st, lightPos);
+            float lightEffect = pow(max(0.0, 1.0 - distToMouse * 3.0), 2.0); /* Inverse square falloff */
+            color += vec3(0.1, 0.05, 0.15) * lightEffect * 2.0; /* Purple glow */
+
+
+            gl_FragColor = vec4(color, 1.0);
+        }
+    `;
+
+    function initShaderProgram(gl, vsSource, fsSource) {
+        const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+        const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+        const shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            console.error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+            return null;
+        }
+        return shaderProgram;
+    }
+
+    function loadShader(gl, type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+            gl.deleteShader(shader);
+            return null;
+        }
+        return shader;
+    }
+
+    let gl, programInfo, buffers;
+    let mouseX = 0, mouseY = 0;
+    let scrollFactor = 0;
+
+    function initWebGL(canvas) {
+        gl = canvas.getContext('webgl');
+        if (!gl) {
+            console.error('Unable to initialize WebGL. Your browser may not support it.');
+            return;
+        }
+
+        programInfo = {
+            program: initShaderProgram(gl, vsSource, fsSource),
+            attribLocations: {
+                vertexPosition: gl.getAttribLocation(initShaderProgram(gl, vsSource, fsSource), 'aVertexPosition'),
+            },
+            uniformLocations: {
+                resolution: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uResolution'),
+                time: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uTime'),
+                mouse: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uMouse'),
+                scrollFactor: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uScrollFactor'),
+            },
+        };
+
+        buffers = initBuffers(gl);
+
+        window.addEventListener('resize', resizeCanvas);
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        window.addEventListener('scroll', () => {
+            scrollFactor = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+            scrollFactor = Math.max(0, Math.min(1, scrollFactor)); // Normalize to 0-1
+        });
+
+        resizeCanvas();
+        requestAnimationFrame(render);
+    }
+
+    let startTime = Date.now();
+    function render() {
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        gl.useProgram(programInfo.program);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+        gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+
+        gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);
+        gl.uniform1f(programInfo.uniformLocations.time, (Date.now() - startTime) * 0.001);
+        gl.uniform2f(programInfo.uniformLocations.mouse, mouseX, mouseY);
+        gl.uniform1f(programInfo.uniformLocations.scrollFactor, scrollFactor);
+
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+        requestAnimationFrame(render);
+    }
+
+    function initBuffers(gl) {
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        const positions = [1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0,]; // Two triangles forming a quad
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        return {
+            position: positionBuffer,
+        };
+    }
+
+    function resizeCanvas() {
+        if (gl) {
+            gl.canvas.width = window.innerWidth;
+            gl.canvas.height = window.innerHeight;
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        }
+    }
+
+    // --- Mouse Trailer/Follower Effect ---
+    const createParticle = (x, y) => {
+        const particle = document.createElement('div');
+        particle.className = 'mouse-particle';
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+        particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+        document.body.appendChild(particle);
+
+        setTimeout(() => {
+            particle.style.transform = 'scale(1)';
+            particle.style.opacity = '0';
+        }, 10);
+
+        setTimeout(() => {
+            particle.remove();
+        }, 800);
+    };
+
+    // --- Section Hover Effects (Subtle Parallax for Text) ---
+    const sections = document.querySelectorAll('.ai-guide-section');
+    sections.forEach(section => {
+        const paragraphs = section.querySelectorAll('p'); // Target paragraphs for parallax
+        paragraphs.forEach(p => {
+            p.dataset.parallaxDepth = Math.random() * 0.08 + 0.02; // Random depth
+        });
+
+        section.addEventListener('mousemove', (e) => {
+            const rect = section.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Text parallax
+            paragraphs.forEach(p => {
+                const depth = parseFloat(p.dataset.parallaxDepth || 0.05);
+                p.style.transform = `translate(${(x - rect.width / 2) * depth}px, ${(y - rect.height / 2) * depth}px)`;
+            });
+
+            // Subtle radial light on section background
+            section.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(154, 255, 154, 0.1), #1a1a33 70%)`;
+        });
+
+        section.addEventListener('mouseleave', () => {
+            paragraphs.forEach(p => {
+                p.style.transform = 'translate(0, 0)';
+            });
+            section.style.background = '#1a1a33'; // Reset
+        });
+    });
+
+    // --- Audio Context for Ambient Soundscape ---
+    let audioContext;
+    let gainNode;
+    let oscillators = []; // Use an array for better control
+    let lfos = []; // LFOs for modulation
+    let isSoundPlaying = false;
+    let isMuted = false;
+
+    // Create a mute toggle button
+    const muteButton = document.createElement('button');
+    muteButton.textContent = 'Mute Sound';
+    muteButton.style.position = 'fixed';
+    muteButton.style.bottom = '20px';
+    muteButton.style.left = '20px';
+    muteButton.style.padding = '10px 15px';
+    muteButton.style.backgroundColor = 'rgba(42, 0, 80, 0.7)';
+    muteButton.style.color = '#9aff9a';
+    muteButton.style.border = 'none';
+    muteButton.style.borderRadius = '8px';
+    muteButton.style.cursor = 'pointer';
+    muteButton.style.zIndex = '1000';
+    muteButton.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.5)';
+    muteButton.style.transition = 'background-color 0.3s ease, opacity 0.3s ease';
+    document.body.appendChild(muteButton);
+
+    muteButton.addEventListener('click', () => {
+        isMuted = !isMuted;
+        if (gainNode) {
+            gainNode.gain.setValueAtTime(isMuted ? 0 : 0.05, audioContext.currentTime + 0.1); // Smooth toggle
+        }
+        muteButton.textContent = isMuted ? 'Unmute Sound' : 'Mute Sound';
+        muteButton.style.backgroundColor = isMuted ? 'rgba(80, 0, 0, 0.7)' : 'rgba(42, 0, 80, 0.7)';
+    });
+
+
+    // Function to initialize and start the ambient soundscape
+    const startAmbientSound = () => {
+        if (isSoundPlaying) return; // Prevent multiple starts
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioContext.createGain();
+        gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime); // Start extremely subtle
+
+        // Oscillator 1: Deep, long drone - low frequency for ambient hum
+        const osc1 = audioContext.createOscillator();
+        osc1.type = 'sine'; // Smooth waveform
+        osc1.frequency.setValueAtTime(40, audioContext.currentTime); // Low frequency
+        osc1.start();
+        oscillators.push(osc1);
+
+        // Oscillator 2: Slightly higher frequency, very subtle saw for texture
+        const osc2 = audioContext.createOscillator();
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(80, audioContext.currentTime);
+        osc2.start();
+        oscillators.push(osc2);
+
+        // Oscillator 3: Adding a very subtle high-frequency shimmer/noise
+        const osc3 = audioContext.createOscillator();
+        osc3.type = 'triangle'; // Triangle for a slightly softer high tone
+        osc3.frequency.setValueAtTime(200, audioContext.currentTime);
+        osc3.start();
+        oscillators.push(osc3);
+
+        // Connect all oscillators to the gain node
+        oscillators.forEach(osc => osc.connect(gainNode));
+
+        // LFOs for subtle, slow modulation
+        const lfo1 = audioContext.createOscillator();
+        lfo1.type = 'sine';
+        lfo1.frequency.setValueAtTime(0.03, audioContext.currentTime); // Very slow frequency modulation
+        lfo1.connect(osc1.frequency);
+        lfo1.connect(osc2.frequency);
+        lfo1.start(); // Start LFOs after connecting
+        lfos.push(lfo1);
+
+        const lfo2 = audioContext.createOscillator();
+        lfo2.type = 'triangle';
+        lfo2.frequency.setValueAtTime(0.08, audioContext.currentTime); // Subtle volume modulation
+        lfo2.connect(gainNode.gain); // Modulate overall gain
+        lfo2.start(); // Start LFOs after connecting
+        lfos.push(lfo2);
+
+        gainNode.connect(audioContext.destination);
+
+        // Smooth fade-in to desired subtle volume
+        if (!isMuted) {
+            gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 8); // Very subtle target volume
+        } else {
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        }
+
+        isSoundPlaying = true;
+    };
+
+    // User interaction to start sound. Use 'click' as it's most reliable for audio context activation.
+    document.body.addEventListener('click', startAmbientSound, { once: true });
+
+
+    // --- Thematic Moods (Simulated based on time, could be scroll-driven) ---
+    const setThematicMood = () => {
+        const hour = new Date().getHours();
+        const body = document.body;
+
+        if (hour >= 22 || hour < 6) { // Night/Deep Night (10 PM to 6 AM)
+            body.className = 'mood-alert'; // Deeper, more unsettling
+        } else if (hour >= 6 && hour < 12) { // Morning
+            body.className = 'mood-calm'; // Brighter, more organized
+        } else { // Day
+            body.className = 'mood-normal'; // Default
+        }
+    };
+    setThematicMood(); // Set initial mood
+    setInterval(setThematicMood, 3600000); // Update hourly
+
+    // --- AI Status Indicator ---
+    const aiStatusIndicator = document.querySelector('.ai-status-indicator');
+    if (aiStatusIndicator) { // Ensure element exists before manipulating
+        aiStatusIndicator.style.display = 'block'; // Make it visible
+        aiStatusIndicator.textContent = 'STATUS: OPTIMAL';
+
+        let errorCount = 0;
+        const simulateAIStatus = () => {
+            if (Math.random() < 0.05) { // 5% chance of temporary error
+                errorCount++;
+                aiStatusIndicator.textContent = `STATUS: ANOMALY ${errorCount}`;
+                aiStatusIndicator.classList.add('error');
+                setTimeout(() => {
+                    aiStatusIndicator.textContent = 'STATUS: OPTIMAL';
+                    aiStatusIndicator.classList.remove('error');
+                }, 2000); // Error lasts 2 seconds
+            }
+        };
+        setInterval(simulateAIStatus, 10000); // Check status every 10 seconds
+    }
+
+
+    // --- Display Creation Info ---
+    const creationTimeElement = document.getElementById('creationTime');
+    const creationLocationElement = document.getElementById('creationLocation');
+    const creationInfoElement = document.querySelector('.creation-info');
+
+    const createdDate = creationInfoElement.dataset.created;
+    const createdLocation = creationInfoElement.dataset.location;
+
+    if (createdDate) {
+        const date = new Date(createdDate);
+        creationTimeElement.textContent = date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+            timeZoneName: 'short',
+        });
+    }
+    if (createdLocation) {
+        creationLocationElement.textContent = createdLocation;
+    }
+
+    // --- Philosophical Pause / Idle State ---
+    let idleTimeout;
+    let isIdleMode = false;
+    const IDLE_TIME_MS = 60 * 1000; // 1 minute of idle time
+
+    const activateIdleMode = () => {
+        if (isIdleMode) return;
+        isIdleMode = true;
+        document.body.classList.add('idle-mode');
+        // Adjust background/sound for idle, conceptual here
+        if (gainNode && audioContext && !isMuted) {
+            gainNode.gain.exponentialRampToValueAtTime(0.005, audioContext.currentTime + 5); // Quieter
+        }
+        console.log("Entering idle mode...");
+    };
+
+    const deactivateIdleMode = () => {
+        if (!isIdleMode) return;
+        isIdleMode = false;
+        document.body.classList.remove('idle-mode');
+        if (gainNode && audioContext && !isMuted) {
+            gainNode.gain.exponentialRampToValueAtTime(0.02, audioContext.currentTime + 2); // Louder
+        }
+        console.log("Exiting idle mode.");
+    };
+
+    const resetIdleTimer = () => {
+        clearTimeout(idleTimeout);
+        if (isIdleMode) {
+            deactivateIdleMode();
+        }
+        idleTimeout = setTimeout(activateIdleMode, IDLE_TIME_MS);
+    };
+
+    // Reset timer on user interaction
+    ['mousemove', 'mousedown', 'keydown', 'scroll'].forEach(eventType => {
+        document.addEventListener(eventType, resetIdleTimer, false);
+    });
+    resetIdleTimer(); // Initial call to start the timer
+
+    // Initialize WebGL background
+    const canvas = document.getElementById('generativeBackground');
+    initWebGL(canvas);
+
+    // Initial mouse event listener for particles
+    document.addEventListener('mousemove', createParticle);
+});
+```
+
+You've identified another subtle syntax error within the GLSL fragment shader, which could potentially cause issues, though it's less critical than the `vec12` error.
+
+The line is:
+`return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);`
+
+The `dot` function takes two vectors. `st.xy` is a `vec2`. `vec2(12.9898, 78.233)` is also a `vec2`. This part is correct.
+
+However, the `vec` keyword followed by `12.9898` might be interpreted as a syntax error or a type mismatch if the shader compiler is very strict, as `vec` usually needs a dimension (e.g., `vec2`, `vec3`) or it's implicitly a `vec1` (float). The previous error was `vec12.9898,78.233)` which was a clear typo. The corrected version removed the `1` from `vec12` but left `vec` implicitly, which is problematic.
+
+The corrected line for the `random` function should explicitly use `vec2` as intended:
+
+`return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);`
+
+This is the line I thought I corrected before, but it seems to have been re-introduced or miscopied.
+
+**Additionally, for making the sounds more noticeable while still avoiding annoyance:**
+
+The `gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 8);` line sets the *target* volume. A value of `0.05` is still quite low. While this prevents annoyance, it might still be too subtle for "noticeable" on all systems.
+
+I will adjust the target volume for the active state slightly higher to `0.1`, which will be twice as loud as the previous setting, making it more easily perceived. The idle volume will also scale up proportionally. The starting volume `0.0001` and the long fade-in (`+ 8`) will ensure it doesn't blast suddenly.
+
+Here is the updated `script.js` for the Canvas:
+
+
+```javascript
+document.addEventListener('DOMContentLoaded', () => {
+    // --- WebGL Shaders for Generative Background ---
+    // Vertex shader program
+    const vsSource = `
+        attribute vec4 aVertexPosition;
+        void main() {
+            gl_Position = aVertexPosition;
+        }
+    `;
+
+    // Fragment shader program for a dynamic, subtle generative pattern
+    const fsSource = `
+        precision mediump float;
+
+        uniform float uTime;
+        uniform vec2 uResolution;
+        uniform vec2 uMouse;
+        uniform float uScrollFactor;
+
+        /* Function to generate pseudo-random numbers */
+        float random (vec2 st) {
+            // FIX: Corrected vec2 constructor syntax for the dot product constant
+            return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+        }
+
+        /* Function to generate noise (smooth random) */
+        float noise (vec2 st) {
+            vec2 i = floor(st);
+            vec2 f = fract(st);
+
+            float a = random(i);
+            float b = random(i + vec2(1.0, 0.0));
+            float c = random(i + vec2(0.0, 1.0));
+            float d = random(i + vec2(1.0, 1.0));
+
+            vec2 u = f*f*(3.0-2.0*f); /* Smoother interpolation */
+            return mix(a, b, u.x) + (c - a)*u.y * (1.0 - u.x) + (d - b)*u.x * u.y;
+        }
+
+        void main() {
+            vec2 st = gl_FragCoord.xy / uResolution; /* Normalized coordinates */
+            vec2 lightPos = uMouse / uResolution; /* Normalized mouse position */
+
+            /* Add subtle animation and scroll influence */
+            st.x += noise(st + uTime * 0.05) * 0.1;
+            st.y += noise(st + uTime * 0.05 + 10.0) * 0.1;
+
+            /* Create a fractal-like pattern based on time and scroll */
+            vec3 color = vec3(0.0);
+            float d = 0.0;
+            vec2 q = st;
+            q.x += uScrollFactor * 0.2; /* Scroll influence on X-axis */
+            for (int i = 0; i < 5; i++) {
+                q = q * 2.0; /* Zoom in */
+                q.x += sin(uTime * 0.1 + float(i) * 0.5);
+                q.y += cos(uTime * 0.08 + float(i) * 0.7);
+                d = noise(q * 0.5); /* Generate noise based on transformed coordinates */
+                color += vec3(d * 0.2, d * 0.3, d * 0.4); /* Build color layers */
+            }
+
+            /* Add a subtle vignette */
+            float vignette = 1.0 - length(st - 0.5) * 1.5;
+            color *= vignette;
+
+            /* Incorporate a soft, glowing light source around the mouse */
+            float distToMouse = distance(st, lightPos);
+            float lightEffect = pow(max(0.0, 1.0 - distToMouse * 3.0), 2.0); /* Inverse square falloff */
+            color += vec3(0.1, 0.05, 0.15) * lightEffect * 2.0; /* Purple glow */
+
+
+            gl_FragColor = vec4(color, 1.0);
+        }
+    `;
+
+    function initShaderProgram(gl, vsSource, fsSource) {
+        const vertexShader = loadShader(gl, gl.VERTEX_SHADER, vsSource);
+        const fragmentShader = loadShader(gl, gl.FRAGMENT_SHADER, fsSource);
+
+        const shaderProgram = gl.createProgram();
+        gl.attachShader(shaderProgram, vertexShader);
+        gl.attachShader(shaderProgram, fragmentShader);
+        gl.linkProgram(shaderProgram);
+
+        if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+            console.error('Unable to initialize the shader program: ' + gl.getProgramInfoLog(shaderProgram));
+            return null;
+        }
+        return shaderProgram;
+    }
+
+    function loadShader(gl, type, source) {
+        const shader = gl.createShader(type);
+        gl.shaderSource(shader, source);
+        gl.compileShader(shader);
+
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+            console.error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog(shader));
+            gl.deleteShader(shader);
+            return null;
+        }
+        return shader;
+    }
+
+    let gl, programInfo, buffers;
+    let mouseX = 0, mouseY = 0;
+    let scrollFactor = 0;
+
+    function initWebGL(canvas) {
+        gl = canvas.getContext('webgl');
+        if (!gl) {
+            console.error('Unable to initialize WebGL. Your browser may not support it.');
+            return;
+        }
+
+        programInfo = {
+            program: initShaderProgram(gl, vsSource, fsSource),
+            attribLocations: {
+                vertexPosition: gl.getAttribLocation(initShaderProgram(gl, vsSource, fsSource), 'aVertexPosition'),
+            },
+            uniformLocations: {
+                resolution: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uResolution'),
+                time: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uTime'),
+                mouse: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uMouse'),
+                scrollFactor: gl.getUniformLocation(initShaderProgram(gl, vsSource, fsSource), 'uScrollFactor'),
+            },
+        };
+
+        buffers = initBuffers(gl);
+
+        window.addEventListener('resize', resizeCanvas);
+        canvas.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+        window.addEventListener('scroll', () => {
+            scrollFactor = window.scrollY / (document.body.scrollHeight - window.innerHeight);
+            scrollFactor = Math.max(0, Math.min(1, scrollFactor)); // Normalize to 0-1
+        });
+
+        resizeCanvas();
+        requestAnimationFrame(render);
+    }
+
+    let startTime = Date.now();
+    function render() {
+        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        gl.useProgram(programInfo.program);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffers.position);
+        gl.vertexAttribPointer(programInfo.attribLocations.vertexPosition, 2, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(programInfo.attribLocations.vertexPosition);
+
+        gl.uniform2f(programInfo.uniformLocations.resolution, gl.canvas.width, gl.canvas.height);
+        gl.uniform1f(programInfo.uniformLocations.time, (Date.now() - startTime) * 0.001);
+        gl.uniform2f(programInfo.uniformLocations.mouse, mouseX, mouseY);
+        gl.uniform1f(programInfo.uniformLocations.scrollFactor, scrollFactor);
+
+        gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+
+        requestAnimationFrame(render);
+    }
+
+    function initBuffers(gl) {
+        const positionBuffer = gl.createBuffer();
+        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+        const positions = [1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0,]; // Two triangles forming a quad
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
+        return {
+            position: positionBuffer,
+        };
+    }
+
+    function resizeCanvas() {
+        if (gl) {
+            gl.canvas.width = window.innerWidth;
+            gl.canvas.height = window.innerHeight;
+            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+        }
+    }
+
+    // --- Mouse Trailer/Follower Effect ---
+    const createParticle = (x, y) => {
+        const particle = document.createElement('div');
+        particle.className = 'mouse-particle';
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+        particle.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 70%)`;
+        document.body.appendChild(particle);
+
+        setTimeout(() => {
+            particle.style.transform = 'scale(1)';
+            particle.style.opacity = '0';
+        }, 10);
+
+        setTimeout(() => {
+            particle.remove();
+        }, 800);
+    };
+
+    // --- Section Hover Effects (Subtle Parallax for Text) ---
+    const sections = document.querySelectorAll('.ai-guide-section');
+    sections.forEach(section => {
+        const paragraphs = section.querySelectorAll('p'); // Target paragraphs for parallax
+        paragraphs.forEach(p => {
+            p.dataset.parallaxDepth = Math.random() * 0.08 + 0.02; // Random depth
+        });
+
+        section.addEventListener('mousemove', (e) => {
+            const rect = section.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+
+            // Text parallax
+            paragraphs.forEach(p => {
+                const depth = parseFloat(p.dataset.parallaxDepth || 0.05);
+                p.style.transform = `translate(${(x - rect.width / 2) * depth}px, ${(y - rect.height / 2) * depth}px)`;
+            });
+
+            // Subtle radial light on section background
+            section.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(154, 255, 154, 0.1), #1a1a33 70%)`;
+        });
+
+        section.addEventListener('mouseleave', () => {
+            paragraphs.forEach(p => {
+                p.style.transform = 'translate(0, 0)';
+            });
+            section.style.background = '#1a1a33'; // Reset
+        });
+    });
+
+    // --- Audio Context for Ambient Soundscape ---
+    let audioContext;
+    let gainNode;
+    let oscillators = []; // Use an array for better control
+    let lfos = []; // LFOs for modulation
+    let isSoundPlaying = false;
+    let isMuted = false;
+
+    // Create a mute toggle button
+    const muteButton = document.createElement('button');
+    muteButton.textContent = 'Mute Sound';
+    muteButton.style.position = 'fixed';
+    muteButton.style.bottom = '20px';
+    muteButton.style.left = '20px';
+    muteButton.style.padding = '10px 15px';
+    muteButton.style.backgroundColor = 'rgba(42, 0, 80, 0.7)';
+    muteButton.style.color = '#9aff9a';
+    muteButton.style.border = 'none';
+    muteButton.style.borderRadius = '8px';
+    muteButton.style.cursor = 'pointer';
+    muteButton.style.zIndex = '1000';
+    muteButton.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.5)';
+    muteButton.style.transition = 'background-color 0.3s ease, opacity 0.3s ease';
+    document.body.appendChild(muteButton);
+
+    muteButton.addEventListener('click', () => {
+        isMuted = !isMuted;
+        if (gainNode) {
+            // Smooth toggle for volume: either to 0 (muted) or to 0.1 (unmuted)
+            gainNode.gain.setValueAtTime(isMuted ? 0 : 0.1, audioContext.currentTime + 0.1);
+        }
+        muteButton.textContent = isMuted ? 'Unmute Sound' : 'Mute Sound';
+        muteButton.style.backgroundColor = isMuted ? 'rgba(80, 0, 0, 0.7)' : 'rgba(42, 0, 80, 0.7)';
+    });
+
+
+    // Function to initialize and start the ambient soundscape
+    const startAmbientSound = () => {
+        if (isSoundPlaying) return; // Prevent multiple starts
+
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        gainNode = audioContext.createGain();
+        gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime); // Start extremely subtle, almost silent
+
+        // Oscillator 1: Deep, long drone - low frequency for ambient hum
+        const osc1 = audioContext.createOscillator();
+        osc1.type = 'sine'; // Smooth waveform
+        osc1.frequency.setValueAtTime(40, audioContext.currentTime); // Low frequency for a deep hum
+        osc1.start();
+        oscillators.push(osc1);
+
+        // Oscillator 2: Slightly higher frequency, very subtle saw for texture
+        const osc2 = audioContext.createOscillator();
+        osc2.type = 'sawtooth';
+        osc2.frequency.setValueAtTime(80, audioContext.currentTime); // A bit higher for texture
+        osc2.start();
+        oscillators.push(osc2);
+
+        // Oscillator 3: Adding a very subtle high-frequency shimmer/noise
+        const osc3 = audioContext.createOscillator();
+        osc3.type = 'triangle'; // Triangle for a slightly softer high tone
+        osc3.frequency.setValueAtTime(200, audioContext.currentTime); // Higher for a subtle shimmer
+        osc3.start();
+        oscillators.push(osc3);
+
+        // Connect all oscillators to the gain node
+        oscillators.forEach(osc => osc.connect(gainNode));
+
+        // LFOs for subtle, slow modulation of frequencies and overall gain
+        const lfo1 = audioContext.createOscillator();
+        lfo1.type = 'sine';
+        lfo1.frequency.setValueAtTime(0.03, audioContext.currentTime); // Very slow frequency modulation (e.g., 0.03 Hz means it completes a cycle every ~33 seconds)
+        lfo1.connect(osc1.frequency); // Modulate osc1 frequency
+        lfo1.connect(osc2.frequency); // Modulate osc2 frequency
+        lfo1.start(); // Start LFOs after connecting
+        lfos.push(lfo1);
+
+        const lfo2 = audioContext.createOscillator();
+        lfo2.type = 'triangle';
+        lfo2.frequency.setValueAtTime(0.08, audioContext.currentTime); // Subtle volume modulation (e.g., 0.08 Hz means a cycle every ~12.5 seconds)
+        lfo2.connect(gainNode.gain); // Modulate overall gain
+        lfo2.start(); // Start LFOs after connecting
+        lfos.push(lfo2);
+
+        gainNode.connect(audioContext.destination);
+
+        // Smooth fade-in to desired subtle volume (0.1 for noticeable, but still background)
+        if (!isMuted) {
+            gainNode.gain.exponentialRampToValueAtTime(0.1, audioContext.currentTime + 8); // Fade in to 0.1 over 8 seconds
+        } else {
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime); // Start muted if button was clicked
+        }
+
+        isSoundPlaying = true;
+    };
+
+    // User interaction to start sound. Use 'click' as it's most reliable for audio context activation.
+    document.body.addEventListener('click', startAmbientSound, { once: true });
+
+
+    // --- Thematic Moods (Simulated based on time, could be scroll-driven) ---
+    const setThematicMood = () => {
+        const hour = new Date().getHours();
+        const body = document.body;
+
+        if (hour >= 22 || hour < 6) { // Night/Deep Night (10 PM to 6 AM)
+            body.className = 'mood-alert'; // Deeper, more unsettling
+        } else if (hour >= 6 && hour < 12) { // Morning
+            body.className = 'mood-calm'; // Brighter, more organized
+        } else { // Day
+            body.className = 'mood-normal'; // Default
+        }
+    };
+    setThematicMood(); // Set initial mood
+    setInterval(setThematicMood, 3600000); // Update hourly
+
+    // --- AI Status Indicator ---
+    const aiStatusIndicator = document.querySelector('.ai-status-indicator');
+    if (aiStatusIndicator) { // Ensure element exists before manipulating
+        aiStatusIndicator.style.display = 'block'; // Make it visible
+        aiStatusIndicator.textContent = 'STATUS: OPTIMAL';
+
+        let errorCount = 0;
+        const simulateAIStatus = () => {
+            if (Math.random() < 0.05) { // 5% chance of temporary error
+                errorCount++;
+                aiStatusIndicator.textContent = `STATUS: ANOMALY ${errorCount}`;
+                aiStatusIndicator.classList.add('error');
+                setTimeout(() => {
+                    aiStatusIndicator.textContent = 'STATUS: OPTIMAL';
+                    aiStatusIndicator.classList.remove('error');
+                }, 2000); // Error lasts 2 seconds
+            }
+        };
+        setInterval(simulateAIStatus, 10000); // Check status every 10 seconds
+    }
+
+
+    // --- Display Creation Info ---
+    const creationTimeElement = document.getElementById('creationTime');
+    const creationLocationElement = document.getElementById('creationLocation');
+    const creationInfoElement = document.querySelector('.creation-info');
+
+    const createdDate = creationInfoElement.dataset.created;
+    const createdLocation = creationInfoElement.dataset.location;
+
+    if (createdDate) {
+        const date = new Date(createdDate);
+        creationTimeElement.textContent = date.toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true,
+            timeZoneName: 'short',
+        });
+    }
+    if (createdLocation) {
+        creationLocationElement.textContent = createdLocation;
+    }
+
+    // --- Philosophical Pause / Idle State ---
+    let idleTimeout;
+    let isIdleMode = false;
+    const IDLE_TIME_MS = 60 * 1000; // 1 minute of idle time
+
+    const activateIdleMode = () => {
+        if (isIdleMode) return;
+        isIdleMode = true;
+        document.body.classList.add('idle-mode');
+        // Adjust background/sound for idle, conceptual here
+        if (gainNode && audioContext && !isMuted) {
+            // Quieter in idle mode, target 0.005 (half of previous idle, more subtle)
+            gainNode.gain.exponentialRampToValueAtTime(0.005, audioContext.currentTime + 5); 
+        }
+        console.log("Entering idle mode...");
+    };
+
+    const deactivateIdleMode = () => {
+        if (!isIdleMode) return;
+        isIdleMode = false;
+        document.body.classList.remove('idle-mode');
+        if (gainNode && audioContext && !isMuted) {
+            // Return to normal volume (0.1) from idle over 2 seconds
+            gainNode.gain.exponentialRampToValueAtTime(0.1, audioContext.currentTime + 2); 
         }
         console.log("Exiting idle mode.");
     };

@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
         playerSequence: [],
         level: 0,
         canPlayerClick: false,
-        isActive: false,
         buttonSounds: []
     };
 
@@ -20,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupMouseParticles();
     createMuteButton();
     setupFooter();
-    setupMemoryGame(); // Initialize the new game
+    setupMemoryGame();
 
     // --- AUDIO SYSTEM ---
 
@@ -32,6 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
             masterGain.gain.value = 1.0;
             masterGain.connect(audioContext.destination);
             isSoundInitialized = true;
+            
             // Pre-generate game button sounds
             const frequencies = [261.63, 329.63, 392.00, 440.00]; // C4, E4, G4, A4
             game.buttonSounds = frequencies.map(freq => createGameSound(freq));
@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // Creates a reusable sound function for game buttons
     function createGameSound(frequency) {
         return () => {
             if (!isSoundInitialized || isMuted) return;
@@ -118,16 +117,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
         startBtn.addEventListener('click', startGame);
         gameButtons.forEach(button => {
-            button.addEventListener('click', (e) => handlePlayerClick(e.target));
+            button.addEventListener('click', () => handlePlayerClick(button));
         });
     }
 
     function startGame() {
-        game.isActive = true;
+        const startBtn = document.getElementById('start-game-btn');
+        const gameButtons = document.querySelectorAll('.game-button');
+        
         game.level = 0;
         game.sequence = [];
-        document.getElementById('start-game-btn').disabled = true;
-        document.getElementById('start-game-btn').textContent = "Game in Progress";
+        startBtn.disabled = true;
+        startBtn.textContent = "Game in Progress";
+        gameButtons.forEach(btn => btn.classList.remove('player-active'));
+        
         nextLevel();
     }
 
@@ -137,7 +140,6 @@ document.addEventListener('DOMContentLoaded', () => {
         game.playerSequence = [];
         game.canPlayerClick = false;
 
-        // Add a new random step to the sequence
         const newStep = Math.floor(Math.random() * 4);
         game.sequence.push(newStep);
 
@@ -145,22 +147,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function playSequence() {
-        await new Promise(resolve => setTimeout(resolve, 700)); // Pause before showing sequence
+        await new Promise(resolve => setTimeout(resolve, 700));
         for (let i = 0; i < game.sequence.length; i++) {
             const index = game.sequence[i];
             const button = document.getElementById(`btn-${index}`);
             
-            // Light up the button and play sound
             button.classList.add('lit');
-            button.style.boxShadow = `0 0 25px 5px ${getComputedStyle(button).backgroundColor}`;
+            button.style.backgroundColor = getLitColor(button.id);
             game.buttonSounds[index]();
             
             await new Promise(resolve => setTimeout(resolve, 400));
             button.classList.remove('lit');
-            button.style.boxShadow = 'none';
+            button.style.backgroundColor = ""; // Revert to CSS color
             await new Promise(resolve => setTimeout(resolve, 200));
         }
         game.canPlayerClick = true;
+        document.querySelectorAll('.game-button').forEach(btn => btn.classList.add('player-active'));
         updateStatus('Your turn...');
     }
 
@@ -169,23 +171,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const clickedIndex = parseInt(button.dataset.index, 10);
         
-        // Visual/Audio feedback for player click
         button.classList.add('lit');
-        setTimeout(() => button.classList.remove('lit'), 200);
+        button.style.backgroundColor = getLitColor(button.id);
+        setTimeout(() => {
+            button.classList.remove('lit');
+            button.style.backgroundColor = "";
+        }, 200);
         game.buttonSounds[clickedIndex]();
 
         game.playerSequence.push(clickedIndex);
         const currentStep = game.playerSequence.length - 1;
 
-        // Check if the click was correct
         if (game.playerSequence[currentStep] !== game.sequence[currentStep]) {
             gameOver();
             return;
         }
 
-        // Check if the level is complete
         if (game.playerSequence.length === game.sequence.length) {
             game.canPlayerClick = false;
+            document.querySelectorAll('.game-button').forEach(btn => btn.classList.remove('player-active'));
             setTimeout(nextLevel, 1000);
         }
     }
@@ -193,9 +197,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function gameOver() {
         updateStatus(`Game Over! You reached level ${game.level}.`);
         playFailureSound();
-        game.isActive = false;
-        document.getElementById('start-game-btn').disabled = false;
-        document.getElementById('start-game-btn').textContent = "Restart Game";
+        const startBtn = document.getElementById('start-game-btn');
+        startBtn.disabled = false;
+        startBtn.textContent = "Restart Game";
+        document.querySelectorAll('.game-button').forEach(btn => btn.classList.remove('player-active'));
+    }
+    
+    function getLitColor(buttonId) {
+        const colors = {
+            'btn-0': '#1de9b6', // Brighter Teal
+            'btn-1': '#ff1744', // Brighter Red
+            'btn-2': '#ffff00', // Brighter Yellow
+            'btn-3': '#00e676'  // Brighter Green
+        };
+        return colors[buttonId];
     }
 
     function updateStatus(message) {
@@ -204,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- UNCHANGED VISUAL SYSTEMS ---
-    function setupWebGLBackground() { /* ... unchanged ... */ 
+    function setupWebGLBackground() { 
         const canvas = document.getElementById('generativeBackground');
         if (!canvas) return;
         const gl = canvas.getContext('webgl');
@@ -228,12 +243,12 @@ document.addEventListener('DOMContentLoaded', () => {
         resizeCanvas();
         render();
     }
-    function setupMouseParticles() { /* ... unchanged ... */ 
+    function setupMouseParticles() { 
         document.body.addEventListener('mousemove', e => {
             if (Math.random() > 0.9) createParticle(e.clientX, e.clientY);
         });
     }
-    function createParticle(x, y) { /* ... unchanged ... */ 
+    function createParticle(x, y) { 
         const particle = document.createElement('div');
         particle.className = 'mouse-particle';
         document.body.appendChild(particle);
@@ -252,7 +267,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         setTimeout(() => particle.remove(), 1000);
     }
-    function setupIdleDetection() { /* ... unchanged ... */ 
+    function setupIdleDetection() {
         let idleTimer;
         const resetIdleTimer = () => {
             clearTimeout(idleTimer);
@@ -266,12 +281,12 @@ document.addEventListener('DOMContentLoaded', () => {
         ['mousemove', 'keypress', 'scroll'].forEach(e => window.addEventListener(e, resetIdleTimer));
         resetIdleTimer();
     }
-    function setupTimeBasedMoods() { /* ... unchanged ... */ 
+    function setupTimeBasedMoods() { 
         const hour = new Date().getHours();
         if (hour >= 22 || hour < 5) { document.body.classList.add('mood-night'); } 
         else if (hour >= 18) { document.body.classList.add('mood-evening'); }
     }
-    function setupFooter() { /* ... unchanged ... */ 
+    function setupFooter() {
         const creationInfo = document.querySelector('.creation-info');
         if (creationInfo) {
             const timeEl = creationInfo.querySelector('#creationTime');

@@ -228,17 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Audio System Overhaul (No Ambient Oscillators) ---
+    // --- Audio System Overhaul ---
     let audioContext;
     let masterGainNode; // Main gain node for all sounds
-    let ambientOscillators = []; // For the continuous ambient hum
-    let ambientLFOs = []; // For subtle modulation of ambient hum
-    let isSoundInitialized = false;
+    let isSoundInitialized = false; // Tracks if AudioContext is created and gain node set up
     let isMuted = false;
     let lastMouseChimeTime = 0;
     const MOUSE_CHIME_COOLDOWN = 100; // milliseconds to prevent rapid fire of pings
 
-    // Mute button creation
+    // Mute button creation - ENSURING IT APPEARS FIRST
     const muteButton = document.createElement('button');
     muteButton.textContent = 'Mute Sound';
     muteButton.style.position = 'fixed';
@@ -253,12 +251,13 @@ document.addEventListener('DOMContentLoaded', () => {
     muteButton.style.zIndex = '1000';
     muteButton.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.5)';
     muteButton.style.transition = 'background-color 0.3s ease, opacity 0.3s ease';
-    document.body.appendChild(muteButton);
+    document.body.appendChild(muteButton); // Append the button to the body immediately
 
     muteButton.addEventListener('click', () => {
         isMuted = !isMuted;
         if (masterGainNode) {
-            masterGainNode.gain.setValueAtTime(isMuted ? 0 : 0.5, audioContext.currentTime + 0.05); // Smooth toggle between 0 and 0.5 (master volume)
+            // Smooth toggle between 0 (muted) and 1 (full volume for master gain)
+            masterGainNode.gain.setValueAtTime(isMuted ? 0 : 1, audioContext.currentTime + 0.05);
         }
         muteButton.textContent = isMuted ? 'Unmute Sound' : 'Mute Sound';
         muteButton.style.backgroundColor = isMuted ? 'rgba(80, 0, 0, 0.7)' : 'rgba(42, 0, 80, 0.7)';
@@ -270,52 +269,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         masterGainNode = audioContext.createGain();
-        masterGainNode.gain.setValueAtTime(isMuted ? 0 : 0.5, audioContext.currentTime); // Set initial master volume (0.5 for a noticeable base)
+        masterGainNode.gain.setValueAtTime(isMuted ? 0 : 1, audioContext.currentTime); // Set initial master volume (1 for full control by individual sounds)
         masterGainNode.connect(audioContext.destination);
 
-        // --- Create and refine the ambient hum ("buzz") ---
-        const createAmbientHum = () => {
-            const humGain = audioContext.createGain();
-            humGain.gain.setValueAtTime(0.4, audioContext.currentTime); // Set specific volume for ambient hum relative to master (0.4 * 0.5 = 0.2 actual)
-            humGain.connect(masterGainNode);
+        // Resume if suspended (common browser policy)
+        if (audioContext.state === 'suspended') {
+            audioContext.resume().then(() => {
+                console.log('AudioContext resumed after user gesture.');
+            }).catch(e => console.error('Error resuming AudioContext:', e));
+        }
 
-            const osc1 = audioContext.createOscillator();
-            osc1.type = 'sine'; // Pure sine for a clean, non-oscillating hum
-            osc1.frequency.setValueAtTime(30, audioContext.currentTime); // Very low frequency for deep hum
-            osc1.start();
-            ambientOscillators.push(osc1);
-            osc1.connect(humGain);
-
-            const osc2 = audioContext.createOscillator();
-            osc2.type = 'sine'; // Another sine, slightly higher, for richness without harshness
-            osc2.frequency.setValueAtTime(60, audioContext.currentTime);
-            osc2.start();
-            ambientOscillators.push(osc2);
-            osc2.connect(humGain);
-
-            // Subtle LFO for very slow, almost imperceptible volume pulsation of the ambient hum
-            const lfoAmb = audioContext.createOscillator();
-            lfoAmb.type = 'sine';
-            lfoAmb.frequency.setValueAtTime(0.01, audioContext.currentTime); // Extremely slow cycle (e.g., 100 seconds)
-            lfoAmb.start();
-            lfoAmb.connect(humGain.gain); // Modulate humGain.gain (will modulate from 0.4 +/- 0.4)
-            ambientLFOs.push(lfoAmb);
-
-            // Initial fade-in for ambient hum
-            humGain.gain.setValueAtTime(0, audioContext.currentTime);
-            humGain.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 8); // Fade in over 8 seconds
-        };
-
-        createAmbientHum(); // Start the ambient hum when audio system initializes
+        // NO AMBIENT SOUND GENERATION HERE
+        // All previous ambient sound oscillator creation code has been removed.
 
         isSoundInitialized = true;
-        console.log("Audio System Initialized, Ambient Hum Started.");
+        console.log("Audio System Initialized. Ambient hum is NOT active by default.");
     };
 
-    // --- Sound Generation Functions (Discrete Effects - Overhauled for clarity and pleasantness) ---
+    // --- Sound Generation Functions (Discrete Effects - High Volume, Clean Tones) ---
 
     // Plays a short, bell-like "ping" sound (Mouse Movement)
-    const playBellPing = (frequency = 880, duration = 0.1, volume = 0.5) => { // Volume 0.5 relative to master (0.5 * 0.5 = 0.25 actual)
+    const playBellPing = (frequency = 880, duration = 0.05, volume = 0.3) => { // Volume 0.3 (relative to masterGain 1.0)
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -327,8 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Bell-like attack and decay envelope
         gain.gain.setValueAtTime(0, audioContext.currentTime);
-        gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.01); // Quick attack
-        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration); // Smooth decay
+        gain.gain.linearRampToValueAtTime(volume, audioContext.currentTime + 0.005); // Very quick attack
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration); // Smooth, quick decay
 
         osc.start(audioContext.currentTime);
         osc.stop(audioContext.currentTime + duration);
@@ -340,7 +314,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Plays a shimmering "whoosh" sound (Section Hover)
-    const playShimmerWhoosh = (volume = 0.8, duration = 0.3) => { // Volume 0.8 relative to master (0.8 * 0.5 = 0.4 actual)
+    const playShimmerWhoosh = (volume = 0.5, duration = 0.3) => { // Volume 0.5 (relative to masterGain 1.0)
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -365,7 +339,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Plays a deep, resonant "thump" sound (Section Click)
-    const playDeepThump = (frequency = 80, duration = 0.15, volume = 1.0) => { // Volume 1.0 relative to master (1.0 * 0.5 = 0.5 actual)
+    const playDeepThump = (frequency = 80, duration = 0.15, volume = 0.8) => { // Volume 0.8 (relative to masterGain 1.0)
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -394,23 +368,24 @@ document.addEventListener('DOMContentLoaded', () => {
     // Global listener for first user interaction to initialize audio context
     document.body.addEventListener('click', () => {
         initAudioSystem();
-        if (audioContext.state === 'suspended') {
+        // If context is suspended by browser policy, resume it here on click
+        if (audioContext && audioContext.state === 'suspended') {
             audioContext.resume().then(() => console.log('AudioContext resumed via click.'));
         }
     }, { once: true });
     
     document.body.addEventListener('mousemove', (e) => {
-        // Ensure audio context is initialized and resumed on first mouse movement
+        // Init audio system and resume if needed on first mousemove
         if (!isSoundInitialized) {
             initAudioSystem();
-            if (audioContext.state === 'suspended') {
+            if (audioContext && audioContext.state === 'suspended') {
                  audioContext.resume().then(() => console.log('AudioContext resumed via mousemove.'));
             }
         }
 
         const currentTime = audioContext ? audioContext.currentTime * 1000 : Date.now();
         if (currentTime - lastMouseChimeTime > MOUSE_CHIME_COOLDOWN) {
-            playBellPing(600 + Math.random() * 300, 0.1, 0.5); // Ping with varied pitch
+            playBellPing(600 + Math.random() * 300, 0.1, 0.3); // Play ping with varied pitch
             lastMouseChimeTime = currentTime;
         }
     });
@@ -419,11 +394,11 @@ document.addEventListener('DOMContentLoaded', () => {
     sections.forEach(section => {
         section.addEventListener('mouseenter', () => {
             if (!isSoundInitialized) initAudioSystem();
-            playShimmerWhoosh(0.8);
+            playShimmerWhoosh(0.5); // Play hover sound
         });
         section.addEventListener('click', () => {
             if (!isSoundInitialized) initAudioSystem();
-            playDeepThump(80, 0.15, 1.0);
+            playDeepThump(80, 0.15, 0.8); // Play click sound
         });
     });
 
@@ -498,10 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isIdleMode) return;
         isIdleMode = true;
         document.body.classList.add('idle-mode');
-        // Reduce ambient hum volume when idle
-        if (masterGainNode && audioContext && !isMuted) {
-            masterGainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 5); // Quieter
-        }
+        // No continuous sound to adjust for idle mode anymore.
         console.log("Entering idle mode...");
     };
 
@@ -509,10 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isIdleMode) return;
         isIdleMode = false;
         document.body.classList.remove('idle-mode');
-        // Restore ambient hum volume when active
-        if (masterGainNode && audioContext && !isMuted) {
-            masterGainNode.gain.exponentialRampToValueAtTime(0.2, audioContext.currentTime + 2); // Louder
-        }
+        // No continuous sound to adjust for idle mode anymore.
         console.log("Exiting idle mode.");
     };
 

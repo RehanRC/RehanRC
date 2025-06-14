@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* Function to generate pseudo-random numbers */
         float random (vec2 st) {
-            return fract(sin(dot(st.xy, vec2(12.9898,78.233)))* 43758.5453123);
+            return fract(sin(dot(st.xy, vec12.9898,78.233)))* 43758.5453123);
         }
 
         /* Function to generate noise (smooth random) */
@@ -230,62 +230,102 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Audio Context for Ambient Soundscape ---
     let audioContext;
     let gainNode;
-    let osc1, osc2, osc3; // Oscillators for ambient sound
-    let lfo1, lfo2; // LFOs for modulation
+    let oscillators = []; // Use an array for better control
+    let lfos = []; // LFOs for modulation
+    let isSoundPlaying = false;
+    let isMuted = false;
+
+    // Create a mute toggle button
+    const muteButton = document.createElement('button');
+    muteButton.textContent = 'Mute Sound';
+    muteButton.style.position = 'fixed';
+    muteButton.style.bottom = '20px';
+    muteButton.style.left = '20px';
+    muteButton.style.padding = '10px 15px';
+    muteButton.style.backgroundColor = 'rgba(42, 0, 80, 0.7)';
+    muteButton.style.color = '#9aff9a';
+    muteButton.style.border = 'none';
+    muteButton.style.borderRadius = '8px';
+    muteButton.style.cursor = 'pointer';
+    muteButton.style.zIndex = '1000';
+    muteButton.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.5)';
+    muteButton.style.transition = 'background-color 0.3s ease, opacity 0.3s ease';
+    document.body.appendChild(muteButton);
+
+    muteButton.addEventListener('click', () => {
+        isMuted = !isMuted;
+        if (gainNode) {
+            gainNode.gain.setValueAtTime(isMuted ? 0 : 0.05, audioContext.currentTime + 0.1); // Smooth toggle
+        }
+        muteButton.textContent = isMuted ? 'Unmute Sound' : 'Mute Sound';
+        muteButton.style.backgroundColor = isMuted ? 'rgba(80, 0, 0, 0.7)' : 'rgba(42, 0, 80, 0.7)';
+    });
+
 
     // Function to initialize and start the ambient soundscape
     const startAmbientSound = () => {
-        if (audioContext && audioContext.state === 'running') return; // Already started
+        if (isSoundPlaying) return; // Prevent multiple starts
 
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         gainNode = audioContext.createGain();
-        gainNode.gain.setValueAtTime(0.001, audioContext.currentTime); // Start very subtle
+        gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime); // Start extremely subtle
 
-        // Oscillator 1: Deep drone
-        osc1 = audioContext.createOscillator();
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(50, audioContext.currentTime);
-        osc1.connect(gainNode);
+        // Oscillator 1: Deep, long drone - low frequency for ambient hum
+        const osc1 = audioContext.createOscillator();
+        osc1.type = 'sine'; // Smooth waveform
+        osc1.frequency.setValueAtTime(40, audioContext.currentTime); // Low frequency
+        osc1.start();
+        oscillators.push(osc1);
 
-        // Oscillator 2: Higher frequency hum
-        osc2 = audioContext.createOscillator();
+        // Oscillator 2: Slightly higher frequency, very subtle saw for texture
+        const osc2 = audioContext.createOscillator();
         osc2.type = 'sawtooth';
-        osc2.frequency.setValueAtTime(100, audioContext.currentTime);
-        osc2.connect(gainNode);
+        osc2.frequency.setValueAtTime(80, audioContext.currentTime);
+        osc2.start();
+        oscillators.push(osc2);
 
-        // Oscillator 3: Adding subtle texture/noise
-        osc3 = audioContext.createOscillator();
-        osc3.type = 'triangle';
+        // Oscillator 3: Adding a very subtle high-frequency shimmer/noise
+        const osc3 = audioContext.createOscillator();
+        osc3.type = 'triangle'; // Triangle for a slightly softer high tone
         osc3.frequency.setValueAtTime(200, audioContext.currentTime);
-        osc3.connect(gainNode);
+        osc3.start();
+        oscillators.push(osc3);
 
-        // LFOs for subtle modulation of frequency
-        lfo1 = audioContext.createOscillator();
+        // Connect all oscillators to the gain node
+        oscillators.forEach(osc => osc.connect(gainNode));
+
+        // LFOs for subtle, slow modulation
+        const lfo1 = audioContext.createOscillator();
         lfo1.type = 'sine';
-        lfo1.frequency.setValueAtTime(0.05, audioContext.currentTime); // Very slow modulation
-        lfo1.connect(osc1.frequency); // Modulate osc1 frequency
-        lfo1.connect(osc2.frequency); // Modulate osc2 frequency
+        lfo1.frequency.setValueAtTime(0.03, audioContext.currentTime); // Very slow frequency modulation
+        lfo1.start();
+        lfo1.connect(osc1.frequency);
+        lfo1.connect(osc2.frequency);
+        lfos.push(lfo1);
 
-        lfo2 = audioContext.createOscillator();
+        const lfo2 = audioContext.createOscillator();
         lfo2.type = 'triangle';
-        lfo2.frequency.setValueAtTime(0.1, audioContext.currentTime);
-        lfo2.connect(gainNode.gain); // Modulate overall gain for subtle volume shifts
+        lfo2.frequency.setValueAtTime(0.08, audioContext.currentTime); // Subtle volume modulation
+        lfo2.start();
+        lfo2.connect(gainNode.gain); // Modulate overall gain
+
+        lfos.push(lfo2);
 
         gainNode.connect(audioContext.destination);
 
-        osc1.start();
-        osc2.start();
-        osc3.start();
-        lfo1.start();
-        lfo2.start();
+        // Smooth fade-in to desired subtle volume
+        if (!isMuted) {
+            gainNode.gain.exponentialRampToValueAtTime(0.02, audioContext.currentTime + 8); // Very subtle target volume
+        } else {
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+        }
 
-        // Fade in sound after a short delay
-        gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 5);
+        isSoundPlaying = true;
     };
 
-    // Start sound on first user interaction (e.g., click anywhere)
+    // User interaction to start sound. Use 'click' as it's most reliable for audio context activation.
     document.body.addEventListener('click', startAmbientSound, { once: true });
-    document.body.addEventListener('mousemove', startAmbientSound, { once: true });
+
 
     // --- Thematic Moods (Simulated based on time, could be scroll-driven) ---
     const setThematicMood = () => {
@@ -360,11 +400,9 @@ document.addEventListener('DOMContentLoaded', () => {
         isIdleMode = true;
         document.body.classList.add('idle-mode');
         // Adjust background/sound for idle, conceptual here
-        if (gainNode && audioContext) {
-            gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 5); // Quieter
+        if (gainNode && audioContext && !isMuted) {
+            gainNode.gain.exponentialRampToValueAtTime(0.005, audioContext.currentTime + 5); // Quieter
         }
-        // Shader parameters can be adjusted via uniform, but WebGL context needs to be available
-        // to pass new uniform value (done in render loop or via separate uniform update function)
         console.log("Entering idle mode...");
     };
 
@@ -372,8 +410,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isIdleMode) return;
         isIdleMode = false;
         document.body.classList.remove('idle-mode');
-        if (gainNode && audioContext) {
-            gainNode.gain.exponentialRampToValueAtTime(0.05, audioContext.currentTime + 2); // Louder
+        if (gainNode && audioContext && !isMuted) {
+            gainNode.gain.exponentialRampToValueAtTime(0.02, audioContext.currentTime + 2); // Louder
         }
         console.log("Exiting idle mode.");
     };
@@ -396,6 +434,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const canvas = document.getElementById('generativeBackground');
     initWebGL(canvas);
 
-    // Initial mouse event listener for particles (can be combined with main document mousemove)
-    document.addEventListener('mousemove', createParticle); // Removed the random check here to make particles more consistent
+    // Initial mouse event listener for particles
+    document.addEventListener('mousemove', createParticle);
 });

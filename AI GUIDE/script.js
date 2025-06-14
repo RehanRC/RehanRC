@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Audio System Overhaul ---
+    // --- Audio System Overhaul (No Ambient Oscillators) ---
     let audioContext;
     let masterGainNode; // Main gain node for all sounds
     let ambientOscillators = []; // For the continuous ambient hum
@@ -347,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         osc.type = 'sawtooth'; // Richer harmonic content
         osc.frequency.setValueAtTime(200, audioContext.currentTime); // Start frequency
-        osc.frequency.exponentialRampToValueAtTime(80Context.currentTime + duration); // Swell up significantly
+        osc.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + duration); // Swell up significantly
         osc.connect(gain);
         gain.connect(masterGainNode);
 
@@ -410,7 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const currentTime = audioContext ? audioContext.currentTime * 1000 : Date.now();
         if (currentTime - lastMouseChimeTime > MOUSE_CHIME_COOLDOWN) {
-            playBellPing(600 + Math.random() * 300, 0.1, MOUSE_CHIME_VOLUME); // Varied pitch for bell-like ping
+            playBellPing(600 + Math.random() * 300, 0.1, 0.5); // Ping with varied pitch
             lastMouseChimeTime = currentTime;
         }
     });
@@ -419,11 +419,11 @@ document.addEventListener('DOMContentLoaded', () => {
     sections.forEach(section => {
         section.addEventListener('mouseenter', () => {
             if (!isSoundInitialized) initAudioSystem();
-            playShimmerWhoosh(SECTION_HOVER_VOLUME);
+            playShimmerWhoosh(0.8);
         });
         section.addEventListener('click', () => {
             if (!isSoundInitialized) initAudioSystem();
-            playDeepThump(80, 0.15, SECTION_CLICK_VOLUME);
+            playDeepThump(80, 0.15, 1.0);
         });
     });
 

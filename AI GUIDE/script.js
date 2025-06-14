@@ -236,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let isSoundInitialized = false;
     let isMuted = false;
     let lastMouseChimeTime = 0;
-    const MOUSE_CHIME_COOLDOWN = 150; // Milliseconds to prevent rapid fire of pings
+    const MOUSE_CHIME_COOLDOWN = 100; // milliseconds to prevent rapid fire of pings
 
     // Mute button creation
     const muteButton = document.createElement('button');
@@ -258,7 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
     muteButton.addEventListener('click', () => {
         isMuted = !isMuted;
         if (masterGainNode) {
-            masterGainNode.gain.setValueAtTime(isMuted ? 0 : 1, audioContext.currentTime + 0.05); // Smooth toggle
+            masterGainNode.gain.setValueAtTime(isMuted ? 0 : 0.5, audioContext.currentTime + 0.05); // Smooth toggle between 0 and 0.5 (master volume)
         }
         muteButton.textContent = isMuted ? 'Unmute Sound' : 'Mute Sound';
         muteButton.style.backgroundColor = isMuted ? 'rgba(80, 0, 0, 0.7)' : 'rgba(42, 0, 80, 0.7)';
@@ -270,13 +270,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
         masterGainNode = audioContext.createGain();
-        masterGainNode.gain.setValueAtTime(isMuted ? 0 : 1, audioContext.currentTime); // Set initial master volume (1 for full control by individual sounds)
+        masterGainNode.gain.setValueAtTime(isMuted ? 0 : 0.5, audioContext.currentTime); // Set initial master volume (0.5 for a noticeable base)
         masterGainNode.connect(audioContext.destination);
 
-        // --- Reinstating and refining the ambient hum ("buzz") ---
+        // --- Create and refine the ambient hum ("buzz") ---
         const createAmbientHum = () => {
             const humGain = audioContext.createGain();
-            humGain.gain.setValueAtTime(0.2, audioContext.currentTime); // Set specific volume for ambient hum
+            humGain.gain.setValueAtTime(0.4, audioContext.currentTime); // Set specific volume for ambient hum relative to master (0.4 * 0.5 = 0.2 actual)
             humGain.connect(masterGainNode);
 
             const osc1 = audioContext.createOscillator();
@@ -298,12 +298,12 @@ document.addEventListener('DOMContentLoaded', () => {
             lfoAmb.type = 'sine';
             lfoAmb.frequency.setValueAtTime(0.01, audioContext.currentTime); // Extremely slow cycle (e.g., 100 seconds)
             lfoAmb.start();
-            lfoAmb.connect(humGain.gain); // Modulate humGain
+            lfoAmb.connect(humGain.gain); // Modulate humGain.gain (will modulate from 0.4 +/- 0.4)
             ambientLFOs.push(lfoAmb);
 
             // Initial fade-in for ambient hum
             humGain.gain.setValueAtTime(0, audioContext.currentTime);
-            humGain.gain.linearRampToValueAtTime(0.2, audioContext.currentTime + 10); // Fade in over 10 seconds to 0.2 volume
+            humGain.gain.linearRampToValueAtTime(0.4, audioContext.currentTime + 8); // Fade in over 8 seconds
         };
 
         createAmbientHum(); // Start the ambient hum when audio system initializes
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Sound Generation Functions (Discrete Effects - Overhauled for clarity and pleasantness) ---
 
     // Plays a short, bell-like "ping" sound (Mouse Movement)
-    const playBellPing = (frequency = 880, duration = 0.1, volume = 0.3) => { // Increased volume for noticeable ping
+    const playBellPing = (frequency = 880, duration = 0.1, volume = 0.5) => { // Volume 0.5 relative to master (0.5 * 0.5 = 0.25 actual)
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -340,14 +340,14 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Plays a shimmering "whoosh" sound (Section Hover)
-    const playShimmerWhoosh = (volume = 0.5, duration = 0.3) => { // Increased volume for noticeable whoosh
+    const playShimmerWhoosh = (volume = 0.8, duration = 0.3) => { // Volume 0.8 relative to master (0.8 * 0.5 = 0.4 actual)
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
 
         osc.type = 'sawtooth'; // Richer harmonic content
         osc.frequency.setValueAtTime(200, audioContext.currentTime); // Start frequency
-        osc.frequency.exponentialRampToValueAtTime(800, audioContext.currentTime + duration); // Swell up significantly
+        osc.frequency.exponentialRampToValueAtTime(80Context.currentTime + duration); // Swell up significantly
         osc.connect(gain);
         gain.connect(masterGainNode);
 
@@ -365,7 +365,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Plays a deep, resonant "thump" sound (Section Click)
-    const playDeepThump = (frequency = 80, duration = 0.15, volume = 0.6) => { // Increased volume for noticeable thump
+    const playDeepThump = (frequency = 80, duration = 0.15, volume = 1.0) => { // Volume 1.0 relative to master (1.0 * 0.5 = 0.5 actual)
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
         const gain = audioContext.createGain();
@@ -392,7 +392,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Event Listeners for Sound Triggers ---
 
     // Global listener for first user interaction to initialize audio context
-    // This will now ALSO trigger the ambient hum
     document.body.addEventListener('click', () => {
         initAudioSystem();
         if (audioContext.state === 'suspended') {

@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         /* Function to generate pseudo-random numbers */
         float random (vec2 st) {
-            // FIX: Corrected vec2 constructor syntax for the dot product constant
+            // Corrected vec2 constructor syntax for the dot product constant
             return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
         }
 
@@ -228,13 +228,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Audio System Overhaul ---
+    // --- Audio System Overhaul (No Ambient Oscillators) ---
     let audioContext;
     let masterGainNode; // Main gain node for all sounds
     let isSoundInitialized = false; // Tracks if AudioContext is created and gain node set up
     let isMuted = false;
     let lastMouseChimeTime = 0;
-    const MOUSE_CHIME_COOLDOWN = 100; // milliseconds to prevent rapid fire
+    const MOUSE_CHIME_COOLDOWN = 100; // milliseconds to prevent rapid fire of sounds
 
     // Mute button creation
     const muteButton = document.createElement('button');
@@ -277,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Sound Generation Functions (Discrete Effects) ---
 
-    // Plays a short, high-pitched "ping" sound
+    // Plays a short, high-pitched "ping" sound (Mouse Movement)
     const playPingSound = (frequency = 880, duration = 0.05, volume = 0.1) => {
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
@@ -300,7 +300,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
 
-    // Plays a "whoosh" or "swell" sound
+    // Plays a "whoosh" or "swell" sound (Section Hover)
     const playWhooshSound = (volume = 0.1, duration = 0.2) => {
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
         };
     };
 
-    // Plays a soft "thump" or "click" sound
+    // Plays a soft "thump" or "click" sound (Section Click)
     const playThumpSound = (frequency = 60, duration = 0.08, volume = 0.15) => {
         if (!isSoundInitialized || isMuted) return;
         const osc = audioContext.createOscillator();
@@ -349,13 +349,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- Event Listeners for Sound Triggers ---
 
-    // Mouse movement chime (rate limited)
+    // Global listener for first user interaction to initialize audio context
+    document.body.addEventListener('click', () => {
+        initAudioSystem();
+        if (audioContext.state === 'suspended') {
+            audioContext.resume().then(() => console.log('AudioContext resumed via click.'));
+        }
+    }, { once: true });
+    
     document.body.addEventListener('mousemove', (e) => {
-        const currentTime = audioContext ? audioContext.currentTime * 1000 : Date.now(); // Use Web Audio time if available
         if (!isSoundInitialized) {
             initAudioSystem(); // Initialize on first mousemove if not yet
+            if (audioContext.state === 'suspended') {
+                 audioContext.resume().then(() => console.log('AudioContext resumed via mousemove.'));
+            }
         }
 
+        const currentTime = audioContext ? audioContext.currentTime * 1000 : Date.now();
         if (currentTime - lastMouseChimeTime > MOUSE_CHIME_COOLDOWN) {
             playPingSound(440 + Math.random() * 200, 0.05, 0.08); // Vary pitch slightly
             lastMouseChimeTime = currentTime;
@@ -445,7 +455,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (isIdleMode) return;
         isIdleMode = true;
         document.body.classList.add('idle-mode');
-        // No continuous sound to adjust for idle mode anymore.
         console.log("Entering idle mode...");
     };
 
@@ -453,7 +462,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isIdleMode) return;
         isIdleMode = false;
         document.body.classList.remove('idle-mode');
-        // No continuous sound to adjust for idle mode anymore.
         console.log("Exiting idle mode.");
     };
 

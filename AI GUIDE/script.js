@@ -228,15 +228,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // --- Audio Context for Ambient Soundscape ---
+    // --- Audio System Overhaul ---
     let audioContext;
-    let gainNode;
-    let oscillators = []; // Use an array for better control
-    let lfos = []; // LFOs for modulation
-    let isSoundPlaying = false;
+    let masterGainNode; // Main gain node for all sounds
+    let isSoundInitialized = false; // Tracks if AudioContext is created and gain node set up
     let isMuted = false;
+    let lastMouseChimeTime = 0;
+    const MOUSE_CHIME_COOLDOWN = 100; // milliseconds to prevent rapid fire
 
-    // Create a mute toggle button
+    // Mute button creation
     const muteButton = document.createElement('button');
     muteButton.textContent = 'Mute Sound';
     muteButton.style.position = 'fixed';
@@ -255,158 +255,161 @@ document.addEventListener('DOMContentLoaded', () => {
 
     muteButton.addEventListener('click', () => {
         isMuted = !isMuted;
-        if (gainNode) {
-            // Smooth toggle for volume: either to 0 (muted) or to 0.1 (unmuted)
-            gainNode.gain.setValueAtTime(isMuted ? 0 : 0.1, audioContext.currentTime + 0.1);
+        if (masterGainNode) {
+            masterGainNode.gain.setValueAtTime(isMuted ? 0 : 0.2, audioContext.currentTime + 0.05); // Smooth toggle
         }
         muteButton.textContent = isMuted ? 'Unmute Sound' : 'Mute Sound';
         muteButton.style.backgroundColor = isMuted ? 'rgba(80, 0, 0, 0.7)' : 'rgba(42, 0, 80, 0.7)';
     });
 
+    // Function to ensure AudioContext is initialized and resumed
+    const initAudioSystem = () => {
+        if (isSoundInitialized) return; // System already set up
 
-    // Function to initialize and start the ambient soundscape
-    const startAmbientSound = () => {
-        // Only proceed if AudioContext is not already created or is suspended
-        if (audioContext && audioContext.state === 'running') return; 
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        masterGainNode = audioContext.createGain();
+        masterGainNode.gain.setValueAtTime(isMuted ? 0 : 0.2, audioContext.currentTime); // Set initial volume
+        masterGainNode.connect(audioContext.destination);
 
-        // Create AudioContext if it doesn't exist or is closed
-        if (!audioContext || audioContext.state === 'closed') {
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-        }
-
-        // Resume if suspended (common browser policy)
-        if (audioContext.state === 'suspended') {
-            audioContext.resume().then(() => {
-                console.log('AudioContext resumed via user gesture.');
-                if (!isSoundPlaying) { // Only proceed to set up if not already playing
-                    setupAudioNodes();
-                    fadeInSound();
-                }
-            });
-        } else if (audioContext.state === 'running' && !isSoundPlaying) {
-             // If already running but not setup (e.g. from a very quick initial gesture)
-             setupAudioNodes();
-             fadeInSound();
-        } else if (!isSoundPlaying) { // First time activation
-            setupAudioNodes();
-            fadeInSound();
-        }
+        isSoundInitialized = true;
+        console.log("Audio System Initialized.");
     };
 
-    const setupAudioNodes = () => {
-        if (isSoundPlaying) return; // Already setup
+    // --- Sound Generation Functions (Discrete Effects) ---
 
-        gainNode = audioContext.createGain();
-        gainNode.gain.setValueAtTime(0.0001, audioContext.currentTime); // Start extremely subtle, almost silent
+    // Plays a short, high-pitched "ping" sound
+    const playPingSound = (frequency = 880, duration = 0.05, volume = 0.1) => {
+        if (!isSoundInitialized || isMuted) return;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
 
-        // FIX: Changed oscillator types for a softer, less buzzing sound
-        // Oscillator 1: Very deep sine wave for a smooth base hum
-        const osc1 = audioContext.createOscillator();
-        osc1.type = 'sine';
-        osc1.frequency.setValueAtTime(30, audioContext.currentTime); // Even lower frequency
-        osc1.start();
-        oscillators.push(osc1);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        osc.connect(gain);
+        gain.connect(masterGainNode);
 
-        // Oscillator 2: Another sine wave, slightly higher, blended for richness
-        const osc2 = audioContext.createOscillator();
-        osc2.type = 'sine'; 
-        osc2.frequency.setValueAtTime(60, audioContext.currentTime); 
-        osc2.start();
-        oscillators.push(osc2);
+        gain.gain.setValueAtTime(volume, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
 
-        // Oscillator 3: Very subtle triangle wave at a higher, but still smooth, frequency
-        const osc3 = audioContext.createOscillator();
-        osc3.type = 'triangle'; // Triangle is softer than sawtooth
-        osc3.frequency.setValueAtTime(120, audioContext.currentTime); // Mid-range for subtle texture
-        osc3.start();
-        oscillators.push(osc3);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + duration);
 
-        // Connect all oscillators to the gain node
-        oscillators.forEach(osc => osc.connect(gainNode));
-
-        // LFOs for subtle, slow modulation of frequencies and overall gain
-        const lfo1 = audioContext.createOscillator();
-        lfo1.type = 'sine';
-        lfo1.frequency.setValueAtTime(0.02, audioContext.currentTime); // Very slow frequency modulation (even slower)
-        lfo1.connect(osc1.frequency);
-        lfo1.connect(osc2.frequency);
-        lfo1.start(); 
-        lfos.push(lfo1);
-
-        const lfo2 = audioContext.createOscillator();
-        lfo2.type = 'triangle';
-        lfo2.frequency.setValueAtTime(0.05, audioContext.currentTime); // Subtle volume modulation (even slower)
-        lfo2.connect(gainNode.gain); 
-        lfo2.start(); 
-        lfos.push(lfo2);
-
-        gainNode.connect(audioContext.destination);
-        isSoundPlaying = true; // Mark as setup and playing
+        osc.onended = () => {
+            osc.disconnect();
+            gain.disconnect();
+        };
     };
 
-    const fadeInSound = () => {
-        if (!isMuted) {
-            // Fade in to 0.1 over 3 seconds for noticeable sound
-            gainNode.gain.exponentialRampToValueAtTime(0.1, audioContext.currentTime + 3); 
-        } else {
-            gainNode.gain.setValueAtTime(0, audioContext.currentTime); // Ensure it's muted if button was clicked
-        }
+    // Plays a "whoosh" or "swell" sound
+    const playWhooshSound = (volume = 0.1, duration = 0.2) => {
+        if (!isSoundInitialized || isMuted) return;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(100, audioContext.currentTime); // Start low
+        osc.frequency.exponentialRampToValueAtTime(500, audioContext.currentTime + duration); // Swell up
+        osc.connect(gain);
+        gain.connect(masterGainNode);
+
+        gain.gain.setValueAtTime(volume, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + duration);
+
+        osc.onended = () => {
+            osc.disconnect();
+            gain.disconnect();
+        };
     };
 
+    // Plays a soft "thump" or "click" sound
+    const playThumpSound = (frequency = 60, duration = 0.08, volume = 0.15) => {
+        if (!isSoundInitialized || isMuted) return;
+        const osc = audioContext.createOscillator();
+        const gain = audioContext.createGain();
 
-    // User interaction to start sound. Use 'click' as it's most reliable for audio context activation.
-    document.body.addEventListener('click', startAmbientSound, { once: true });
-    // Also trigger on mousemove, but check context state to resume if needed.
-    document.body.addEventListener('mousemove', () => {
-        // If sound is not playing (first time, or was stopped and not re-initialized yet)
-        if (!isSoundPlaying) {
-            startAmbientSound(); // Attempt to start/resume
-        } else if (audioContext && audioContext.state === 'suspended') {
-            // If context exists but is suspended, try to resume it
-            audioContext.resume().then(() => {
-                console.log('AudioContext resumed via mousemove');
-            }).catch(e => console.error('Error resuming AudioContext:', e));
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(frequency, audioContext.currentTime);
+        osc.connect(gain);
+        gain.connect(masterGainNode);
+
+        gain.gain.setValueAtTime(volume, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, audioContext.currentTime + duration);
+
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + duration);
+
+        osc.onended = () => {
+            osc.disconnect();
+            gain.disconnect();
+        };
+    };
+
+    // --- Event Listeners for Sound Triggers ---
+
+    // Mouse movement chime (rate limited)
+    document.body.addEventListener('mousemove', (e) => {
+        const currentTime = audioContext ? audioContext.currentTime * 1000 : Date.now(); // Use Web Audio time if available
+        if (!isSoundInitialized) {
+            initAudioSystem(); // Initialize on first mousemove if not yet
         }
-    }, { once: true }); // Use once:true here to prevent firing repeatedly and interfering
 
+        if (currentTime - lastMouseChimeTime > MOUSE_CHIME_COOLDOWN) {
+            playPingSound(440 + Math.random() * 200, 0.05, 0.08); // Vary pitch slightly
+            lastMouseChimeTime = currentTime;
+        }
+    });
 
-    // --- Thematic Moods (Simulated based on time, could be scroll-driven) ---
+    // Section hover sound
+    sections.forEach(section => {
+        section.addEventListener('mouseenter', () => {
+            if (!isSoundInitialized) initAudioSystem();
+            playWhooshSound(0.08);
+        });
+        section.addEventListener('click', () => {
+            if (!isSoundInitialized) initAudioSystem();
+            playThumpSound();
+        });
+    });
+
+    // --- Thematic Moods (Simulated based on time) ---
     const setThematicMood = () => {
         const hour = new Date().getHours();
         const body = document.body;
 
         if (hour >= 22 || hour < 6) { // Night/Deep Night (10 PM to 6 AM)
-            body.className = 'mood-alert'; // Deeper, more unsettling
+            body.className = 'mood-alert';
         } else if (hour >= 6 && hour < 12) { // Morning
-            body.className = 'mood-calm'; // Brighter, more organized
+            body.className = 'mood-calm';
         } else { // Day
-            body.className = 'mood-normal'; // Default
+            body.className = 'mood-normal';
         }
     };
-    setThematicMood(); // Set initial mood
-    setInterval(setThematicMood, 3600000); // Update hourly
+    setThematicMood();
+    setInterval(setThematicMood, 3600000);
 
     // --- AI Status Indicator ---
     const aiStatusIndicator = document.querySelector('.ai-status-indicator');
-    if (aiStatusIndicator) { // Ensure element exists before manipulating
-        aiStatusIndicator.style.display = 'block'; // Make it visible
+    if (aiStatusIndicator) {
+        aiStatusIndicator.style.display = 'block';
         aiStatusIndicator.textContent = 'STATUS: OPTIMAL';
 
         let errorCount = 0;
         const simulateAIStatus = () => {
-            if (Math.random() < 0.05) { // 5% chance of temporary error
+            if (Math.random() < 0.05) {
                 errorCount++;
                 aiStatusIndicator.textContent = `STATUS: ANOMALY ${errorCount}`;
                 aiStatusIndicator.classList.add('error');
                 setTimeout(() => {
                     aiStatusIndicator.textContent = 'STATUS: OPTIMAL';
                     aiStatusIndicator.classList.remove('error');
-                }, 2000); // Error lasts 2 seconds
+                }, 2000);
             }
         };
-        setInterval(simulateAIStatus, 10000); // Check status every 10 seconds
+        setInterval(simulateAIStatus, 10000);
     }
-
 
     // --- Display Creation Info ---
     const creationTimeElement = document.getElementById('creationTime');
@@ -436,17 +439,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Philosophical Pause / Idle State ---
     let idleTimeout;
     let isIdleMode = false;
-    const IDLE_TIME_MS = 60 * 1000; // 1 minute of idle time
+    const IDLE_TIME_MS = 60 * 1000;
 
     const activateIdleMode = () => {
         if (isIdleMode) return;
         isIdleMode = true;
         document.body.classList.add('idle-mode');
-        // Adjust background/sound for idle, conceptual here
-        if (gainNode && audioContext && !isMuted) {
-            // Quieter in idle mode, target 0.005 (half of previous idle, more subtle)
-            gainNode.gain.exponentialRampToValueAtTime(0.005, audioContext.currentTime + 5); 
-        }
+        // No continuous sound to adjust for idle mode anymore.
         console.log("Entering idle mode...");
     };
 
@@ -454,10 +453,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!isIdleMode) return;
         isIdleMode = false;
         document.body.classList.remove('idle-mode');
-        if (gainNode && audioContext && !isMuted) {
-            // Return to normal volume (0.1) from idle over 2 seconds
-            gainNode.gain.exponentialRampToValueAtTime(0.1, audioContext.currentTime + 2); 
-        }
+        // No continuous sound to adjust for idle mode anymore.
         console.log("Exiting idle mode.");
     };
 
@@ -473,7 +469,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ['mousemove', 'mousedown', 'keydown', 'scroll'].forEach(eventType => {
         document.addEventListener(eventType, resetIdleTimer, false);
     });
-    resetIdleTimer(); // Initial call to start the timer
+    resetIdleTimer();
 
     // Initialize WebGL background
     const canvas = document.getElementById('generativeBackground');

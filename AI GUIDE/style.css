@@ -31,12 +31,12 @@ h1 {
 }
 
 h2, h3 {
-    position: relative; /* Needed for the glitch effect pseudo-elements */
+    position: relative; /* Crucial for the glitch effect */
 }
 
 h2 {
     font-size: 2.2em;
-    color: #9aff9a; /* Bright green accent */
+    color: #9aff9a;
     margin-top: 40px;
     margin-bottom: 20px;
     border-bottom: 2px solid #5a0080;
@@ -45,7 +45,7 @@ h2 {
 
 h3 {
     font-size: 1.6em;
-    color: #bbeaff; /* Light blue accent */
+    color: #bbeaff;
     margin-top: 30px;
     margin-bottom: 15px;
     font-weight: 600;
@@ -129,18 +129,58 @@ blockquote {
     box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3);
 }
 
-/* --- Text Glitch Effect --- */
+/* --- NEW: Text Glitch Effect --- */
 h2:hover, h3:hover {
-    animation: glitch-main 0.3s linear both;
+    animation: text-glitch 150ms infinite linear alternate-reverse;
 }
 
-@keyframes glitch-main {
-    0% { transform: skewX(0deg); }
-    20% { transform: skewX(2deg); }
-    40% { transform: skewX(-2deg); }
-    60% { transform: skewX(1deg); }
-    80% { transform: skewX(-1deg); }
-    100% { transform: skewX(0deg); }
+h2::before, h2::after,
+h3::before, h3::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #1a1a33; /* Match section background to hide original text */
+    overflow: hidden;
+    color: #9aff9a; /* Match h2 color */
+}
+
+h3::before, h3::after {
+    color: #bbeaff; /* Match h3 color */
+    background: #1a1a33;
+}
+
+
+h2:hover::before, h3:hover::before {
+    left: 2px;
+    text-shadow: -2px 0 #ff00ff; /* Magenta shadow */
+    animation: glitch-anim 300ms infinite linear alternate-reverse;
+}
+
+h2:hover::after, h3:hover::after {
+    left: -2px;
+    text-shadow: -2px 0 #00ffff, 2px 2px #ff00ff; /* Cyan and Magenta shadows */
+    animation: glitch-anim2 200ms infinite linear alternate-reverse;
+}
+
+@keyframes text-glitch {
+    0% { transform: translate(0); }
+    25% { transform: translate(2px, 2px); }
+    50% { transform: translate(-2px, -2px); }
+    75% { transform: translate(2px, -2px); }
+    100% { transform: translate(-2px, 2px); }
+}
+
+@keyframes glitch-anim {
+    0% { clip-path: polygon(0 2%, 100% 2%, 100% 5%, 0 5%); }
+    100% { clip-path: polygon(0 75%, 100% 75%, 100% 80%, 0 80%); }
+}
+
+@keyframes glitch-anim2 {
+    0% { clip-path: polygon(0 50%, 100% 50%, 100% 55%, 0 55%); }
+    100% { clip-path: polygon(0 15%, 100% 15%, 100% 20%, 0 20%); }
 }
 
 /* --- Generative Background & Particles --- */
@@ -159,11 +199,10 @@ h2:hover, h3:hover {
     pointer-events: none;
     opacity: 1;
     transform: translate(-50%, -50%);
-    transition: transform 0.4s ease-out, opacity 0.4s ease-out; /* Faster fade for "sparkly" feel */
+    transition: transform 0.5s cubic-bezier(0,.8,.26,.99), opacity 0.5s ease-out; /* Smoother trail animation */
     z-index: 9999;
-    filter: blur(1px); /* Adds to the glowing effect */
+    filter: blur(1.5px); /* Stronger glow */
 }
-
 
 /* --- Footer & UI --- */
 footer {

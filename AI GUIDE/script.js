@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let masterGain;
     let isMuted = false;
     let isSoundInitialized = false;
+    let lastPingTime = 0;
+    const PING_COOLDOWN = 250; // Increased cooldown for subtlety
 
     // --- GAME STATE ---
     const game = {
@@ -20,6 +22,8 @@ document.addEventListener('DOMContentLoaded', () => {
     createMuteButton();
     setupFooter();
     setupMemoryGame();
+    setupSectionInteractivity(); // Re-enabled for interactive sounds
+    setupGlitchText(); // NEW: Adds support for CSS glitch effect
 
     // --- AUDIO SYSTEM ---
 
@@ -32,7 +36,6 @@ document.addEventListener('DOMContentLoaded', () => {
             masterGain.connect(audioContext.destination);
             isSoundInitialized = true;
             
-            // Pre-generate game button sounds
             const frequencies = [261.63, 329.63, 392.00, 440.00]; // C4, E4, G4, A4
             game.buttonSounds = frequencies.map(freq => createGameSound(freq));
         } catch (e) {
@@ -40,6 +43,69 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
+    // --- DISCRETE SOUND FUNCTIONS ---
+
+    function playBellPing() {
+        if (!isSoundInitialized || isMuted) return;
+        const now = performance.now();
+        if (now - lastPingTime < PING_COOLDOWN) return;
+        lastPingTime = now;
+
+        const osc = audioContext.createOscillator();
+        const soundGain = audioContext.createGain();
+        osc.connect(soundGain);
+        soundGain.connect(masterGain);
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1200, audioContext.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(600, audioContext.currentTime + 0.2);
+        soundGain.gain.setValueAtTime(0.1, audioContext.currentTime); // Subtle volume
+        soundGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.3);
+    }
+
+    function playShimmerWhoosh() {
+        if (!isSoundInitialized || isMuted) return;
+        const noise = audioContext.createBufferSource();
+        const bufferSize = audioContext.sampleRate * 0.5;
+        const buffer = audioContext.createBuffer(1, bufferSize, audioContext.sampleRate);
+        const output = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) { output[i] = Math.random() * 2 - 1; }
+        noise.buffer = buffer;
+
+        const bandpass = audioContext.createBiquadFilter();
+        bandpass.type = 'bandpass';
+        bandpass.frequency.setValueAtTime(1200, audioContext.currentTime);
+        bandpass.Q.setValueAtTime(15, audioContext.currentTime);
+
+        const soundGain = audioContext.createGain();
+        noise.connect(bandpass);
+        bandpass.connect(soundGain);
+        soundGain.connect(masterGain);
+        
+        soundGain.gain.setValueAtTime(0, audioContext.currentTime);
+        soundGain.gain.linearRampToValueAtTime(0.15, audioContext.currentTime + 0.05); // Subtle volume
+        soundGain.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.5);
+
+        noise.start(audioContext.currentTime);
+        noise.stop(audioContext.currentTime + 0.5);
+    }
+
+    function playDeepThump() {
+        if (!isSoundInitialized || isMuted) return;
+        const osc = audioContext.createOscillator();
+        const soundGain = audioContext.createGain();
+        osc.connect(soundGain);
+        soundGain.connect(masterGain);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(100, audioContext.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(30, audioContext.currentTime + 0.2);
+        soundGain.gain.setValueAtTime(0.3, audioContext.currentTime); // Subtle volume
+        soundGain.gain.exponentialRampToValueAtTime(0.001, audioContext.currentTime + 0.3);
+        osc.start(audioContext.currentTime);
+        osc.stop(audioContext.currentTime + 0.3);
+    }
+
     function createGameSound(frequency) {
         return () => {
             if (!isSoundInitialized || isMuted) return;
@@ -110,7 +176,70 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.addEventListener('click', userFirstInteractionHandler);
     document.body.addEventListener('mousemove', userFirstInteractionHandler);
 
-    // --- MEMORY SEQUENCE GAME LOGIC ---
+    // --- NEW: Glitch Text Setup ---
+    function setupGlitchText() {
+        document.querySelectorAll('h2, h3').forEach(header => {
+            header.setAttribute('data-text', header.textContent);
+        });
+    }
+
+    // --- ENHANCED MOUSE PARTICLES ---
+    function setupMouseParticles() { 
+        document.body.addEventListener('mousemove', e => {
+            // Create particles more frequently for a denser trail
+            if (Math.random() > 0.4) {
+                createParticle(e.clientX, e.clientY);
+            }
+            // Also play the subtle ping sound on movement
+            playBellPing();
+        });
+    }
+
+    function createParticle(x, y) { 
+        const particle = document.createElement('div');
+        particle.className = 'mouse-particle';
+        document.body.appendChild(particle);
+
+        const size = Math.random() * 5 + 3; // Random size between 3px and 8px
+        const color = `hsl(${Math.random() * 60 + 180}, 100%, 80%)`; // Electric blue/cyan tones
+
+        particle.style.width = `${size}px`;
+        particle.style.height = `${size}px`;
+        particle.style.left = `${x}px`;
+        particle.style.top = `${y}px`;
+        particle.style.backgroundColor = color;
+        particle.style.boxShadow = `0 0 12px ${color}`;
+
+        // Animate out
+        setTimeout(() => {
+            particle.style.transform = `translate(-50%, -50%) scale(0)`;
+            particle.style.opacity = '0';
+        }, 10); // Start fade out almost immediately
+
+        // Remove from DOM after animation
+        setTimeout(() => particle.remove(), 500);
+    }
+    
+    // --- RESTORED: Section Interactivity Sounds ---
+    function setupSectionInteractivity() {
+        const sections = document.querySelectorAll('.ai-guide-section');
+        sections.forEach(section => {
+            // Add sound triggers
+            section.addEventListener('mouseenter', playShimmerWhoosh);
+            section.addEventListener('click', playDeepThump);
+
+            // Keep visual effect
+            section.addEventListener('mousemove', e => {
+                const rect = section.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                section.style.background = `radial-gradient(circle at ${x}px ${y}px, rgba(42, 42, 71, 1) 0%, rgba(26, 26, 51, 1) 70%)`;
+            });
+            section.addEventListener('mouseleave', () => { section.style.background = '#1a1a33'; });
+        });
+    }
+
+    // --- MEMORY SEQUENCE GAME LOGIC (Unchanged) ---
     function setupMemoryGame() {
         const startBtn = document.getElementById('start-game-btn');
         const gameButtons = document.querySelectorAll('.game-button');
@@ -158,7 +287,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             await new Promise(resolve => setTimeout(resolve, 400));
             button.classList.remove('lit');
-            button.style.backgroundColor = ""; // Revert to CSS color
+            button.style.backgroundColor = "";
             await new Promise(resolve => setTimeout(resolve, 200));
         }
         game.canPlayerClick = true;
@@ -205,10 +334,10 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function getLitColor(buttonId) {
         const colors = {
-            'btn-0': '#1de9b6', // Brighter Teal
-            'btn-1': '#ff1744', // Brighter Red
-            'btn-2': '#ffff00', // Brighter Yellow
-            'btn-3': '#00e676'  // Brighter Green
+            'btn-0': '#1de9b6',
+            'btn-1': '#ff1744',
+            'btn-2': '#ffff00',
+            'btn-3': '#00e676'
         };
         return colors[buttonId];
     }
@@ -218,7 +347,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // --- UNCHANGED VISUAL SYSTEMS ---
+    // --- OTHER UNCHANGED SYSTEMS ---
     function setupWebGLBackground() { 
         const canvas = document.getElementById('generativeBackground');
         if (!canvas) return;
@@ -242,30 +371,6 @@ document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
         render();
-    }
-    function setupMouseParticles() { 
-        document.body.addEventListener('mousemove', e => {
-            if (Math.random() > 0.9) createParticle(e.clientX, e.clientY);
-        });
-    }
-    function createParticle(x, y) { 
-        const particle = document.createElement('div');
-        particle.className = 'mouse-particle';
-        document.body.appendChild(particle);
-        particle.style.left = `${x}px`;
-        particle.style.top = `${y}px`;
-        const color = `hsl(${Math.random() * 360}, 100%, 75%)`;
-        particle.style.backgroundColor = color;
-        particle.style.boxShadow = `0 0 8px ${color}`;
-        requestAnimationFrame(() => {
-            particle.style.transform = `translate(-50%, -50%) scale(1)`;
-            particle.style.opacity = '1';
-            setTimeout(() => {
-                particle.style.transform = `translate(-50%, -50%) scale(0)`;
-                particle.style.opacity = '0';
-            }, 500);
-        });
-        setTimeout(() => particle.remove(), 1000);
     }
     function setupIdleDetection() {
         let idleTimer;

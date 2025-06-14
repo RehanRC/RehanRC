@@ -90,30 +90,11 @@ ul li:hover {
     margin-top: 30px;
 }
 
-/* Cool visual effects ideas */
-
-/* Pulsating shadow for interactive elements (controlled by JS if needed) */
-/* animation: pulse-shadow 2s infinite alternate; */
+/* Cool visual effects ideas (controlled by JS if needed) */
 @keyframes pulse-shadow {
     from { box-shadow: 0 0 5px rgba(154, 255, 154, 0.5); }
     to { box-shadow: 0 0 20px rgba(154, 255, 154, 0.8); }
 }
-
-/* Background particle effect (conceptual, will be done with JS) */
-body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    /* Example for a subtle background pattern */
-    /* background-image: radial-gradient(#2a0050 1px, transparent 1px); */
-    /* background-size: 20px 20px; */
-    /* opacity: 0.2; */
-}
-
 
 /* Style for blockquote to visually distinguish quotes */
 blockquote {
@@ -140,29 +121,51 @@ blockquote cite {
     font-style: normal; /* Override italic for citation */
 }
 
+/* Styling for the embedded infographic image */
+.infographic-container {
+    text-align: center; /* Center the image */
+    margin: 30px auto;
+    max-width: 100%; /* Ensure it fits within the section */
+}
 
-/* Styling for the Infographic Rules List */
+.infographic-container img {
+    max-width: 100%; /* Make the image responsive */
+    height: auto;
+    display: block; /* Remove extra space below image */
+    border-radius: 8px; /* Match section rounded corners */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); /* Add some depth */
+}
+
+.image-caption {
+    font-size: 0.95em;
+    color: #a0a0c0;
+    margin-top: 15px;
+    font-style: italic;
+}
+
+/* The following styles were for the HTML-rendered infographic list and are now removed/commented out */
+/*
 .ai-rules-list {
-    list-style: none; /* Remove default numbering */
+    list-style: none;
     padding: 0;
     margin-top: 30px;
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Space between rule items */
+    gap: 15px;
 }
 
 .rule-item {
-    background-color: #2a2a47; /* Default background color for each rule box */
+    background-color: #2a2a47;
     padding: 15px 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     position: relative;
-    overflow: hidden; /* For pseudo-elements */
+    overflow: hidden;
     transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 .rule-item:hover {
-    transform: translateY(-3px); /* Subtle lift on hover */
+    transform: translateY(-3px);
     background-color: #3a3a5a;
 }
 
@@ -170,18 +173,18 @@ blockquote cite {
     margin-top: 0;
     margin-bottom: 5px;
     font-size: 1.3em;
-    color: #9aff9a; /* Bright color for rule titles */
+    color: #9aff9a;
     position: relative;
-    padding-left: 40px; /* Space for the numbered circle */
+    padding-left: 40px;
 }
 
 .rule-item h3::before {
-    content: attr(data-rule-number); /* Use the data-rule-number for the content */
+    content: attr(data-rule-number);
     position: absolute;
     left: 0;
     top: 50%;
     transform: translateY(-50%);
-    background-color: #5a0080; /* Circle background */
+    background-color: #5a0080;
     color: #fff;
     width: 30px;
     height: 30px;
@@ -191,44 +194,41 @@ blockquote cite {
     justify-content: center;
     font-size: 1em;
     font-weight: bold;
-    border: 2px solid #9aff9a; /* Border for the circle */
+    border: 2px solid #9aff9a;
 }
 
 .rule-item p {
     font-size: 1em;
     color: #e0e0f0;
     margin-bottom: 0;
-    padding-left: 40px; /* Align text with title after number */
+    padding-left: 40px;
 }
 
-/* Specific background colors for each rule item based on the infographic's bands */
 .rule-item[data-rule-number="10"],
 .rule-item[data-rule-number="6"],
 .rule-item[data-rule-number="2"] {
-    background-color: #3d0073; /* Purple band color */
+    background-color: #3d0073;
 }
 
 .rule-item[data-rule-number="9"],
 .rule-item[data-rule-number="5"],
 .rule-item[data-rule-number="1"] {
-    background-color: #503d00; /* Yellow/orange band color */
+    background-color: #503d00;
 }
 
 .rule-item[data-rule-number="8"],
 .rule-item[data-rule-number="4"] {
-    background-color: #33004c; /* Darker purple band color */
+    background-color: #33004c;
 }
 
 .rule-item[data-rule-number="7"],
 .rule-item[data-rule-number="3"] {
-    background-color: #332100; /* Darker yellow/orange band color */
+    background-color: #332100;
 }
 
-
-/* Styling for the Foundational Rule */
 .foundational-rule {
-    background-color: #ffcc00; /* Yellow background from infographic */
-    color: #333; /* Dark text for contrast */
+    background-color: #ffcc00;
+    color: #333;
     padding: 20px;
     margin-top: 30px;
     border-radius: 8px;
@@ -237,7 +237,7 @@ blockquote cite {
 }
 
 .foundational-rule h3 {
-    color: #333; /* Ensure dark text */
+    color: #333;
     margin-top: 0;
     margin-bottom: 10px;
     font-size: 1.5em;
@@ -258,3 +258,4 @@ blockquote cite {
     margin-bottom: 25px;
     text-align: center;
 }
+*/

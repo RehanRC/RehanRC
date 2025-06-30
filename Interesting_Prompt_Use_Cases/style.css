@@ -1,0 +1,267 @@
+/* style.css - The Alchemist's Grimoire */
+
+/* ----- Global Resets and Base Styles ----- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'EB Garamond', serif;
+    background-color: #1a1a2e; /* Deep Indigo */
+    color: #e0e0e0; /* Light grey for text */
+    line-height: 1.6;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+    position: relative; /* For particle container positioning */
+}
+
+/* ----- Particle Background ----- */
+#particle-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1; /* Behind all content */
+    pointer-events: none; /* Allow clicks to pass through */
+    /* Particles will be styled here if pure CSS, or managed by JS */
+    /* For a simple CSS particle effect (can be enhanced with JS) */
+    background-image:
+        radial-gradient(circle at 20% 20%, rgba(255, 215, 0, 0.05) 1px, transparent 1px),
+        radial-gradient(circle at 80% 30%, rgba(255, 215, 0, 0.04) 1px, transparent 1px),
+        radial-gradient(circle at 30% 70%, rgba(255, 215, 0, 0.03) 1px, transparent 1px),
+        radial-gradient(circle at 70% 80%, rgba(255, 215, 0, 0.05) 1px, transparent 1px);
+    background-size: 50px 50px, 70px 70px, 60px 60px, 80px 80px;
+    animation: drift 60s linear infinite;
+}
+
+@keyframes drift {
+    0% { background-position: 0 0, 0 0, 0 0, 0 0; }
+    100% { background-position: 1000px 500px, 700px -300px, -600px 800px, 800px -400px; }
+}
+
+
+/* ----- Typography ----- */
+h1, h2, h3 {
+    font-family: 'Cinzel Decorative', cursive;
+    color: #ffd700; /* Gold */
+    margin-bottom: 0.5em;
+    font-weight: 700;
+}
+
+h1 {
+    font-size: 2.8em;
+    text-align: center;
+    margin-bottom: 0.8em;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+h2 { /* Used for prompt titles */
+    font-size: 1.8em;
+    color: #f0e68c; /* Lighter Gold/Khaki for card titles */
+}
+
+h3 { /* Used for sections within prompts */
+    font-size: 1.3em;
+    color: #ffd700;
+    margin-top: 0.8em;
+}
+
+p, li {
+    font-size: 1em;
+    margin-bottom: 0.75em;
+}
+
+pre {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 1em;
+    border-radius: 4px;
+    border-left: 3px solid #ffd700;
+    font-family: 'Courier New', Courier, monospace;
+    white-space: pre-wrap; /* Wrap long lines */
+    word-wrap: break-word;
+    color: #c0c0c0; /* Lighter text for code/instructions */
+    font-size: 0.95em;
+}
+
+code {
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* ----- Main Grimoire Container ----- */
+.grimoire-container {
+    max-width: 1200px;
+    margin: 2em auto;
+    padding: 2em;
+    background: rgba(12, 12, 22, 0.6); /* Darker, slightly transparent charcoal */
+    border: 1px solid rgba(255, 215, 0, 0.2); /* Subtle gold border */
+    border-radius: 10px;
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 215, 0, 0.1);
+    backdrop-filter: blur(5px); /* Frosty glass effect for supporting browsers */
+}
+
+/* ----- Header ----- */
+.grimoire-header {
+    margin-bottom: 2em;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    padding-bottom: 1.5em;
+}
+
+/* ----- Category Filter "Runes" ----- */
+.category-runes {
+    display: flex;
+    justify-content: center;
+    gap: 15px; /* Spacing between runes */
+    flex-wrap: wrap; /* Allow runes to wrap on smaller screens */
+}
+
+.rune {
+    font-family: 'Cinzel Decorative', cursive; /* Using title font for rune text */
+    font-size: 1.1em; /* Slightly larger for impact */
+    font-weight: 700;
+    color: #ffd700; /* Gold */
+    background-color: transparent;
+    border: 2px solid #ffd700; /* Gold border */
+    width: 50px; /* Circular shape */
+    height: 50px; /* Circular shape */
+    border-radius: 50%; /* Makes it circular */
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase; /* If using single letters or short codes */
+    box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+}
+
+.rune:hover {
+    background-color: rgba(255, 215, 0, 0.1); /* Slight gold tint on hover */
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.7); /* Brighter glow */
+    transform: scale(1.1);
+}
+
+.rune.active {
+    background-color: #ffd700; /* Solid gold */
+    color: #1a1a2e; /* Deep Indigo text */
+    box-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.5); /* Bright, pulsing glow */
+    animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.7), 0 0 15px rgba(255, 215, 0, 0.4); }
+    50% { box-shadow: 0 0 20px rgba(255, 215, 0, 1), 0 0 30px rgba(255, 215, 0, 0.6); }
+    100% { box-shadow: 0 0 10px rgba(255, 215, 0, 0.7), 0 0 15px rgba(255, 215, 0, 0.4); }
+}
+
+/* ----- Prompt Recipe Grid ----- */
+.prompt-recipe-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive grid */
+    gap: 1.5em;
+}
+
+/* ----- Prompt Recipe Card ----- */
+.prompt-recipe-card {
+    background-color: rgba(40, 40, 58, 0.7); /* Darker charcoal, slightly transparent */
+    border: 1px solid rgba(255, 215, 0, 0.4); /* Subtle golden border */
+    border-radius: 8px;
+    padding: 1.5em;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column; /* Ensure button is at the bottom */
+}
+
+.prompt-recipe-card:hover {
+    transform: translateY(-5px) scale(1.02); /* Slight lift and scale */
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.5), 0 0 25px rgba(255, 215, 0, 0.3); /* Pulsing golden glow */
+}
+
+.prompt-recipe-card section {
+    margin-bottom: 1em;
+}
+
+.prompt-recipe-card section:last-of-type {
+    margin-bottom: 0; /* Remove margin from last section before button */
+}
+
+/* ----- "Transcribe Incantation" Button ----- */
+.transcribe-button {
+    font-family: 'EB Garamond', serif;
+    font-weight: bold;
+    background-color: #ffd700; /* Gold */
+    color: #1a1a2e; /* Deep Indigo */
+    border: none;
+    padding: 0.75em 1.2em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease, transform 0.2s ease;
+    margin-top: auto; /* Pushes button to the bottom of the card */
+    align-self: flex-start; /* Align to the start of the flex container */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+.transcribe-button:hover {
+    background-color: #e6c300; /* Darker gold on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+
+}
+
+.transcribe-button.transcribed {
+    background-color: #4CAF50; /* Green for success */
+    color: white;
+    animation: transcribed-feedback 0.8s ease;
+}
+
+@keyframes transcribed-feedback {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+
+/* ----- Responsive Adjustments ----- */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2.2em;
+    }
+    .grimoire-container {
+        margin: 1em;
+        padding: 1em;
+    }
+    .prompt-recipe-grid {
+        grid-template-columns: 1fr; /* Single column on smaller screens */
+    }
+    .rune {
+        width: 45px;
+        height: 45px;
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.8em;
+    }
+    .rune {
+        width: 40px;
+        height: 40px;
+        font-size: 0.9em;
+        gap: 10px;
+    }
+    .transcribe-button {
+        width: 100%; /* Full width button on small screens */
+        padding: 0.8em;
+    }
+}
+
+/* Accessibility: Focus visible for keyboard navigation */
+.rune:focus-visible,
+.transcribe-button:focus-visible {
+    outline: 2px solid #fff; /* White outline for visibility on dark background */
+    outline-offset: 2px;
+}

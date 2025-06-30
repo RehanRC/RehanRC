@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Alchemist's Grimoire</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Ambient Particles Background -->
+    <div id="particle-container"></div>
+
+    <div class="grimoire-container">
+        <header class="grimoire-header">
+            <h1>The Alchemist's Grimoire</h1>
+            <nav id="category-runes-container" class="category-runes" aria-label="Filter Prompts by Category">
+                <!-- Filter runes will be dynamically inserted here by script.js -->
+                <!-- Example Rune (for styling purposes, will be removed/replaced by JS) -->
+                <!-- <button class="rune active" data-category="CategoryName">C</button> -->
+            </nav>
+        </header>
+
+        <main id="prompt-grid" class="prompt-recipe-grid" aria-live="polite">
+            <!-- Prompt recipes will be dynamically inserted here by script.js -->
+            <!-- Example Card (for styling purposes, will be removed/replaced by JS) -->
+            <!--
+            <article class="prompt-recipe-card">
+                <h2>Prompt Title</h2>
+                <section>
+                    <h3>Description</h3>
+                    <p>This is a short description of the prompt.</p>
+                </section>
+                <section>
+                    <h3>Instructions</h3>
+                    <pre><code>These are the detailed instructions.</code></pre>
+                </section>
+                <section>
+                    <h3>Transformation</h3>
+                    <p>This explains the transformation.</p>
+                </section>
+                <button class="transcribe-button">Transcribe Incantation</button>
+            </article>
+            -->
+        </main>
+    </div>
+
+    <!-- Custom Script -->
+    <script src="script.js"></script>
+</body>
+</html>

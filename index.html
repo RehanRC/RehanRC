@@ -1,40 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>RehanRC.com Home</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Creative Prompt Library</title>
+
+    <!-- Google Font: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- Vanta.js Dependencies (three.js and Vanta.js itself) -->
+    <!-- Using specific versions for stability, update as needed -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
+    <!-- For DOTS effect, if preferred later:
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.dots.min.js"></script>
+    -->
+
+    <!-- Custom Stylesheet -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Welcome to RehanRC.com</h1>
-  <ul>
-    <li>
-      <a href="Command-Verb-Prompting-Guide/Command_Verbs_Guide_Home.html">
-        Command Verb Prompting Guide
-      </a>
-    </li>
-    <!-- Add more links for future projects/sites below -->
+    <!-- Container for Vanta.js Interactive Background -->
+    <div id="vanta-background"></div>
 
-    <!-- <li><a href="AnotherSection/AnotherLandingPage.html">Another Project</a></li> -->
-    <li>
-      <a href="Definitive Prompt Toolset/Definitive Prompt Toolset.html">
-        Definitive Prompt Toolset
-      </a>
-      
-    <li>
-      <a href="AI GUIDE/AI_Guide.html">
-        AI GUIDE
-      </a>
-    </li>
+    <!-- Wrapper for page content to sit above the fixed background -->
+    <div class="page-content">
+        <header class="library-header">
+            <h1>Creative Prompt Library</h1>
+            <nav id="category-filter-container" class="category-filters" aria-label="Filter prompts by category">
+                <!-- Filter buttons will be dynamically inserted here by script.js -->
+                <!-- Example button structure (for styling reference, will be replaced):
+                <button class="filter-button active" data-category="All">All</button>
+                <button class="filter-button" data-category="Technology">Technology</button>
+                -->
+            </nav>
+        </header>
 
+        <main id="prompt-grid-container" class="prompt-grid" aria-live="polite">
+            <!-- Prompt cards will be dynamically inserted here by script.js -->
+            <!-- Example card structure (for styling reference, will be replaced):
+            <article class="prompt-card" data-category="SomeCategory">
+                <h2 class="prompt-title">Example Prompt Title</h2>
+                <div class="prompt-details">
+                    <section class="prompt-section">
+                        <h3>Description</h3>
+                        <p>This is a brief description of the creative prompt.</p>
+                    </section>
+                    <section class="prompt-section">
+                        <h3>Instructions</h3>
+                        <pre><code>These are the detailed instructions for the prompt.</code></pre>
+                    </section>
+                    <section class="prompt-section">
+                        <h3>Transformation</h3>
+                        <p>This explains the expected transformation or output.</p>
+                    </section>
+                </div>
+                <button class="copy-button">Copy Instructions</button>
+            </article>
+            -->
+        </main>
 
-    <li>
-      <a href="AI GUIDE/page_1.png">
-        Human Rules for Surviving AI
-      </a>
-    </li>
-    
-     
-    </li>
-  </ul>
+        <footer class="library-footer">
+            <p>Powered by Creative Sparks & Code</p>
+        </footer>
+    </div>
+
+    <!-- Custom Script (defer to ensure HTML is parsed, Vanta needs body elements) -->
+    <script src="script.js" defer></script>
 </body>
 </html>

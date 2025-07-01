@@ -1,4 +1,4 @@
-/* style.css - Creative Prompt Library - GRIDPULSE Edition */
+/* style.css - Creative Prompt Library - GRIDPULSE Edition - REAPPLIED */
 
 /* ----- Global Resets and Base Styles ----- */
 *,
@@ -28,14 +28,12 @@ body {
     font-family: var(--font-body);
     background-color: var(--base-bg-color);
     color: var(--text-color);
-    line-height: 1.6; /* Adjusted from 1.7 for prompt readability */
+    line-height: 1.6;
     overflow-x: hidden;
     min-height: 100vh;
 }
 
-/* ----- Main Container and Background Canvas ----- */
-/* #gridpulse-container would be the body or a full-page wrapper if needed, not strictly necessary if body is styled */
-
+/* ----- Background Canvas and Content Overlay ----- */
 #gridpulse-background {
     position: fixed;
     top: 0;
@@ -43,31 +41,31 @@ body {
     width: 100%;
     height: 100%;
     z-index: 0;
-    opacity: 0.6; /* Slightly less opacity for better text contrast */
+    opacity: 0.6;
 }
 
 .content-overlay {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 1100px; /* Slightly wider for library content */
-    padding: 1.5em; /* Adjusted padding */
-    margin: 0 auto; /* Center content overlay */
+    max-width: 1100px;
+    padding: 1.5em;
+    margin: 0 auto;
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-/* ----- Library Header (Hero Title Styling) ----- */
-.library-header.hero-section { /* Combining for title styling */
+/* ----- Library Header (Main Title) ----- */
+.library-header.hero-section {
     text-align: center;
-    padding: 3vh 1em 3vh; /* Reduced padding for library title */
-    margin-bottom: 1.5em; /* Space before filters */
+    padding: 3vh 1em 3vh;
+    margin-bottom: 1.5em;
 }
 
 .hero-title { /* Applied to <h1>Creative Prompt Library</h1> */
     font-family: var(--font-hero);
-    font-size: clamp(2.5rem, 8vw, 5rem); /* Adjusted for library title */
+    font-size: clamp(2.5rem, 8vw, 4.5rem); /* Slightly reduced max for library title */
     font-weight: 700;
     color: var(--hero-title-color);
     text-transform: uppercase;
@@ -76,21 +74,29 @@ body {
     text-shadow:
         0 0 5px var(--glow-color-primary),
         0 0 10px var(--glow-color-primary),
-        0 0 15px var(--hero-title-color); /* Simpler glow for library title */
-    animation: title-glow-pulse 3s infinite ease-in-out; /* Kept glow pulse */
+        0 0 15px var(--hero-title-color);
+    animation: title-glow-pulse 3s infinite ease-in-out;
 }
-/* Removed title-flicker for library title for better readability, can be re-added if desired */
-@keyframes title-glow-pulse {
+@keyframes title-glow-pulse { /* Copied from GRIDPULSE */
     0%, 100% { text-shadow: 0 0 5px var(--glow-color-primary), 0 0 10px var(--glow-color-primary), 0 0 15px var(--hero-title-color); }
     50% { text-shadow: 0 0 8px var(--glow-color-primary), 0 0 15px var(--glow-color-primary), 0 0 25px var(--hero-title-color); }
 }
+.hero-tagline { /* If added in HTML */
+    font-family: var(--font-mono);
+    font-size: clamp(1rem, 2.5vw, 1.2rem); /* Adjusted size */
+    color: var(--text-color);
+    letter-spacing: 1px;
+    opacity: 0.8;
+    text-transform: uppercase;
+}
 
-/* ----- Filter Controls Area ----- */
+
+/* ----- Filter Controls Styling ----- */
 .filter-controls-wrapper {
     padding: 1.5em 1em;
     margin-bottom: 2em;
     border: 1px solid var(--border-color);
-    background-color: rgba(10, 10, 10, 0.4);
+    background-color: rgba(10, 10, 10, 0.4); /* Matches .info-section */
     backdrop-filter: blur(4px);
     box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -100,36 +106,36 @@ body {
     box-shadow: 0 0 20px var(--glow-color-primary);
 }
 
-.filter-group {
+.filter-group { /* Contains h2 and nav for filters */
     margin-bottom: 1.5em;
 }
 .filter-group:last-child {
     margin-bottom: 0;
 }
 
-.section-title.filter-group-title { /* For "Main Categories", "Subcategories" */
+.section-title.filter-group-title { /* For "Main Categories", "Subcategories" h2 */
     font-family: var(--font-hero);
-    font-size: clamp(1.5rem, 4vw, 2rem);
-    color: var(--secondary-accent-color); /* Neon Green */
+    font-size: clamp(1.3rem, 3.5vw, 1.8rem); /* Adjusted size */
+    color: var(--secondary-accent-color);
     text-transform: uppercase;
     margin-bottom: 0.8em;
     letter-spacing: 1px;
-    text-align: left; /* Align left for filter groups */
+    text-align: left;
     text-shadow: 0 0 5px var(--glow-color-secondary), 0 0 8px var(--secondary-accent-color);
 }
 
-.category-filters {
+.category-filters { /* Nav container for buttons */
     display: flex;
     flex-wrap: wrap;
-    gap: 8px; /* Slightly reduced gap */
+    gap: 8px;
 }
 
-.filter-button { /* Styling like .action-button from GRIDPULSE */
-    font-family: var(--font-mono); /* Using mono for buttons for a techy feel */
+.filter-button {
+    font-family: var(--font-mono);
     background-color: transparent;
     color: var(--primary-accent-color);
-    border: 1px solid var(--primary-accent-color); /* Thinner border */
-    padding: 0.5em 1em; /* Adjusted padding */
+    border: 1px solid var(--primary-accent-color);
+    padding: 0.5em 1em;
     font-size: 0.9rem;
     text-transform: uppercase;
     letter-spacing: 0.5px;
@@ -147,17 +153,17 @@ body {
 }
 
 .filter-button.active {
-    background-color: var(--secondary-accent-color); /* Neon green for active */
+    background-color: var(--secondary-accent-color);
     color: var(--base-bg-color);
     border-color: var(--secondary-accent-color);
     box-shadow: 0 0 10px var(--glow-color-secondary), 0 0 15px var(--secondary-accent-color);
 }
 
-#subcategories-section.hidden {
+#subcategories-section.hidden { /* Class applied by JS */
     display: none;
 }
 
-/* ----- Prompt Grid & Cards ----- */
+/* ----- Prompt Grid & Cards Styling ----- */
 .prompt-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
@@ -165,7 +171,7 @@ body {
     flex-grow: 1;
 }
 
-.prompt-card { /* Styling like .info-section from GRIDPULSE */
+.prompt-card {
     padding: 1.5em;
     border: 1px solid var(--border-color);
     background-color: rgba(10, 10, 10, 0.3);
@@ -182,29 +188,29 @@ body {
 }
 
 .prompt-card .prompt-title { /* h2 within card */
-    font-family: var(--font-hero); /* Orbitron for card titles */
+    font-family: var(--font-hero);
     font-size: 1.4rem;
     color: var(--primary-accent-color);
     margin-bottom: 0.75em;
     text-shadow: 0 0 3px var(--glow-color-primary);
 }
 
-.prompt-card .prompt-section h3 { /* Section titles within card */
+.prompt-card .prompt-section h3 { /* h3 within card sections */
     font-family: var(--font-body);
     font-weight: 700;
     font-size: 1rem;
-    color: var(--secondary-accent-color); /* Neon green for subheadings */
+    color: var(--secondary-accent-color);
     margin-top: 0.8em;
     margin-bottom: 0.3em;
 }
 
 .prompt-card p {
-    font-size: 0.95rem; /* Slightly smaller for density */
+    font-size: 0.95rem;
     margin-bottom: 0.8em;
     color: var(--text-color);
 }
 
-.prompt-card pre { /* Styling like .code-snippet */
+.prompt-card pre {
     font-family: var(--font-mono);
     background-color: rgba(0, 0, 0, 0.4);
     border: 1px solid rgba(0,255,255,0.2);
@@ -221,10 +227,10 @@ body {
     font-family: inherit;
 }
 
-.copy-button { /* Styling like .action-button */
+.copy-button {
     font-family: var(--font-mono);
     background-color: transparent;
-    color: var(--secondary-accent-color); /* Neon green for copy button */
+    color: var(--secondary-accent-color);
     border: 1px solid var(--secondary-accent-color);
     padding: 0.5em 1em;
     font-size: 0.85rem;
@@ -232,7 +238,7 @@ body {
     letter-spacing: 0.5px;
     cursor: pointer;
     transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
-    margin-top: auto; /* Push to bottom of card */
+    margin-top: auto;
     align-self: flex-start;
     box-shadow: 0 0 3px rgba(57, 255, 20, 0.4);
 }
@@ -244,14 +250,13 @@ body {
     box-shadow: 0 0 10px var(--glow-color-secondary), 0 0 15px var(--secondary-accent-color);
 }
 
-.copy-button.copied { /* JS will need to add this class */
+.copy-button.copied { /* JS adds/removes this class */
     background-color: var(--primary-accent-color);
     color: var(--base-bg-color);
     border-color: var(--primary-accent-color);
     pointer-events: none;
     box-shadow: 0 0 10px var(--glow-color-primary);
 }
-
 
 /* ----- Footer ----- */
 .library-footer.page-footer {
@@ -275,13 +280,13 @@ body {
     background-color: rgba(0,255,255,0.05);
 }
 
-/* ----- Animations for scroll-triggered effects (if used) ----- */
-.filter-controls-wrapper.visible, /* Example if we animate filter box */
-.prompt-card.visible { /* If we animate cards individually */
+/* ----- Animations for scroll-triggered effects ----- */
+.filter-controls-wrapper.visible,
+.prompt-card.visible {
     animation: fadeInSlideUp 0.7s ease-out forwards;
 }
 
-@keyframes fadeInSlideUp {
+@keyframes fadeInSlideUp { /* Copied from GRIDPULSE */
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
@@ -294,8 +299,19 @@ body {
 }
 
 @media (max-width: 480px) {
-    .hero-title { font-size: clamp(2rem, 7vw, 3.5rem); }
-    .section-title.filter-group-title { font-size: clamp(1.2rem, 3.5vw, 1.5rem); }
-    .filter-button { width: calc(50% - 4px); text-align: center; } /* 2 per row */
+    .hero-title { font-size: clamp(2rem, 7vw, 3rem); } /* Adjusted max */
+    .section-title.filter-group-title { font-size: clamp(1.1rem, 3vw, 1.3rem); } /* Adjusted max */
+    .filter-button {
+        /* width: calc(50% - 4px); Let them flow naturally with smaller size */
+        text-align: center;
+        font-size: 0.8rem; /* Smaller for more density if needed */
+    }
     .copy-button { width: 100%; text-align: center; }
+}
+
+/* Accessibility: Focus visible for keyboard navigation */
+.filter-button:focus-visible,
+.copy-button:focus-visible {
+    outline: 2px solid var(--primary-accent-color); /* Cyan outline */
+    outline-offset: 2px;
 }

@@ -3,56 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative Prompt Library - Advanced Filters</title>
+    <title>GRIDPULSE Interface</title>
 
-    <!-- Google Font: Inter -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-    <!-- Vanta.js Dependencies -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Condensed:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
     <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Container for Vanta.js Interactive Background -->
-    <div id="vanta-background"></div>
+    <div class="gridpulse-container">
+        <!-- Dynamic Background Canvas -->
+        <canvas id="gridpulse-background"></canvas>
 
-    <!-- Wrapper for page content to sit above the fixed background -->
-    <div class="page-content">
-        <header class="library-header">
-            <h1>Creative Prompt Library</h1>
-            <div class="filter-controls" role="tablist" aria-label="Prompt Filters">
-                <section id="main-categories-section" aria-labelledby="main-categories-heading">
-                    <h2 id="main-categories-heading" class="filter-group-heading">Main Categories</h2>
-                    <nav id="main-categories" class="category-filters" aria-label="Filter by Main Category">
-                        <!-- Main category filter buttons will be dynamically inserted here by script.js -->
-                    </nav>
+        <!-- Content Overlay -->
+        <div class="content-overlay">
+            <header class="hero-section">
+                <h1 class="hero-title" data-text="GRIDPULSE">GRIDPULSE</h1>
+                <p class="hero-tagline">Enter the Datastream // System Online</p>
+            </header>
+
+            <main class="main-content">
+                <section class="info-section" id="section-one">
+                    <h2 class="section-title">ACCESS NODE_01</h2>
+                    <div class="section-content">
+                        <p>Initializing core systems. Data packets flowing through the neon grid. The digital frontier expands, revealing pathways to uncharted territories within the mainframe. Stand by for full immersion.</p>
+                        <pre class="code-snippet"><code>&gt; System.Diagnostics.Run(All);
+&gt; Network.Status: SECURE_LINK ESTABLISHED
+&gt; User.Authentication: GRANTED</code></pre>
+                    </div>
                 </section>
 
-                <section id="subcategories-section" aria-labelledby="subcategories-heading">
-                     <h2 id="subcategories-heading" class="filter-group-heading">Subcategories</h2>
-                    <nav id="subcategories" class="category-filters subcategory-filters" aria-label="Filter by Subcategory">
-                        <!-- Subcategory filter buttons will be dynamically inserted here by script.js -->
-                        <!-- This container might be initially hidden or empty -->
-                    </nav>
+                <section class="info-section" id="section-two">
+                    <h2 class="section-title">DATA STREAM_X7</h2>
+                    <div class="section-content">
+                        <p>Information cascades, forming a symphony of light and logic. Each pulse a new possibility, each connection a deeper understanding of the underlying architecture. The echo of the '80s and '90s digital revolution resonates here, refined and sharpened.</p>
+                        <div class="interactive-placeholder">
+                            <button class="action-button">Initiate Sequence</button>
+                        </div>
+                    </div>
                 </section>
-            </div>
-        </header>
+            </main>
 
-        <main id="prompt-grid-container" class="prompt-grid" aria-live="polite">
-            <!-- Prompt cards will be dynamically inserted here by script.js -->
-        </main>
-
-        <footer class="library-footer">
-            <p>Enhanced Filtering Edition</p>
-        </footer>
+            <footer class="page-footer">
+                <p>&copy; <span id="current-year"></span> GRIDPULSE SYSTEMS. // ALL RIGHTS RESERVED //</p>
+            </footer>
+        </div>
     </div>
 
-    <!-- Custom Script (defer to ensure HTML is parsed, Vanta needs body elements) -->
+    <!-- Custom Script (defer for canvas and DOM manipulation) -->
     <script src="script.js" defer></script>
 </body>
 </html>

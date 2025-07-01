@@ -1,252 +1,179 @@
-// script.js - Creative Prompt Library - Advanced Two-Level Filtering
+// script.js - GRIDPULSE Interface
 
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements
-    const vantaEffectContainer = document.getElementById('vanta-background');
-    const mainCategoriesContainer = document.getElementById('main-categories');
-    const subcategoriesContainer = document.getElementById('subcategories');
-    const subcategoriesSection = document.getElementById('subcategories-section'); // To hide/show
-    const promptGridContainer = document.getElementById('prompt-grid-container');
+    const canvas = document.getElementById('gridpulse-background');
+    const ctx = canvas.getContext('2d');
 
-    // Data URL (New URL for two-level data)
-    const PROMPTS_DATA_URL = 'https://raw.githubusercontent.com/RehanRC/RehanRC/main/Interesting_Prompt_Use_Cases_2/prompts.json';
+    let width, height, gridSize, particles;
+    const particleSpeed = 0.5;
+    const connectionDistance = 100; // Max distance for lines between particles
+    const particleColor = 'rgba(0, 255, 255, 0.7)'; // Cyan
+    const lineColor = 'rgba(0, 255, 255, 0.15)'; // Fainter Cyan for lines
 
-    // State Variables
-    let allPromptsData = [];
-    let currentMainCategory = 'All';
-    let currentSubCategory = 'All'; // Represents "All" within the selected main category's subcategories
+    // --- Dynamic Year for Footer ---
+    const currentYearSpan = document.getElementById('current-year');
+    if (currentYearSpan) {
+        currentYearSpan.textContent = new Date().getFullYear();
+    }
 
-    /**
-     * Initializes the Vanta.js NET effect.
-     */
-    function initVantaBackground() {
-        if (window.VANTA && vantaEffectContainer) {
-            window.VANTA.NET({
-                el: "#vanta-background",
-                mouseControls: true,
-                touchControls: true,
-                gyroControls: false,
-                minHeight: 200.00,
-                minWidth: 200.00,
-                scale: 1.00,
-                scaleMobile: 1.00,
-                color: 0x00ffff,
-                backgroundColor: 0x12121a,
-                points: 10.00,
-                maxDistance: 20.00,
-                spacing: 15.00
+    // --- Hero Title Glitch Effect (Subtle - CSS handles main flicker) ---
+    // This can be enhanced for more complex JS-driven glitch if needed
+    const heroTitle = document.querySelector('.hero-title');
+    if (heroTitle) {
+        // Example: Slightly change text-shadow periodically for a subtle digital pulse
+        // This is more of a placeholder for complex JS glitch; CSS handles a lot.
+        // setInterval(() => {
+        //     const x = Math.random() * 2 - 1;
+        //     const y = Math.random() * 2 - 1;
+        //     heroTitle.style.textShadow = `
+        //         ${x}px ${y}px 0px rgba(255,0,255,0.7),
+        //         ${-x}px ${-y}px 0px rgba(0,255,255,0.7),
+        //         0 0 5px var(--glow-color-primary),
+        //         0 0 10px var(--glow-color-primary),
+        //         0 0 20px var(--glow-color-primary),
+        //         0 0 40px var(--hero-title-color),
+        //         0 0 70px var(--hero-title-color)
+        //     `;
+        // }, 2000 + Math.random() * 1000);
+    }
+
+
+    // --- Animated Grid/Particle Background ---
+    function setupCanvas() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+        gridSize = 30; // Adjust for grid density
+        particles = [];
+        const numberOfParticles = Math.floor((width * height) / (gridSize * gridSize * 5)); // Adjust density
+
+        for (let i = 0; i < numberOfParticles; i++) {
+            particles.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * particleSpeed, // X velocity
+                vy: (Math.random() - 0.5) * particleSpeed  // Y velocity
             });
-        } else {
-            console.warn("Vanta.js or #vanta-background element not found. Skipping background effect.");
-            if (vantaEffectContainer) vantaEffectContainer.style.backgroundColor = '#12121a';
         }
     }
 
-    /**
-     * Fetches prompt data from the URL.
-     * @returns {Promise<Array<Object>>} Array of prompt objects.
-     */
-    async function fetchPromptsData() {
-        try {
-            const response = await fetch(PROMPTS_DATA_URL);
-            if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-            return await response.json();
-        } catch (error) {
-            console.error("Failed to fetch prompt data:", error);
-            promptGridContainer.innerHTML = '<p class="error-message">Failed to load prompts. The library is temporarily unavailable.</p>';
-            return [];
+    function drawGrid() {
+        ctx.strokeStyle = 'rgba(0, 255, 255, 0.05)'; // Very faint grid lines
+        ctx.lineWidth = 0.5;
+
+        // Draw vertical lines
+        for (let x = 0; x <= width; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, height);
+            ctx.stroke();
+        }
+        // Draw horizontal lines
+        for (let y = 0; y <= height; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(width, y);
+            ctx.stroke();
         }
     }
 
-    /**
-     * Basic sanitization helper.
-     * @param {string} str - String to sanitize.
-     * @returns {string} Sanitized string.
-     */
-    const sanitizeHTML = (str) => {
-        const temp = document.createElement('div');
-        temp.textContent = str;
-        return temp.innerHTML;
+    function drawParticlesAndConnections() {
+        ctx.fillStyle = particleColor;
+        ctx.strokeStyle = lineColor;
+        ctx.lineWidth = 0.5;
+
+        particles.forEach(p => {
+            // Draw particle
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2); // Small dots
+            ctx.fill();
+
+            // Update position
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Boundary check (wrap around)
+            if (p.x < 0) p.x = width;
+            if (p.x > width) p.x = 0;
+            if (p.y < 0) p.y = height;
+            if (p.y > height) p.y = 0;
+
+            // Draw connections to nearby particles
+            particles.forEach(otherP => {
+                if (p === otherP) return;
+                const dx = p.x - otherP.x;
+                const dy = p.y - otherP.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+
+                if (distance < connectionDistance) {
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(otherP.x, otherP.y);
+                    // Optional: Make line opacity based on distance
+                    // ctx.strokeStyle = `rgba(0, 255, 255, ${1 - distance / connectionDistance * 0.85})`; // Fades out
+                    ctx.stroke();
+                }
+            });
+        });
+    }
+
+
+    function animateBackground() {
+        ctx.clearRect(0, 0, width, height); // Clear canvas
+        drawGrid(); // Draw the static grid lines
+        drawParticlesAndConnections(); // Draw moving particles and their connections
+        requestAnimationFrame(animateBackground);
+    }
+
+    // Initialize canvas and animation
+    if (canvas) {
+        setupCanvas();
+        animateBackground();
+        window.addEventListener('resize', setupCanvas); // Re-setup on resize
+    } else {
+        console.warn("Canvas element #gridpulse-background not found.");
+    }
+
+
+    // --- Scroll-Triggered Animations for Sections ---
+    const sections = document.querySelectorAll('.info-section');
+    const observerOptions = {
+        root: null, // relative to document viewport
+        rootMargin: '0px',
+        threshold: 0.1 // 10% of item visible
     };
 
-    /**
-     * Creates an HTML element for a single prompt card.
-     * @param {Object} prompt - The prompt data object.
-     * @returns {HTMLElement} The created prompt card element.
-     */
-    function createPromptCardElement(prompt) {
-        const card = document.createElement('article');
-        card.className = 'prompt-card';
-        card.dataset.mainCategory = prompt.main_category;
-        card.dataset.subCategory = prompt.sub_category;
-
-        card.innerHTML = `
-            <h2 class="prompt-title">${sanitizeHTML(prompt.title)}</h2>
-            <div class="prompt-details">
-                <section class="prompt-section">
-                    <h3>Description</h3>
-                    <p>${sanitizeHTML(prompt.description)}</p>
-                </section>
-                <section class="prompt-section">
-                    <h3>Instructions</h3>
-                    <pre><code>${sanitizeHTML(prompt.instructions)}</code></pre>
-                </section>
-                <section class="prompt-section">
-                    <h3>Transformation</h3>
-                    <p>${sanitizeHTML(prompt.transformation)}</p>
-                </section>
-            </div>
-            <button class="copy-button" aria-label="Copy instructions for ${sanitizeHTML(prompt.title)}">Copy Instructions</button>
-        `;
-
-        const copyButton = card.querySelector('.copy-button');
-        copyButton.addEventListener('click', () => {
-            navigator.clipboard.writeText(prompt.instructions)
-                .then(() => {
-                    copyButton.textContent = 'Copied!';
-                    copyButton.classList.add('copied');
-                    setTimeout(() => {
-                        copyButton.textContent = 'Copy Instructions';
-                        copyButton.classList.remove('copied');
-                    }, 2000);
-                })
-                .catch(err => {
-                    console.error('Failed to copy instructions: ', err);
-                    copyButton.textContent = 'Copy Failed';
-                    setTimeout(() => copyButton.textContent = 'Copy Instructions', 2000);
-                });
-        return card;
-    }
-
-    /**
-     * Renders prompt cards to the grid.
-     * @param {Array<Object>} promptsToRender - Prompts to display.
-     */
-    function renderPromptCards(promptsToRender) {
-        promptGridContainer.innerHTML = '';
-        if (promptsToRender.length === 0 && !document.querySelector('.error-message')) {
-            promptGridContainer.innerHTML = `<p class="no-results-message">No prompts match the current filter criteria.</p>`;
-        } else {
-            promptsToRender.forEach(prompt => {
-                promptGridContainer.appendChild(createPromptCardElement(prompt));
-            });
-        }
-    }
-
-    /**
-     * Updates active state for a group of filter buttons.
-     * @param {HTMLElement} container - The container of the filter buttons.
-     * @param {string} activeCategoryName - The name of the category to mark as active.
-     */
-    function updateActiveButtonStates(container, activeCategoryName) {
-        const buttons = container.querySelectorAll('.filter-button');
-        buttons.forEach(button => {
-            if (button.dataset.category === activeCategoryName) {
-                button.classList.add('active');
-                button.setAttribute('aria-pressed', 'true');
+    const observer = new IntersectionObserver((entries, observerRef) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+                // Optional: unobserve after animation to save resources
+                // observerRef.unobserve(entry.target);
             } else {
-                button.classList.remove('active');
-                button.setAttribute('aria-pressed', 'false');
+                // Optional: remove class to re-animate if scrolling up then down
+                // entry.target.classList.remove('visible');
             }
         });
+    }, observerOptions);
+
+    sections.forEach(section => {
+        observer.observe(section);
+    });
+
+    // --- Mouse Interaction (Subtle Parallax/Spotlight - Example) ---
+    // This is a very subtle effect, can be expanded or changed.
+    const contentOverlay = document.querySelector('.content-overlay');
+    if (contentOverlay) {
+        // document.body.addEventListener('mousemove', (e) => {
+        //     const { clientX, clientY } = e;
+        //     const x = (clientX / window.innerWidth - 0.5) * 2; // -1 to 1
+        //     const y = (clientY / window.innerHeight - 0.5) * 2; // -1 to 1
+
+            // Example: Shift a pseudo-element or a dedicated spotlight div
+            // For simplicity, let's imagine a CSS variable we could update
+            // document.documentElement.style.setProperty('--mouse-x', `${x * 10}px`);
+            // document.documentElement.style.setProperty('--mouse-y', `${y * 10}px`);
+            // Then use these in CSS for a subtle transform on some elements or a spotlight div.
+            // For now, this is commented out as it requires corresponding CSS.
+        // });
     }
-
-    /**
-     * Populates filter buttons in a given container.
-     * @param {HTMLElement} container - The DOM element to populate.
-     * @param {Array<string>} categories - Array of category names.
-     * @param {string} currentActive - The currently active category name for this group.
-     * @param {Function} clickHandler - Function to call on button click.
-     */
-    function populateFilterButtons(container, categories, currentActive, clickHandler) {
-        container.innerHTML = '';
-        categories.forEach(categoryName => {
-            const button = document.createElement('button');
-            button.className = 'filter-button';
-            button.dataset.category = categoryName;
-            button.textContent = categoryName;
-            if (categoryName === currentActive) {
-                button.classList.add('active');
-                button.setAttribute('aria-pressed', 'true');
-            } else {
-                 button.setAttribute('aria-pressed', 'false');
-            }
-            button.addEventListener('click', () => clickHandler(categoryName));
-            container.appendChild(button);
-        });
-    }
-
-    /**
-     * Handles main category filter clicks.
-     * @param {string} mainCategoryName - The clicked main category name.
-     */
-    function handleMainCategoryClick(mainCategoryName) {
-        currentMainCategory = mainCategoryName;
-        currentSubCategory = 'All'; // Reset subcategory when main changes
-
-        updateActiveButtonStates(mainCategoriesContainer, currentMainCategory);
-
-        if (currentMainCategory === 'All') {
-            subcategoriesContainer.innerHTML = ''; // Clear subcategories
-            subcategoriesSection.classList.add('hidden'); // Hide subcategory section
-            renderPromptsBasedOnFilters();
-        } else {
-            const relevantPrompts = allPromptsData.filter(p => p.main_category === currentMainCategory);
-            const subCategoryNames = ['All', ...new Set(relevantPrompts.map(p => p.sub_category))];
-
-            populateFilterButtons(subcategoriesContainer, subCategoryNames, currentSubCategory, handleSubCategoryClick);
-            subcategoriesSection.classList.remove('hidden'); // Show subcategory section
-            renderPromptsBasedOnFilters();
-        }
-    }
-
-    /**
-     * Handles subcategory filter clicks.
-     * @param {string} subCategoryName - The clicked subcategory name.
-     */
-    function handleSubCategoryClick(subCategoryName) {
-        currentSubCategory = subCategoryName;
-        updateActiveButtonStates(subcategoriesContainer, currentSubCategory);
-        renderPromptsBasedOnFilters();
-    }
-
-    /**
-     * Filters and renders prompts based on current main and sub category selections.
-     */
-    function renderPromptsBasedOnFilters() {
-        let filteredPrompts = allPromptsData;
-
-        if (currentMainCategory !== 'All') {
-            filteredPrompts = filteredPrompts.filter(p => p.main_category === currentMainCategory);
-        }
-
-        if (currentSubCategory !== 'All' && currentMainCategory !== 'All') { // Only apply sub-filter if a main category is chosen
-            filteredPrompts = filteredPrompts.filter(p => p.sub_category === currentSubCategory);
-        }
-
-        renderPromptCards(filteredPrompts);
-    }
-
-    /**
-     * Initializes the application.
-     */
-    async function initializeLibrary() {
-        initVantaBackground();
-        allPromptsData = await fetchPromptsData();
-
-        if (allPromptsData.length > 0) {
-            const mainCategoryNames = ['All', ...new Set(allPromptsData.map(p => p.main_category))];
-            populateFilterButtons(mainCategoriesContainer, mainCategoryNames, currentMainCategory, handleMainCategoryClick);
-
-            // Initially hide subcategories until a main category (other than 'All') is selected
-            subcategoriesSection.classList.add('hidden');
-
-            renderPromptsBasedOnFilters(); // Initial render (all prompts)
-        } else if (!document.querySelector('.error-message')) {
-             promptGridContainer.innerHTML = '<p class="no-results-message">The Prompt Library is currently empty.</p>';
-        }
-    }
-
-    // Start the application
-    initializeLibrary();
 });

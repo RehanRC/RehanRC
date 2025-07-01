@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Creative Prompt Library - GRIDPULSE Edition</title>
+    <title>Creative Prompt Library - GRIDPULSE Edition</title> <!-- Themed Title -->
 
     <!-- GRIDPULSE Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Condensed:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
-    <!-- Custom Stylesheet -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -19,40 +18,39 @@
 
     <!-- Wrapper for page content, to sit above the canvas -->
     <div class="content-overlay">
-        <header class="library-header hero-section"> <!-- Re-using hero-section for title styling -->
+        <header class="library-header hero-section"> <!-- Using hero-section class for title styling -->
             <h1 class="hero-title" data-text="Creative Prompt Library">Creative Prompt Library</h1>
-            <!-- Tagline can be added if desired, styled as hero-tagline -->
-            <!-- <p class="hero-tagline">Accessing Prompt Matrix...</p> -->
+            <!-- Optional tagline: <p class="hero-tagline">Accessing Prompt Matrix...</p> -->
         </header>
 
-        <div class="filter-controls-wrapper"> <!-- Wrapper for styling filter area like a section -->
+        <!-- Wrapper for filter controls to apply section-like styling -->
+        <div class="filter-controls-wrapper">
             <div class="filter-controls" role="tablist" aria-label="Prompt Filters">
                 <section id="main-categories-section" class="filter-group" aria-labelledby="main-categories-heading">
                     <h2 id="main-categories-heading" class="section-title filter-group-title">Main Categories</h2>
                     <nav id="main-categories" class="category-filters" aria-label="Filter by Main Category">
-                        <!-- Main category filter buttons -->
+                        <!-- Main category filter buttons dynamically inserted -->
                     </nav>
                 </section>
 
                 <section id="subcategories-section" class="filter-group" aria-labelledby="subcategories-heading">
                      <h2 id="subcategories-heading" class="section-title filter-group-title">Subcategories</h2>
                     <nav id="subcategories" class="category-filters subcategory-filters" aria-label="Filter by Subcategory">
-                        <!-- Subcategory filter buttons -->
+                        <!-- Subcategory filter buttons dynamically inserted -->
                     </nav>
                 </section>
             </div>
         </div>
 
         <main id="prompt-grid-container" class="prompt-grid" aria-live="polite">
-            <!-- Prompt cards will be dynamically inserted here -->
+            <!-- Prompt cards dynamically inserted -->
         </main>
 
-        <footer class="library-footer page-footer"> <!-- Re-using page-footer for styling -->
+        <footer class="library-footer page-footer"> <!-- Using page-footer class for styling -->
             <p>Creative Prompt Library &copy; <span id="current-year"></span> // GRIDPULSE INTERFACE // </p>
         </footer>
     </div>
 
-    <!-- Custom Script (defer to ensure HTML is parsed) -->
     <script src="script.js" defer></script>
 </body>
 </html>

@@ -1,7 +1,7 @@
-// script.js - Creative Prompt Library - GRIDPULSE Edition
+// script.js - Creative Prompt Library - GRIDPULSE Edition (Merged)
 
 document.addEventListener('DOMContentLoaded', () => {
-    // DOM Elements from Library
+    // DOM Elements for Library
     const mainCategoriesContainer = document.getElementById('main-categories');
     const subcategoriesContainer = document.getElementById('subcategories');
     const subcategoriesSection = document.getElementById('subcategories-section');
@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const ctx = canvas ? canvas.getContext('2d') : null;
 
     // GRIDPULSE Canvas Variables
-    let width, height, gridSize, particles;
-    const particleSpeed = 0.4; // Slightly slower
+    let width, height, canvasGridSize, particles; // Renamed gridSize to canvasGridSize to avoid conflict
+    const particleSpeed = 0.4;
     const connectionDistance = 90;
     const particleColor = 'rgba(0, 255, 255, 0.6)';
     const lineColor = 'rgba(0, 255, 255, 0.1)';
@@ -28,19 +28,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- 1. GRIDPULSE THEME JAVASCRIPT ---
 
-    // --- Dynamic Year for Footer ---
     if (currentYearSpan) {
         currentYearSpan.textContent = new Date().getFullYear();
     }
 
-    // --- Animated Grid/Particle Background ---
     function setupCanvas() {
         if (!canvas || !ctx) return;
         width = canvas.width = window.innerWidth;
         height = canvas.height = window.innerHeight;
-        gridSize = 35; // Slightly larger grid
+        canvasGridSize = 35;
         particles = [];
-        const numberOfParticles = Math.floor((width * height) / (gridSize * gridSize * 6));
+        const numberOfParticles = Math.floor((width * height) / (canvasGridSize * canvasGridSize * 6));
 
         for (let i = 0; i < numberOfParticles; i++) {
             particles.push({
@@ -52,14 +50,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function drawGrid() {
+    function drawCanvasGrid() { // Renamed to avoid conflict if another drawGrid exists
         if (!ctx) return;
         ctx.strokeStyle = staticGridColor;
         ctx.lineWidth = 0.5;
-        for (let x = 0; x <= width; x += gridSize) {
+        for (let x = 0; x <= width; x += canvasGridSize) {
             ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, height); ctx.stroke();
         }
-        for (let y = 0; y <= height; y += gridSize) {
+        for (let y = 0; y <= height; y += canvasGridSize) {
             ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(width, y); ctx.stroke();
         }
     }
@@ -90,7 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function animateBackground() {
         if (!ctx) return;
         ctx.clearRect(0, 0, width, height);
-        drawGrid();
+        drawCanvasGrid();
         drawParticlesAndConnections();
         requestAnimationFrame(animateBackground);
     }
@@ -103,54 +101,57 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn("Canvas element #gridpulse-background not found or context failed.");
     }
 
-    // --- Scroll-Triggered Animations for Sections (Prompt Cards) ---
-    const cardObserverOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
-    let cardObserver;
+    // Scroll-Triggered Animations
+    const observerOptions = { root: null, rootMargin: '0px', threshold: 0.1 };
+    let promptCardObserver;
 
-    function observePromptCards() {
-        if (cardObserver) cardObserver.disconnect(); // Disconnect previous observer if any
+    function observeDynamicElements() {
+        if (promptCardObserver) promptCardObserver.disconnect();
 
-        const cards = document.querySelectorAll('.prompt-card:not(.visible)'); // Only observe new, non-visible cards
-        if (cards.length === 0) return;
+        const cardsToObserve = document.querySelectorAll('.prompt-card:not(.visible)');
+        if (cardsToObserve.length === 0) return;
 
-        cardObserver = new IntersectionObserver((entries, observerRef) => {
+        promptCardObserver = new IntersectionObserver((entries, observer) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    observerRef.unobserve(entry.target); // Unobserve after animation
+                    observer.unobserve(entry.target);
                 }
             });
-        }, cardObserverOptions);
-
-        cards.forEach(card => cardObserver.observe(card));
+        }, observerOptions);
+        cardsToObserve.forEach(card => promptCardObserver.observe(card));
     }
 
-    // Also observe filter controls wrapper if it exists
-    const filterControlsWrapper = document.querySelector('.filter-controls-wrapper');
-    if(filterControlsWrapper){
-        const staticObserver = new IntersectionObserver((entries, observerRef) => {
-             entries.forEach(entry => {
+    const staticElementsToObserve = document.querySelectorAll('.filter-controls-wrapper'); // Add other static elements if needed
+    if (staticElementsToObserve.length > 0) {
+        const staticObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('visible');
-                    observerRef.unobserve(entry.target);
+                    observer.unobserve(entry.target);
                 }
             });
-        }, {threshold: 0.1});
-        staticObserver.observe(filterControlsWrapper);
+        }, observerOptions);
+        staticElementsToObserve.forEach(el => staticObserver.observe(el));
     }
 
-
-    // --- 2. CREATIVE PROMPT LIBRARY CORE LOGIC ---
+    // --- 2. CREATIVE PROMPT LIBRARY CORE LOGIC --- (Adapted from restored version)
 
     async function fetchPromptsData() {
         try {
             const response = await fetch(PROMPTS_DATA_URL);
             if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
             const data = await response.json();
-            return Array.isArray(data.prompts) ? data.prompts : [];
+            if (data && Array.isArray(data.prompts)) {
+                return data.prompts;
+            } else {
+                console.error("Fetched data is not in expected format:", data);
+                if(promptGridContainer) promptGridContainer.innerHTML = '<p class="error-message">Error: Data format incorrect.</p>';
+                return [];
+            }
         } catch (error) {
             console.error("Failed to fetch prompt data:", error);
-            if(promptGridContainer) promptGridContainer.innerHTML = '<p class="error-message">Failed to load prompts. The library is temporarily unavailable.</p>';
+            if(promptGridContainer) promptGridContainer.innerHTML = '<p class="error-message">Failed to load prompts. Network or server issue.</p>';
             return [];
         }
     }
@@ -164,7 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function createPromptCardElement(prompt) {
         const card = document.createElement('article');
-        card.classList.add('prompt-card'); // Class for GRIDPULSE styling
+        card.classList.add('prompt-card');
         card.dataset.mainCategory = prompt.main_category;
         card.dataset.subCategory = prompt.sub_category;
 
@@ -183,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
             navigator.clipboard.writeText(prompt.instructions)
                 .then(() => {
                     copyButton.textContent = 'Copied!';
-                    copyButton.classList.add('copied'); // Use class for styling feedback
+                    copyButton.classList.add('copied');
                     setTimeout(() => {
                         copyButton.textContent = 'Copy Instructions';
                         copyButton.classList.remove('copied');
@@ -207,20 +208,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 promptGridContainer.appendChild(createPromptCardElement(prompt));
             });
         }
-        observePromptCards(); // Re-observe cards after rendering new ones
+        observeDynamicElements(); // Observe newly added cards
     }
 
     function updateActiveButtonStates(container, activeCategoryName) {
         if(!container) return;
         const buttons = container.querySelectorAll('.filter-button');
         buttons.forEach(button => {
-            if (button.dataset.category === activeCategoryName) {
-                button.classList.add('active');
-                button.setAttribute('aria-pressed', 'true');
-            } else {
-                button.classList.remove('active');
-                button.setAttribute('aria-pressed', 'false');
-            }
+            button.classList.toggle('active', button.dataset.category === activeCategoryName);
+            button.setAttribute('aria-pressed', button.dataset.category === activeCategoryName);
         });
     }
 
@@ -282,16 +278,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const mainCategoryNames = ['All', ...new Set(allPromptsData.map(p => p.main_category).filter(mc => mc))];
             populateFilterButtons(mainCategoriesContainer, mainCategoryNames, currentMainCategory, handleMainCategoryClick);
             if (subcategoriesSection) subcategoriesSection.classList.add('hidden');
-            renderPromptsBasedOnFilters();
+            renderPromptsBasedOnFilters(); // This will also call observeDynamicElements
         } else if (promptGridContainer && !promptGridContainer.querySelector('.error-message')) {
-            promptGridContainer.innerHTML = '<p class="no-results-message">The Prompt Library is currently empty or data could not be loaded correctly.</p>';
+            promptGridContainer.innerHTML = '<p class="no-results-message">Prompt Library empty or data load issue.</p>';
         }
     }
 
     // Initialize Library and Theme Components
-    if (document.readyState === 'loading') { // For safety, though defer helps
-        document.addEventListener('DOMContentLoaded', initializeLibrary);
-    } else {
-        initializeLibrary(); // DOMContentLoaded has already fired
-    }
+    initializeLibrary(); // Call this after all function definitions
 });

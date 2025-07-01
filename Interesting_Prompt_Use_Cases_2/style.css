@@ -1,4 +1,4 @@
-/* style.css - Creative Prompt Library */
+/* style.css - Creative Prompt Library - Advanced Filters */
 
 /* ----- Global Resets and Base Styles ----- */
 *,
@@ -47,17 +47,25 @@ h1, h2, h3 {
 }
 
 h1 { /* Page Title */
-    font-size: 2.5em; /* Adjusted for modern look */
+    font-size: 2.5em;
     text-align: center;
-    margin-bottom: 1em;
-    font-weight: 700; /* Bolder for main title */
+    margin-bottom: 0.75em; /* Reduced margin slightly */
+    font-weight: 700;
     letter-spacing: 1px;
     color: #00ffff; /* Cyan accent */
 }
 
+h2.filter-group-heading { /* For "Main Categories" and "Subcategories" */
+    font-size: 1.3em;
+    color: #a0a0a0; /* Lighter gray, less prominent than H1 */
+    text-align: center;
+    margin-bottom: 0.8em;
+    font-weight: 400; /* Normal weight */
+}
+
 h2 { /* Prompt Card Titles */
     font-size: 1.5em;
-    color: #f0f0f0; /* Slightly off-white */
+    color: #f0f0f0;
     margin-bottom: 0.75em;
 }
 
@@ -71,15 +79,15 @@ h3 { /* Section Headings within Cards */
 p {
     font-size: 1em;
     margin-bottom: 1em;
-    color: #cccccc; /* Lighter gray for paragraph text */
+    color: #cccccc;
 }
 
 pre {
     background-color: rgba(0, 0, 0, 0.2);
     padding: 1em;
     border-radius: 4px;
-    border-left: 3px solid #00ffff; /* Cyan accent border */
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* Modern mono stack */
+    border-left: 3px solid #00ffff;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
     white-space: pre-wrap;
     word-wrap: break-word;
     color: #d0d0d0;
@@ -87,80 +95,104 @@ pre {
     margin-bottom: 1em;
 }
 
-code {
-    font-family: inherit; /* Inherit from pre */
-}
-
-/* ----- Header ----- */
+/* ----- Header & Filter Controls ----- */
 .library-header {
-    padding-bottom: 1.5em;
-    margin-bottom: 2em;
-    border-bottom: 1px solid rgba(0, 255, 255, 0.2); /* Subtle cyan border */
+    padding-bottom: 1em;
+    margin-bottom: 1.5em;
+    /* Removed border-bottom for a cleaner look with grouped filters */
 }
 
-/* ----- Category Filter Buttons ----- */
+.filter-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5em; /* Space between main and subcategory sections */
+    margin-bottom: 2em;
+    padding: 1em;
+    background-color: rgba(255, 255, 255, 0.02); /* Very subtle background for the filter area */
+    border-radius: 8px;
+}
+
+#main-categories-section,
+#subcategories-section {
+    /* Individual styling for sections if needed */
+}
+
+/* Initially hide subcategories if it's empty or not applicable */
+#subcategories-section.hidden {
+    display: none;
+}
+
+/* ----- Category Filter Buttons (Shared Style) ----- */
 .category-filters {
     display: flex;
     justify-content: center;
     gap: 10px;
     flex-wrap: wrap;
-    margin-bottom: 2em;
 }
+
+/* Specifically for subcategories if they need different layout */
+.subcategory-filters {
+    /* Example: could be slightly smaller or different alignment if many items */
+     justify-content: flex-start; /* Align to left if many subcategories */
+}
+
 
 .filter-button {
     font-family: 'Inter', sans-serif;
-    font-size: 0.95em;
+    font-size: 0.90em; /* Slightly smaller for more buttons */
     font-weight: 500;
     color: #e0e0e0;
-    background-color: rgba(255, 255, 255, 0.05); /* Slightly transparent background */
-    border: 1px solid rgba(0, 255, 255, 0.3); /* Cyan border */
-    padding: 0.6em 1.2em;
-    border-radius: 20px; /* Pill shape */
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    padding: 0.5em 1em; /* Adjusted padding */
+    border-radius: 18px; /* Slightly smaller pill shape */
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 .filter-button:hover {
-    background-color: rgba(0, 255, 255, 0.1); /* Cyan tint on hover */
+    background-color: rgba(0, 255, 255, 0.1);
     color: #ffffff;
     border-color: #00ffff;
+    box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
 }
 
 .filter-button.active {
-    background-color: #00ffff; /* Solid cyan */
-    color: #12121a; /* Dark text for contrast */
+    background-color: #00ffff;
+    color: #12121a;
     font-weight: 700;
     border-color: #00ffff;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
 }
 
 /* ----- Prompt Grid ----- */
 .prompt-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Responsive grid */
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 1.5em;
-    flex-grow: 1; /* Takes available space */
+    flex-grow: 1;
 }
 
 /* ----- Prompt Card ----- */
 .prompt-card {
-    background-color: rgba(30, 30, 46, 0.7); /* Darker card background: #1e1e2e with alpha */
-    backdrop-filter: blur(5px); /* Subtle blur for cards over Vanta */
-    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle light border */
-    border-radius: 8px; /* Slight border-radius */
+    background-color: rgba(30, 30, 46, 0.7);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
     padding: 1.5em;
     transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
     display: flex;
     flex-direction: column;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
 .prompt-card:hover {
-    border-color: #00ffff; /* Cyan border on hover */
-    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.15); /* Cyan glow/shadow on hover */
+    border-color: #00ffff;
+    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.15);
 }
 
 .prompt-card .prompt-details {
-    flex-grow: 1; /* Ensures details take space, pushing button down */
+    flex-grow: 1;
 }
 
 .prompt-section {
@@ -170,33 +202,32 @@ code {
     margin-bottom: 0;
 }
 
-
 /* ----- Copy Button ----- */
 .copy-button {
     font-family: 'Inter', sans-serif;
     font-size: 0.9em;
     font-weight: 500;
-    color: #00ffff; /* Cyan text */
+    color: #00ffff;
     background-color: transparent;
-    border: 1px solid #00ffff; /* Cyan border */
+    border: 1px solid #00ffff;
     padding: 0.5em 1em;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-    margin-top: 1.5em; /* Space above the button */
-    align-self: flex-start; /* Align to the start of the card */
+    margin-top: 1.5em;
+    align-self: flex-start;
 }
 
 .copy-button:hover {
-    background-color: rgba(0, 255, 255, 0.1); /* Light cyan background */
+    background-color: rgba(0, 255, 255, 0.1);
     color: #ffffff;
 }
 
 .copy-button.copied {
-    background-color: #00bfa5; /* A slightly different shade of cyan/teal for "copied" state */
+    background-color: #00bfa5;
     color: #12121a;
     border-color: #00bfa5;
-    pointer-events: none; /* Disable button briefly */
+    pointer-events: none;
 }
 
 /* ----- Footer ----- */
@@ -211,11 +242,12 @@ code {
 
 /* ----- Utility Classes ----- */
 .error-message, .no-results-message {
-    color: #ff6b6b; /* A soft red for errors */
+    color: #ff6b6b;
     text-align: center;
     padding: 2em;
     font-size: 1.1em;
-    grid-column: 1 / -1; /* Span full grid if inside */
+    grid-column: 1 / -1; /* Span full grid if inside .prompt-grid */
+    width: 100%; /* Ensure it takes full width if in other containers */
 }
 
 /* ----- Responsive Adjustments ----- */
@@ -226,12 +258,18 @@ code {
     h1 {
         font-size: 2em;
     }
+    .filter-controls {
+        padding: 0.5em;
+    }
     .prompt-grid {
-        grid-template-columns: 1fr; /* Single column on smaller screens */
+        grid-template-columns: 1fr;
     }
     .filter-button {
-        font-size: 0.9em;
-        padding: 0.5em 1em;
+        font-size: 0.85em;
+        padding: 0.4em 0.8em;
+    }
+     .subcategory-filters {
+        justify-content: center; /* Center on smaller screens */
     }
 }
 
@@ -242,9 +280,13 @@ code {
     h1 {
         font-size: 1.8em;
     }
+    h2.filter-group-heading {
+        font-size: 1.1em;
+    }
     .filter-button {
-        width: calc(50% - 5px); /* Two buttons per row */
-        text-align: center;
+        /* width: calc(50% - 5px); */ /* Removed to allow natural flow with smaller buttons */
+        font-size: 0.8em;
+        padding: 0.4em 0.7em;
     }
     .copy-button {
         width: 100%;
@@ -255,6 +297,6 @@ code {
 /* Accessibility: Focus visible for keyboard navigation */
 .filter-button:focus-visible,
 .copy-button:focus-visible {
-    outline: 2px solid #00ffff; /* Cyan outline */
+    outline: 2px solid #00ffff;
     outline-offset: 2px;
 }

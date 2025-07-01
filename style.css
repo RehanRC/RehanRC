@@ -1,4 +1,4 @@
-/* style.css - GRIDPULSE Interface */
+/* style.css - Creative Prompt Library - GRIDPULSE Edition */
 
 /* ----- Global Resets and Base Styles ----- */
 *,
@@ -10,12 +10,12 @@
 }
 
 :root {
-    --base-bg-color: #0A0A0A; /* Deep dark background */
+    --base-bg-color: #0A0A0A;
     --primary-accent-color: #00FFFF; /* Electric Cyan */
     --secondary-accent-color: #39FF14; /* Neon Green */
-    --text-color: #E0E0E0; /* Light grey / Off-white */
+    --text-color: #E0E0E0;
     --hero-title-color: var(--primary-accent-color);
-    --border-color: rgba(0, 255, 255, 0.3); /* Cyan with alpha */
+    --border-color: rgba(0, 255, 255, 0.3);
     --glow-color-primary: rgba(0, 255, 255, 0.7);
     --glow-color-secondary: rgba(57, 255, 20, 0.6);
 
@@ -28,20 +28,13 @@ body {
     font-family: var(--font-body);
     background-color: var(--base-bg-color);
     color: var(--text-color);
-    line-height: 1.7;
+    line-height: 1.6; /* Adjusted from 1.7 for prompt readability */
     overflow-x: hidden;
     min-height: 100vh;
 }
 
 /* ----- Main Container and Background Canvas ----- */
-.gridpulse-container {
-    position: relative;
-    width: 100%;
-    min-height: 100vh;
-    display: flex; /* For centering content overlay if needed, or just managing flow */
-    flex-direction: column;
-    align-items: center; /* Center content horizontally */
-}
+/* #gridpulse-container would be the body or a full-page wrapper if needed, not strictly necessary if body is styled */
 
 #gridpulse-background {
     position: fixed;
@@ -49,208 +42,260 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0; /* Behind all content */
-    opacity: 0.7; /* Make grid slightly transparent to not overpower text */
+    z-index: 0;
+    opacity: 0.6; /* Slightly less opacity for better text contrast */
 }
 
 .content-overlay {
     position: relative;
     z-index: 1;
     width: 100%;
-    max-width: 1000px; /* Control content width */
-    padding: 2em;
+    max-width: 1100px; /* Slightly wider for library content */
+    padding: 1.5em; /* Adjusted padding */
+    margin: 0 auto; /* Center content overlay */
     display: flex;
     flex-direction: column;
     min-height: 100vh;
 }
 
-/* ----- Hero Section ----- */
-.hero-section {
+/* ----- Library Header (Hero Title Styling) ----- */
+.library-header.hero-section { /* Combining for title styling */
     text-align: center;
-    padding: 10vh 1em 5vh; /* Vertical padding based on viewport height */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    min-height: 70vh; /* Ensure hero takes significant space */
-    position: relative; /* For pseudo-elements if needed */
+    padding: 3vh 1em 3vh; /* Reduced padding for library title */
+    margin-bottom: 1.5em; /* Space before filters */
 }
 
-.hero-title {
+.hero-title { /* Applied to <h1>Creative Prompt Library</h1> */
     font-family: var(--font-hero);
-    font-size: clamp(3rem, 10vw, 7rem); /* Responsive font size */
+    font-size: clamp(2.5rem, 8vw, 5rem); /* Adjusted for library title */
     font-weight: 700;
     color: var(--hero-title-color);
     text-transform: uppercase;
     letter-spacing: 2px;
-    margin-bottom: 0.2em;
-    position: relative; /* For glitch effect */
+    margin-bottom: 0.1em;
     text-shadow:
         0 0 5px var(--glow-color-primary),
         0 0 10px var(--glow-color-primary),
-        0 0 20px var(--glow-color-primary),
-        0 0 40px var(--hero-title-color),
-        0 0 70px var(--hero-title-color);
-    animation: title-flicker 5s infinite alternate, title-glow-pulse 3s infinite ease-in-out;
+        0 0 15px var(--hero-title-color); /* Simpler glow for library title */
+    animation: title-glow-pulse 3s infinite ease-in-out; /* Kept glow pulse */
 }
-
-/* Basic Glitch / Flicker Animation for Title */
-@keyframes title-flicker {
-    0%, 100% { opacity: 1; transform: skewX(0deg); }
-    48% { opacity: 1; }
-    50% { opacity: 0.7; transform: skewX(-2deg); }
-    52% { opacity: 1; }
-    54% { opacity: 0.8; transform: skewX(1deg); }
-    56% { opacity: 1; }
-}
+/* Removed title-flicker for library title for better readability, can be re-added if desired */
 @keyframes title-glow-pulse {
     0%, 100% { text-shadow: 0 0 5px var(--glow-color-primary), 0 0 10px var(--glow-color-primary), 0 0 15px var(--hero-title-color); }
-    50% { text-shadow: 0 0 10px var(--glow-color-primary), 0 0 20px var(--glow-color-primary), 0 0 30px var(--hero-title-color), 0 0 50px var(--hero-title-color); }
+    50% { text-shadow: 0 0 8px var(--glow-color-primary), 0 0 15px var(--glow-color-primary), 0 0 25px var(--hero-title-color); }
 }
 
-
-.hero-tagline {
-    font-family: var(--font-mono);
-    font-size: clamp(1rem, 2.5vw, 1.5rem);
-    color: var(--text-color);
-    letter-spacing: 1px;
-    opacity: 0.8;
-    text-transform: uppercase;
-}
-
-/* ----- Main Content & Sections ----- */
-.main-content {
-    flex-grow: 1; /* Takes remaining space */
-    width: 100%;
-}
-
-.info-section {
-    padding: 3em 1em;
-    margin-bottom: 3em;
+/* ----- Filter Controls Area ----- */
+.filter-controls-wrapper {
+    padding: 1.5em 1em;
+    margin-bottom: 2em;
     border: 1px solid var(--border-color);
-    border-radius: 0px; /* Sharp corners */
-    background-color: rgba(10, 10, 10, 0.3); /* Slightly visible background for sections */
-    backdrop-filter: blur(3px); /* Subtle blur for sections over canvas */
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); /* Faint cyan glow */
+    background-color: rgba(10, 10, 10, 0.4);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
-
-.info-section:hover {
+.filter-controls-wrapper:hover {
     border-color: var(--primary-accent-color);
-    box-shadow: 0 0 25px var(--glow-color-primary);
+    box-shadow: 0 0 20px var(--glow-color-primary);
 }
 
-.section-title {
+.filter-group {
+    margin-bottom: 1.5em;
+}
+.filter-group:last-child {
+    margin-bottom: 0;
+}
+
+.section-title.filter-group-title { /* For "Main Categories", "Subcategories" */
     font-family: var(--font-hero);
-    font-size: clamp(1.8rem, 5vw, 2.5rem);
-    color: var(--secondary-accent-color); /* Neon Green for section titles */
+    font-size: clamp(1.5rem, 4vw, 2rem);
+    color: var(--secondary-accent-color); /* Neon Green */
     text-transform: uppercase;
     margin-bottom: 0.8em;
     letter-spacing: 1px;
-    text-align: left;
-    text-shadow: 0 0 5px var(--glow-color-secondary), 0 0 10px var(--secondary-accent-color);
+    text-align: left; /* Align left for filter groups */
+    text-shadow: 0 0 5px var(--glow-color-secondary), 0 0 8px var(--secondary-accent-color);
 }
 
-.section-content p {
-    font-size: 1.1rem;
-    margin-bottom: 1em;
+.category-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px; /* Slightly reduced gap */
 }
 
-.code-snippet {
-    font-family: var(--font-mono);
-    background-color: rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--border-color);
-    padding: 1em;
-    font-size: 0.95rem;
-    color: var(--primary-accent-color);
-    white-space: pre-wrap;
-    word-wrap: break-word;
-    margin-top: 1em;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
-}
-.code-snippet code {
-    font-family: inherit;
-}
-
-
-/* ----- Interactive Elements (Placeholder Button) ----- */
-.action-button {
-    font-family: var(--font-hero);
+.filter-button { /* Styling like .action-button from GRIDPULSE */
+    font-family: var(--font-mono); /* Using mono for buttons for a techy feel */
     background-color: transparent;
     color: var(--primary-accent-color);
-    border: 2px solid var(--primary-accent-color);
-    padding: 0.8em 1.8em;
-    font-size: 1rem;
+    border: 1px solid var(--primary-accent-color); /* Thinner border */
+    padding: 0.5em 1em; /* Adjusted padding */
+    font-size: 0.9rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     cursor: pointer;
-    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 0 5px var(--glow-color-primary);
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 0 3px rgba(0, 255, 255, 0.4);
 }
 
-.action-button:hover,
-.action-button:focus {
+.filter-button:hover,
+.filter-button:focus {
     background-color: var(--primary-accent-color);
     color: var(--base-bg-color);
-    box-shadow: 0 0 15px var(--glow-color-primary), 0 0 25px var(--primary-accent-color);
+    box-shadow: 0 0 10px var(--glow-color-primary), 0 0 15px var(--primary-accent-color);
     outline: none;
 }
 
+.filter-button.active {
+    background-color: var(--secondary-accent-color); /* Neon green for active */
+    color: var(--base-bg-color);
+    border-color: var(--secondary-accent-color);
+    box-shadow: 0 0 10px var(--glow-color-secondary), 0 0 15px var(--secondary-accent-color);
+}
+
+#subcategories-section.hidden {
+    display: none;
+}
+
+/* ----- Prompt Grid & Cards ----- */
+.prompt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5em;
+    flex-grow: 1;
+}
+
+.prompt-card { /* Styling like .info-section from GRIDPULSE */
+    padding: 1.5em;
+    border: 1px solid var(--border-color);
+    background-color: rgba(10, 10, 10, 0.3);
+    backdrop-filter: blur(3px);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.05);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.prompt-card:hover {
+    border-color: var(--primary-accent-color);
+    box-shadow: 0 0 20px var(--glow-color-primary);
+}
+
+.prompt-card .prompt-title { /* h2 within card */
+    font-family: var(--font-hero); /* Orbitron for card titles */
+    font-size: 1.4rem;
+    color: var(--primary-accent-color);
+    margin-bottom: 0.75em;
+    text-shadow: 0 0 3px var(--glow-color-primary);
+}
+
+.prompt-card .prompt-section h3 { /* Section titles within card */
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--secondary-accent-color); /* Neon green for subheadings */
+    margin-top: 0.8em;
+    margin-bottom: 0.3em;
+}
+
+.prompt-card p {
+    font-size: 0.95rem; /* Slightly smaller for density */
+    margin-bottom: 0.8em;
+    color: var(--text-color);
+}
+
+.prompt-card pre { /* Styling like .code-snippet */
+    font-family: var(--font-mono);
+    background-color: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0,255,255,0.2);
+    padding: 0.8em;
+    font-size: 0.9rem;
+    color: var(--primary-accent-color);
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    margin-top: 0.5em;
+    margin-bottom: 1em;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+}
+.prompt-card pre code {
+    font-family: inherit;
+}
+
+.copy-button { /* Styling like .action-button */
+    font-family: var(--font-mono);
+    background-color: transparent;
+    color: var(--secondary-accent-color); /* Neon green for copy button */
+    border: 1px solid var(--secondary-accent-color);
+    padding: 0.5em 1em;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+    margin-top: auto; /* Push to bottom of card */
+    align-self: flex-start;
+    box-shadow: 0 0 3px rgba(57, 255, 20, 0.4);
+}
+
+.copy-button:hover,
+.copy-button:focus {
+    background-color: var(--secondary-accent-color);
+    color: var(--base-bg-color);
+    box-shadow: 0 0 10px var(--glow-color-secondary), 0 0 15px var(--secondary-accent-color);
+}
+
+.copy-button.copied { /* JS will need to add this class */
+    background-color: var(--primary-accent-color);
+    color: var(--base-bg-color);
+    border-color: var(--primary-accent-color);
+    pointer-events: none;
+    box-shadow: 0 0 10px var(--glow-color-primary);
+}
+
+
 /* ----- Footer ----- */
-.page-footer {
+.library-footer.page-footer {
     text-align: center;
     padding: 2em 0 1em;
     font-family: var(--font-mono);
     font-size: 0.9rem;
-    color: rgba(224, 224, 224, 0.5); /* Dimmed text */
-    border-top: 1px solid rgba(0, 255, 255, 0.1); /* Faint cyan line */
-    margin-top: auto; /* Pushes footer to bottom if content is short */
+    color: rgba(224, 224, 224, 0.5);
+    border-top: 1px solid rgba(0, 255, 255, 0.1);
+    margin-top: auto;
 }
 
-/* ----- Animations for scroll-triggered effects (to be activated by JS) ----- */
-.info-section.visible {
-    animation: fadeInSlideUp 0.8s ease-out forwards;
+/* ----- Utility & Messages ----- */
+.error-message, .no-results-message {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2em;
+    font-family: var(--font-mono);
+    color: var(--primary-accent-color);
+    border: 1px dashed var(--border-color);
+    background-color: rgba(0,255,255,0.05);
+}
+
+/* ----- Animations for scroll-triggered effects (if used) ----- */
+.filter-controls-wrapper.visible, /* Example if we animate filter box */
+.prompt-card.visible { /* If we animate cards individually */
+    animation: fadeInSlideUp 0.7s ease-out forwards;
 }
 
 @keyframes fadeInSlideUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
 }
-
 
 /* ----- Responsive Adjustments ----- */
 @media (max-width: 768px) {
-    .content-overlay {
-        padding: 1.5em;
-    }
-    .hero-section {
-        min-height: 60vh;
-        padding-top: 8vh;
-    }
-    .info-section {
-        padding: 2em 0.8em;
-    }
+    .content-overlay { padding: 1em; }
+    .filter-button { font-size: 0.85rem; padding: 0.4em 0.8em; }
+    .prompt-card .prompt-title { font-size: 1.2rem; }
 }
 
 @media (max-width: 480px) {
-    .hero-section {
-        min-height: 50vh;
-        padding-top: 6vh;
-    }
-    .hero-tagline {
-        font-size: clamp(0.9rem, 2vw, 1.2rem);
-    }
-    .section-content p {
-        font-size: 1rem;
-    }
-    .action-button {
-        width: 100%;
-        padding: 1em;
-    }
+    .hero-title { font-size: clamp(2rem, 7vw, 3.5rem); }
+    .section-title.filter-group-title { font-size: clamp(1.2rem, 3.5vw, 1.5rem); }
+    .filter-button { width: calc(50% - 4px); text-align: center; } /* 2 per row */
+    .copy-button { width: 100%; text-align: center; }
 }

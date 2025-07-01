@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GRIDPULSE Interface</title>
+    <title>Creative Prompt Library - GRIDPULSE Edition</title>
 
-    <!-- Google Fonts -->
+    <!-- GRIDPULSE Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto+Condensed:wght@300;400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
@@ -14,46 +14,45 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="gridpulse-container">
-        <!-- Dynamic Background Canvas -->
-        <canvas id="gridpulse-background"></canvas>
+    <!-- Canvas for GRIDPULSE background -->
+    <canvas id="gridpulse-background"></canvas>
 
-        <!-- Content Overlay -->
-        <div class="content-overlay">
-            <header class="hero-section">
-                <h1 class="hero-title" data-text="GRIDPULSE">GRIDPULSE</h1>
-                <p class="hero-tagline">Enter the Datastream // System Online</p>
-            </header>
+    <!-- Wrapper for page content, to sit above the canvas -->
+    <div class="content-overlay">
+        <header class="library-header hero-section"> <!-- Re-using hero-section for title styling -->
+            <h1 class="hero-title" data-text="Creative Prompt Library">Creative Prompt Library</h1>
+            <!-- Tagline can be added if desired, styled as hero-tagline -->
+            <!-- <p class="hero-tagline">Accessing Prompt Matrix...</p> -->
+        </header>
 
-            <main class="main-content">
-                <section class="info-section" id="section-one">
-                    <h2 class="section-title">ACCESS NODE_01</h2>
-                    <div class="section-content">
-                        <p>Initializing core systems. Data packets flowing through the neon grid. The digital frontier expands, revealing pathways to uncharted territories within the mainframe. Stand by for full immersion.</p>
-                        <pre class="code-snippet"><code>&gt; System.Diagnostics.Run(All);
-&gt; Network.Status: SECURE_LINK ESTABLISHED
-&gt; User.Authentication: GRANTED</code></pre>
-                    </div>
+        <div class="filter-controls-wrapper"> <!-- Wrapper for styling filter area like a section -->
+            <div class="filter-controls" role="tablist" aria-label="Prompt Filters">
+                <section id="main-categories-section" class="filter-group" aria-labelledby="main-categories-heading">
+                    <h2 id="main-categories-heading" class="section-title filter-group-title">Main Categories</h2>
+                    <nav id="main-categories" class="category-filters" aria-label="Filter by Main Category">
+                        <!-- Main category filter buttons -->
+                    </nav>
                 </section>
 
-                <section class="info-section" id="section-two">
-                    <h2 class="section-title">DATA STREAM_X7</h2>
-                    <div class="section-content">
-                        <p>Information cascades, forming a symphony of light and logic. Each pulse a new possibility, each connection a deeper understanding of the underlying architecture. The echo of the '80s and '90s digital revolution resonates here, refined and sharpened.</p>
-                        <div class="interactive-placeholder">
-                            <button class="action-button">Initiate Sequence</button>
-                        </div>
-                    </div>
+                <section id="subcategories-section" class="filter-group" aria-labelledby="subcategories-heading">
+                     <h2 id="subcategories-heading" class="section-title filter-group-title">Subcategories</h2>
+                    <nav id="subcategories" class="category-filters subcategory-filters" aria-label="Filter by Subcategory">
+                        <!-- Subcategory filter buttons -->
+                    </nav>
                 </section>
-            </main>
-
-            <footer class="page-footer">
-                <p>&copy; <span id="current-year"></span> GRIDPULSE SYSTEMS. // ALL RIGHTS RESERVED //</p>
-            </footer>
+            </div>
         </div>
+
+        <main id="prompt-grid-container" class="prompt-grid" aria-live="polite">
+            <!-- Prompt cards will be dynamically inserted here -->
+        </main>
+
+        <footer class="library-footer page-footer"> <!-- Re-using page-footer for styling -->
+            <p>Creative Prompt Library &copy; <span id="current-year"></span> // GRIDPULSE INTERFACE // </p>
+        </footer>
     </div>
 
-    <!-- Custom Script (defer for canvas and DOM manipulation) -->
+    <!-- Custom Script (defer to ensure HTML is parsed) -->
     <script src="script.js" defer></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
-/* style.css - Creative Prompt Library - Advanced Filters */
+/* style.css - GRIDPULSE Interface */
 
 /* ----- Global Resets and Base Styles ----- */
 *,
@@ -9,294 +9,248 @@
     padding: 0;
 }
 
-body {
-    font-family: 'Inter', sans-serif;
-    background-color: #12121a; /* Dark base for Vanta to overlay */
-    color: #e0e0e0; /* Light grey for text */
-    line-height: 1.6;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+:root {
+    --base-bg-color: #0A0A0A; /* Deep dark background */
+    --primary-accent-color: #00FFFF; /* Electric Cyan */
+    --secondary-accent-color: #39FF14; /* Neon Green */
+    --text-color: #E0E0E0; /* Light grey / Off-white */
+    --hero-title-color: var(--primary-accent-color);
+    --border-color: rgba(0, 255, 255, 0.3); /* Cyan with alpha */
+    --glow-color-primary: rgba(0, 255, 255, 0.7);
+    --glow-color-secondary: rgba(57, 255, 20, 0.6);
+
+    --font-hero: 'Orbitron', sans-serif;
+    --font-body: 'Roboto Condensed', sans-serif;
+    --font-mono: 'Share Tech Mono', monospace;
 }
 
-/* ----- Vanta.js Background Container ----- */
-#vanta-background {
+body {
+    font-family: var(--font-body);
+    background-color: var(--base-bg-color);
+    color: var(--text-color);
+    line-height: 1.7;
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* ----- Main Container and Background Canvas ----- */
+.gridpulse-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    display: flex; /* For centering content overlay if needed, or just managing flow */
+    flex-direction: column;
+    align-items: center; /* Center content horizontally */
+}
+
+#gridpulse-background {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    z-index: 0; /* Behind page content */
+    z-index: 0; /* Behind all content */
+    opacity: 0.7; /* Make grid slightly transparent to not overpower text */
 }
 
-/* ----- Page Content Wrapper ----- */
-.page-content {
-    position: relative; /* To sit above the fixed background */
+.content-overlay {
+    position: relative;
     z-index: 1;
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 1000px; /* Control content width */
     padding: 2em;
-    min-height: 100vh; /* Ensure it takes at least full viewport height */
     display: flex;
     flex-direction: column;
+    min-height: 100vh;
 }
 
-/* ----- Typography ----- */
-h1, h2, h3 {
-    color: #ffffff; /* White for titles */
-    margin-bottom: 0.5em;
-    font-weight: 500; /* Medium weight for Inter */
-}
-
-h1 { /* Page Title */
-    font-size: 2.5em;
+/* ----- Hero Section ----- */
+.hero-section {
     text-align: center;
-    margin-bottom: 0.75em; /* Reduced margin slightly */
+    padding: 10vh 1em 5vh; /* Vertical padding based on viewport height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 70vh; /* Ensure hero takes significant space */
+    position: relative; /* For pseudo-elements if needed */
+}
+
+.hero-title {
+    font-family: var(--font-hero);
+    font-size: clamp(3rem, 10vw, 7rem); /* Responsive font size */
     font-weight: 700;
+    color: var(--hero-title-color);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 0.2em;
+    position: relative; /* For glitch effect */
+    text-shadow:
+        0 0 5px var(--glow-color-primary),
+        0 0 10px var(--glow-color-primary),
+        0 0 20px var(--glow-color-primary),
+        0 0 40px var(--hero-title-color),
+        0 0 70px var(--hero-title-color);
+    animation: title-flicker 5s infinite alternate, title-glow-pulse 3s infinite ease-in-out;
+}
+
+/* Basic Glitch / Flicker Animation for Title */
+@keyframes title-flicker {
+    0%, 100% { opacity: 1; transform: skewX(0deg); }
+    48% { opacity: 1; }
+    50% { opacity: 0.7; transform: skewX(-2deg); }
+    52% { opacity: 1; }
+    54% { opacity: 0.8; transform: skewX(1deg); }
+    56% { opacity: 1; }
+}
+@keyframes title-glow-pulse {
+    0%, 100% { text-shadow: 0 0 5px var(--glow-color-primary), 0 0 10px var(--glow-color-primary), 0 0 15px var(--hero-title-color); }
+    50% { text-shadow: 0 0 10px var(--glow-color-primary), 0 0 20px var(--glow-color-primary), 0 0 30px var(--hero-title-color), 0 0 50px var(--hero-title-color); }
+}
+
+
+.hero-tagline {
+    font-family: var(--font-mono);
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    color: var(--text-color);
     letter-spacing: 1px;
-    color: #00ffff; /* Cyan accent */
+    opacity: 0.8;
+    text-transform: uppercase;
 }
 
-h2.filter-group-heading { /* For "Main Categories" and "Subcategories" */
-    font-size: 1.3em;
-    color: #a0a0a0; /* Lighter gray, less prominent than H1 */
-    text-align: center;
+/* ----- Main Content & Sections ----- */
+.main-content {
+    flex-grow: 1; /* Takes remaining space */
+    width: 100%;
+}
+
+.info-section {
+    padding: 3em 1em;
+    margin-bottom: 3em;
+    border: 1px solid var(--border-color);
+    border-radius: 0px; /* Sharp corners */
+    background-color: rgba(10, 10, 10, 0.3); /* Slightly visible background for sections */
+    backdrop-filter: blur(3px); /* Subtle blur for sections over canvas */
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); /* Faint cyan glow */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.info-section:hover {
+    border-color: var(--primary-accent-color);
+    box-shadow: 0 0 25px var(--glow-color-primary);
+}
+
+.section-title {
+    font-family: var(--font-hero);
+    font-size: clamp(1.8rem, 5vw, 2.5rem);
+    color: var(--secondary-accent-color); /* Neon Green for section titles */
+    text-transform: uppercase;
     margin-bottom: 0.8em;
-    font-weight: 400; /* Normal weight */
+    letter-spacing: 1px;
+    text-align: left;
+    text-shadow: 0 0 5px var(--glow-color-secondary), 0 0 10px var(--secondary-accent-color);
 }
 
-h2 { /* Prompt Card Titles */
-    font-size: 1.5em;
-    color: #f0f0f0;
-    margin-bottom: 0.75em;
-}
-
-h3 { /* Section Headings within Cards */
-    font-size: 1.1em;
-    color: #00ffff; /* Cyan accent */
-    margin-bottom: 0.3em;
-    font-weight: 500;
-}
-
-p {
-    font-size: 1em;
+.section-content p {
+    font-size: 1.1rem;
     margin-bottom: 1em;
-    color: #cccccc;
 }
 
-pre {
-    background-color: rgba(0, 0, 0, 0.2);
+.code-snippet {
+    font-family: var(--font-mono);
+    background-color: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-color);
     padding: 1em;
-    border-radius: 4px;
-    border-left: 3px solid #00ffff;
-    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+    font-size: 0.95rem;
+    color: var(--primary-accent-color);
     white-space: pre-wrap;
     word-wrap: break-word;
-    color: #d0d0d0;
-    font-size: 0.9em;
-    margin-bottom: 1em;
+    margin-top: 1em;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
 }
-
-/* ----- Header & Filter Controls ----- */
-.library-header {
-    padding-bottom: 1em;
-    margin-bottom: 1.5em;
-    /* Removed border-bottom for a cleaner look with grouped filters */
-}
-
-.filter-controls {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5em; /* Space between main and subcategory sections */
-    margin-bottom: 2em;
-    padding: 1em;
-    background-color: rgba(255, 255, 255, 0.02); /* Very subtle background for the filter area */
-    border-radius: 8px;
-}
-
-#main-categories-section,
-#subcategories-section {
-    /* Individual styling for sections if needed */
-}
-
-/* Initially hide subcategories if it's empty or not applicable */
-#subcategories-section.hidden {
-    display: none;
-}
-
-/* ----- Category Filter Buttons (Shared Style) ----- */
-.category-filters {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-/* Specifically for subcategories if they need different layout */
-.subcategory-filters {
-    /* Example: could be slightly smaller or different alignment if many items */
-     justify-content: flex-start; /* Align to left if many subcategories */
+.code-snippet code {
+    font-family: inherit;
 }
 
 
-.filter-button {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.90em; /* Slightly smaller for more buttons */
-    font-weight: 500;
-    color: #e0e0e0;
-    background-color: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(0, 255, 255, 0.3);
-    padding: 0.5em 1em; /* Adjusted padding */
-    border-radius: 18px; /* Slightly smaller pill shape */
-    cursor: pointer;
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-
-.filter-button:hover {
-    background-color: rgba(0, 255, 255, 0.1);
-    color: #ffffff;
-    border-color: #00ffff;
-    box-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
-}
-
-.filter-button.active {
-    background-color: #00ffff;
-    color: #12121a;
-    font-weight: 700;
-    border-color: #00ffff;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-}
-
-/* ----- Prompt Grid ----- */
-.prompt-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5em;
-    flex-grow: 1;
-}
-
-/* ----- Prompt Card ----- */
-.prompt-card {
-    background-color: rgba(30, 30, 46, 0.7);
-    backdrop-filter: blur(5px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 1.5em;
-    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
-    display: flex;
-    flex-direction: column;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-}
-
-.prompt-card:hover {
-    border-color: #00ffff;
-    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.15);
-}
-
-.prompt-card .prompt-details {
-    flex-grow: 1;
-}
-
-.prompt-section {
-    margin-bottom: 1em;
-}
-.prompt-section:last-child {
-    margin-bottom: 0;
-}
-
-/* ----- Copy Button ----- */
-.copy-button {
-    font-family: 'Inter', sans-serif;
-    font-size: 0.9em;
-    font-weight: 500;
-    color: #00ffff;
+/* ----- Interactive Elements (Placeholder Button) ----- */
+.action-button {
+    font-family: var(--font-hero);
     background-color: transparent;
-    border: 1px solid #00ffff;
-    padding: 0.5em 1em;
-    border-radius: 5px;
+    color: var(--primary-accent-color);
+    border: 2px solid var(--primary-accent-color);
+    padding: 0.8em 1.8em;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     cursor: pointer;
-    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
-    margin-top: 1.5em;
-    align-self: flex-start;
+    transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 0 5px var(--glow-color-primary);
 }
 
-.copy-button:hover {
-    background-color: rgba(0, 255, 255, 0.1);
-    color: #ffffff;
-}
-
-.copy-button.copied {
-    background-color: #00bfa5;
-    color: #12121a;
-    border-color: #00bfa5;
-    pointer-events: none;
+.action-button:hover,
+.action-button:focus {
+    background-color: var(--primary-accent-color);
+    color: var(--base-bg-color);
+    box-shadow: 0 0 15px var(--glow-color-primary), 0 0 25px var(--primary-accent-color);
+    outline: none;
 }
 
 /* ----- Footer ----- */
-.library-footer {
+.page-footer {
     text-align: center;
-    padding: 1.5em 0;
-    margin-top: 2em;
-    font-size: 0.9em;
-    color: rgba(255, 255, 255, 0.5);
-    border-top: 1px solid rgba(0, 255, 255, 0.1);
+    padding: 2em 0 1em;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    color: rgba(224, 224, 224, 0.5); /* Dimmed text */
+    border-top: 1px solid rgba(0, 255, 255, 0.1); /* Faint cyan line */
+    margin-top: auto; /* Pushes footer to bottom if content is short */
 }
 
-/* ----- Utility Classes ----- */
-.error-message, .no-results-message {
-    color: #ff6b6b;
-    text-align: center;
-    padding: 2em;
-    font-size: 1.1em;
-    grid-column: 1 / -1; /* Span full grid if inside .prompt-grid */
-    width: 100%; /* Ensure it takes full width if in other containers */
+/* ----- Animations for scroll-triggered effects (to be activated by JS) ----- */
+.info-section.visible {
+    animation: fadeInSlideUp 0.8s ease-out forwards;
 }
+
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 
 /* ----- Responsive Adjustments ----- */
 @media (max-width: 768px) {
-    .page-content {
+    .content-overlay {
         padding: 1.5em;
     }
-    h1 {
-        font-size: 2em;
+    .hero-section {
+        min-height: 60vh;
+        padding-top: 8vh;
     }
-    .filter-controls {
-        padding: 0.5em;
-    }
-    .prompt-grid {
-        grid-template-columns: 1fr;
-    }
-    .filter-button {
-        font-size: 0.85em;
-        padding: 0.4em 0.8em;
-    }
-     .subcategory-filters {
-        justify-content: center; /* Center on smaller screens */
+    .info-section {
+        padding: 2em 0.8em;
     }
 }
 
 @media (max-width: 480px) {
-    .page-content {
+    .hero-section {
+        min-height: 50vh;
+        padding-top: 6vh;
+    }
+    .hero-tagline {
+        font-size: clamp(0.9rem, 2vw, 1.2rem);
+    }
+    .section-content p {
+        font-size: 1rem;
+    }
+    .action-button {
+        width: 100%;
         padding: 1em;
     }
-    h1 {
-        font-size: 1.8em;
-    }
-    h2.filter-group-heading {
-        font-size: 1.1em;
-    }
-    .filter-button {
-        /* width: calc(50% - 5px); */ /* Removed to allow natural flow with smaller buttons */
-        font-size: 0.8em;
-        padding: 0.4em 0.7em;
-    }
-    .copy-button {
-        width: 100%;
-        text-align: center;
-    }
-}
-
-/* Accessibility: Focus visible for keyboard navigation */
-.filter-button:focus-visible,
-.copy-button:focus-visible {
-    outline: 2px solid #00ffff;
-    outline-offset: 2px;
 }

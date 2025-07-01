@@ -86,15 +86,13 @@
 
 <!-- How to Use Workflow Section -->
 <div class="max-w-5xl mx-auto mb-20 p-8 rounded-3xl glass-card">
-     <h2 class="text-3xl font-bold text-center mb-6 text-slate-100">How to Use the Protocol</h2>
+    <h2 class="text-3xl font-bold text-center mb-6 text-slate-100">How to Use the Protocol</h2>
     <ol class="list-decimal list-inside space-y-4 text-slate-300">
-        <li><strong>Input Your Subject:</strong> Paste the text, idea, or system you want to analyze. This becomes the baseline for every role prompt.</li>
-        <li><strong>Run the Role Sequence:</strong> 
-            Use the <strong>Scholar</strong> prompt first. Then pass the subject and Scholar output into the <strong>Trickster</strong> prompt.
-            Finally, provide the subject and both prior outputs to the <strong>Prophet</strong> prompt.
-        </li>
-        <li><strong>Assemble the Master Analysis Report:</strong> After each stage, copy the output and append it to a document. Maintain clear section labels for each role.</li>
-        <li><strong>Generate the Final Artifact:</strong> Once all three roles are complete, input the subject and the full Master Analysis Report into the <strong>Master Synthesizer</strong> prompt to create the definitive version.</li>
+        <li><strong>Begin with your subject.</strong> This is the idea or text you want to refine.</li>
+        <li><strong>Run the Scholar prompt.</strong> Use the Scholar on the subject (previous turn).</li>
+        <li><strong>Run the Trickster prompt.</strong> Use the Trickster on the same subject, along with the Scholar’s output.</li>
+        <li><strong>Run the Prophet prompt.</strong> Use the Prophet on the same subject, along with both the Scholar and Trickster outputs.</li>
+        <li><strong>Run the Master Synthesizer prompt.</strong> Use the Synthesizer on the subject and the full three-part analysis. This yields the final version.</li>
     </ol>
 </div>
         

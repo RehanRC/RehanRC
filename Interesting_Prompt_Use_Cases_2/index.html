@@ -10,12 +10,12 @@
     <style>
         /* --- Base & Theming --- */
         :root {
-            --bg-color: #0d0d1a;
-            --primary-glow: #00ffff;
-            --secondary-glow: #ff00ff;
-            --text-color: #e0e0e0;
-            --card-bg: rgba(20, 20, 40, 0.6);
-            --border-color: rgba(0, 255, 255, 0.2);
+            --bg-color: #0a0a14;
+            --primary-glow: #00e5ff;
+            --secondary-glow: #ff00c1;
+            --text-color: #d0d0e0;
+            --card-bg: rgba(20, 20, 45, 0.5);
+            --border-color: rgba(0, 229, 255, 0.2);
             --font-main: 'Source Code Pro', monospace;
         }
 
@@ -48,7 +48,7 @@
             position: relative;
             z-index: 1;
             padding: 2rem;
-            max-width: 1600px;
+            max-width: 1800px;
             margin: 0 auto;
         }
 
@@ -59,23 +59,27 @@
         }
 
         h1 {
-            font-size: 3rem;
+            font-size: 3.5rem;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 4px;
+            letter-spacing: 5px;
             color: var(--primary-glow);
-            text-shadow: 0 0 10px var(--primary-glow), 0 0 20px var(--primary-glow);
-            animation: textFlicker 5s infinite alternate;
+            text-shadow: 0 0 12px var(--primary-glow), 0 0 24px var(--primary-glow), 0 0 40px rgba(0, 229, 255, 0.7);
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: .15em solid var(--primary-glow);
+            animation: typing 3s steps(30, end), blink-caret .75s step-end infinite;
         }
 
-        /* --- Filters & Search --- */
+        /* --- Controls & Filters --- */
         .controls-container {
-            background: rgba(0,0,0,0.3);
-            backdrop-filter: blur(5px);
+            background: rgba(10, 10, 25, 0.4);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--border-color);
             padding: 1.5rem;
-            margin-bottom: 2rem;
-            border-radius: 4px;
+            margin-bottom: 2.5rem;
+            border-radius: 8px;
             animation: slideInUp 0.8s ease-out;
         }
 
@@ -85,10 +89,10 @@
 
         #search-input {
             width: 100%;
-            padding: 0.75rem 1rem;
+            padding: 0.85rem 1.2rem;
             font-family: var(--font-main);
             font-size: 1rem;
-            background-color: rgba(0,0,0,0.5);
+            background-color: rgba(0,0,0,0.6);
             border: 1px solid var(--border-color);
             color: var(--text-color);
             border-radius: 4px;
@@ -100,14 +104,9 @@
             border-color: var(--primary-glow);
             box-shadow: 0 0 15px var(--primary-glow);
         }
-
-        .filter-group {
-            margin-bottom: 1rem;
-        }
         
-        .filter-group:last-child {
-            margin-bottom: 0;
-        }
+        .filter-group { margin-bottom: 1rem; }
+        .filter-group:last-child { margin-bottom: 0; }
 
         .filter-label {
             font-weight: 600;
@@ -116,17 +115,13 @@
             margin-bottom: 0.75rem;
             display: block;
             color: var(--secondary-glow);
-            text-shadow: 0 0 5px var(--secondary-glow);
+            text-shadow: 0 0 8px var(--secondary-glow);
         }
 
-        .filter-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
+        .filter-buttons { display: flex; flex-wrap: wrap; gap: 0.75rem; }
 
         .filter-btn {
-            padding: 0.5rem 1rem;
+            padding: 0.6rem 1.1rem;
             font-family: var(--font-main);
             font-size: 0.875rem;
             background-color: transparent;
@@ -151,16 +146,14 @@
             box-shadow: 0 0 10px var(--primary-glow);
         }
 
-        #subcategories-container {
-            min-height: 40px; /* Prevent layout shift */
-            transition: opacity 0.5s;
-        }
+        #subcategories-container { min-height: 42px; transition: opacity 0.5s; }
 
         /* --- Prompt Cards Grid --- */
         #prompt-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-            gap: 1.5rem;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 2rem;
+            perspective: 1000px;
         }
 
         .prompt-card {
@@ -170,51 +163,24 @@
             display: flex;
             flex-direction: column;
             gap: 1rem;
-            transition: all 0.4s ease;
-            backdrop-filter: blur(5px);
-            border-radius: 4px;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 8px;
             animation: cardFadeIn 0.5s ease-out forwards;
             opacity: 0;
-        }
-
-        .prompt-card.hidden {
-            display: none;
+            transform-style: preserve-3d;
         }
 
         .prompt-card:hover {
-            transform: translateY(-5px) scale(1.02);
             border-color: var(--primary-glow);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 229, 255, 0.2);
         }
 
-        .prompt-card h2 {
-            font-size: 1.25rem;
-            color: var(--primary-glow);
-            font-weight: 700;
-            text-transform: uppercase;
-        }
-
-        .prompt-card .category-tag {
-            font-size: 0.8rem;
-            color: var(--secondary-glow);
-            font-weight: 600;
-        }
-
-        .prompt-card h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: var(--text-color);
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 0.25rem;
-            margin-top: 0.5rem;
-        }
-
-        .prompt-card p {
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
+        .prompt-card h2 { font-size: 1.3rem; color: var(--primary-glow); font-weight: 700; text-transform: uppercase; }
+        .prompt-card .category-tag { font-size: 0.8rem; color: var(--secondary-glow); font-weight: 600; opacity: 0.8; }
+        .prompt-card h3 { font-size: 0.9rem; font-weight: 600; color: var(--text-color); text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border-color); padding-bottom: 0.25rem; margin-top: 0.5rem; }
+        .prompt-card p { font-size: 0.95rem; line-height: 1.6; opacity: 0.9; }
 
         .copy-btn {
             margin-top: auto;
@@ -230,53 +196,21 @@
             border-radius: 4px;
         }
 
-        .copy-btn:hover {
-            background-color: var(--secondary-glow);
-            color: var(--bg-color);
-            box-shadow: 0 0 10px var(--secondary-glow);
-        }
+        .copy-btn:hover { background-color: var(--secondary-glow); color: var(--bg-color); box-shadow: 0 0 10px var(--secondary-glow); }
 
         /* --- Animations --- */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideInUp {
-             from { transform: translateY(50px); opacity: 0; }
-             to { transform: translateY(0); opacity: 1; }
-        }
-
-        @keyframes cardFadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes textFlicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% {
-                text-shadow:
-                    0 0 8px var(--primary-glow),
-                    0 0 16px var(--primary-glow),
-                    0 0 32px var(--primary-glow);
-            }
-            20%, 24%, 55% {
-                text-shadow: none;
-            }
-        }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideInUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes cardFadeIn { from { opacity: 0; transform: translateY(30px) rotateX(-10deg); } to { opacity: 1; transform: translateY(0) rotateX(0deg); } }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--primary-glow); } }
         
         /* --- Responsive Design --- */
         @media (max-width: 768px) {
-            .main-container {
-                padding: 1rem;
-            }
-            h1 {
-                font-size: 2rem;
-            }
-            #prompt-grid {
-                grid-template-columns: 1fr;
-            }
+            .main-container { padding: 1rem; }
+            h1 { font-size: 2rem; }
+            #prompt-grid { grid-template-columns: 1fr; }
         }
-
     </style>
 </head>
 <body>
@@ -290,7 +224,7 @@
 
         <div class="controls-container">
             <div class="search-wrapper">
-                <input type="search" id="search-input" placeholder="Search prompts by title or description...">
+                <input type="search" id="search-input" placeholder="Search prompts...">
             </div>
             <div class="filter-group">
                 <label class="filter-label" for="main-categories-container">Categories</label>
@@ -302,9 +236,7 @@
             </div>
         </div>
 
-        <div id="prompt-grid">
-            <!-- Prompt cards will be dynamically inserted here -->
-        </div>
+        <div id="prompt-grid"></div>
     </div>
 
     <script>
@@ -313,95 +245,77 @@
         // --- Interactive Background Canvas ---
         const canvas = document.getElementById('interactive-bg');
         const ctx = canvas.getContext('2d');
-        let width, height, points;
-        let mouse = { x: null, y: null, max: 20000 };
+        let width, height, grid;
+        const mouse = { x: undefined, y: undefined, radius: 150 };
 
         function initCanvas() {
             width = canvas.width = window.innerWidth;
             height = canvas.height = window.innerHeight;
-            points = [];
-            let pointCount = Math.floor(width * height / 12000);
-            for (let i = 0; i < pointCount; i++) {
-                points.push({
-                    x: Math.random() * width,
-                    y: Math.random() * height,
-                    originX: Math.random() * width,
-                    originY: Math.random() * height,
-                    vx: Math.random() * 0.4 - 0.2,
-                    vy: Math.random() * 0.4 - 0.2,
-                    size: Math.random() * 2 + 1
-                });
+            const gridSize = 40;
+            grid = [];
+            for (let y = 0; y < Math.ceil(height / gridSize); y++) {
+                for (let x = 0; x < Math.ceil(width / gridSize); x++) {
+                    grid.push({
+                        x: x * gridSize,
+                        y: y * gridSize,
+                        ox: x * gridSize,
+                        oy: y * gridSize,
+                    });
+                }
             }
         }
 
         function animate() {
             ctx.clearRect(0, 0, width, height);
-            for (let i = 0; i < points.length; i++) {
-                let p = points[i];
+            for (let i = 0; i < grid.length; i++) {
+                let p = grid[i];
                 let dx = mouse.x - p.x;
                 let dy = mouse.y - p.y;
-                let dist = dx * dx + dy * dy;
-
-                if (dist < mouse.max) {
-                    p.x -= dx * 0.02;
-                    p.y -= dy * 0.02;
+                let dist = Math.sqrt(dx * dx + dy * dy);
+                
+                if (dist < mouse.radius) {
+                    const force = (mouse.radius - dist) / mouse.radius;
+                    p.x -= dx / dist * force * 25;
+                    p.y -= dy / dist * force * 25;
                 } else {
-                    if (p.x !== p.originX) {
-                        let odx = p.originX - p.x;
-                        p.x += odx / 20;
-                    }
-                    if (p.y !== p.originY) {
-                        let ody = p.originY - p.y;
-                        p.y += ody / 20;
-                    }
+                    p.x += (p.ox - p.x) * 0.05;
+                    p.y += (p.oy - p.y) * 0.05;
                 }
 
-                p.x += p.vx;
-                p.y += p.vy;
-
-                if (p.x > width + p.size) p.x = -p.size;
-                if (p.x < -p.size) p.x = width + p.size;
-                if (p.y > height + p.size) p.y = -p.size;
-                if (p.y < -p.size) p.y = height + p.size;
-
-                ctx.fillStyle = 'rgba(0, 255, 255, 0.5)';
+                ctx.fillStyle = `rgba(0, 229, 255, 0.5)`;
                 ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
                 ctx.fill();
-            }
-
-            for (let i = 0; i < points.length; i++) {
-                for (let j = i + 1; j < points.length; j++) {
-                    let p1 = points[i];
-                    let p2 = points[j];
-                    let dx = p1.x - p2.x;
-                    let dy = p1.y - p2.y;
-                    let dist = Math.sqrt(dx * dx + dy * dy);
-                    if (dist < 120) {
-                        ctx.beginPath();
-                        ctx.moveTo(p1.x, p1.y);
-                        ctx.lineTo(p2.x, p2.y);
-                        ctx.strokeStyle = `rgba(0, 255, 255, ${1 - dist / 120})`;
-                        ctx.lineWidth = 0.5;
-                        ctx.stroke();
-                    }
-                }
             }
             requestAnimationFrame(animate);
         }
 
-        window.addEventListener('mousemove', (e) => {
-            mouse.x = e.x;
-            mouse.y = e.y;
-        });
-        window.addEventListener('mouseout', () => {
-            mouse.x = null;
-            mouse.y = null;
-        });
+        window.addEventListener('mousemove', e => { mouse.x = e.x; mouse.y = e.y; });
+        window.addEventListener('mouseout', () => { mouse.x = undefined; mouse.y = undefined; });
         window.addEventListener('resize', initCanvas);
         
         initCanvas();
         animate();
+
+        // --- Card Tilt Effect ---
+        const promptGridForTilt = document.getElementById('prompt-grid');
+        promptGridForTilt.addEventListener('mousemove', e => {
+            if (e.target.classList.contains('prompt-card')) {
+                const card = e.target;
+                const { top, left, width, height } = card.getBoundingClientRect();
+                const x = e.clientX - left;
+                const y = e.clientY - top;
+                const rotateX = -1 * (10 * ((y - height / 2) / height));
+                const rotateY = 1 * (10 * ((x - width / 2) / width));
+                card.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.05)`;
+            }
+        });
+        promptGridForTilt.addEventListener('mouseout', e => {
+             if (e.target.classList.contains('prompt-card')) {
+                e.target.style.transform = 'rotateX(0) rotateY(0) scale(1)';
+             }
+        });
+
 
         // --- Main Application Logic ---
         const promptGrid = document.getElementById('prompt-grid');
@@ -414,68 +328,56 @@
         let activeSubcategory = 'All';
 
         const CATEGORY_DATA = {
-            "🧠 Thinking & Cognition": { subcategories: ["Mental Models", "Cognitive Forensics", "Frame Shifting", "Pattern Extraction"], keywords: ["think", "cognition", "mental", "logic", "perspective", "bias", "model", "recursive", "pattern"] },
-            "🎭 Identity & Self": { subcategories: ["Symbolic Self-Analysis", "Personal Mythology", "Evolution Tracking", "Self-Image Deconstruction"], keywords: ["identity", "self", "archetype", "symbolic", "role", "transformation", "review", "shadow", "ego"] },
-            "📜 Storytelling & Narrative Design": { subcategories: ["Plot Mechanics", "Character Construction", "Genre Remixing", "Meta-Narratives"], keywords: ["story", "narrative", "worldbuilding", "plot", "hero", "myth", "character", "genre"] },
-            "🔮 Insight & Analysis": { subcategories: ["Comparative Intelligence", "Systems Thinking", "Root Cause Mining", "Multi-Lens Synthesis"], keywords: ["insight", "analysis", "pattern", "diagnostic", "deep dive", "compare", "system"] },
-            "🧩 Creativity & Concept Generation": { subcategories: ["Idea Remixing", "Metaphor Construction", "Constraint-Based Innovation", "Oblique Approaches"], keywords: ["creativity", "concept", "idea", "remix", "metaphor", "juxtaposition", "generate"] },
-            "🛠️ Problem Solving & Strategy": { subcategories: ["Tradeoff Framing", "Adversarial Prompting", "Heuristic Building", "Opportunity Scanning"], keywords: ["problem", "solving", "strategy", "tradeoff", "adversarial", "decision", "mirror"] },
-            "🔥 Emotional & Existential Work": { subcategories: ["Grief/Trauma Alchemy", "Desire Mapping", "Shadow Integration", "Spiritual Compression"], keywords: ["emotional", "existential", "grief", "trauma", "desire", "interrogation", "feeling"] },
-            "📈 Productivity & Action": { subcategories: ["Prompt Chains / Scaffolds", "Execution Support", "Motivation Triggers", "Outcome Rehearsal"], keywords: ["productivity", "action", "scaffold", "plan", "generator", "success", "drill"] },
-            "🎙️ Expression & Communication": { subcategories: ["Voice Tuning", "Conflict Language", "Persuasion Techniques", "Dialogic Tools"], keywords: ["expression", "communication", "rhetoric", "tone", "dialog", "simulate", "speak"] },
-            "🎨 Art, Design, & Aesthetic": { subcategories: ["Moodboard Language", "Symbolic Palette Crafting", "Character Vibe Shaping", "Scene Construction"], keywords: ["art", "design", "aesthetic", "visual", "sensory", "moodboard", "motif", "color"] },
-            "👁️‍🗨️ Philosophy & Ontology": { subcategories: ["Thought Experiments", "Ethical Paradoxes", "Ontological Rewrites", "Temporal Disruptions"], keywords: ["philosophy", "ontology", "thought experiment", "reality", "meta", "ethics"] },
-            "👤 Relationships & Dialogue": { subcategories: ["Perspective Simulation", "Conflict Diagnosis", "Emotional Reconciliation", "Mirror Confrontation"], keywords: ["relationship", "dialogue", "conflict", "reframe", "conversation", "repair", "empathy"] },
-            "📂 Frameworks & Systems": { subcategories: ["Recursive Skeletons", "Multimodal Prompt Design", "Meta-System Builders", "Scalable Reuse Patterns"], keywords: ["framework", "system", "schema", "recursive", "model", "template"] },
-            "🕳️ Depth & Subconscious": { subcategories: ["Dream Analysis", "Hidden Belief Surfacing", "Ritualized Prompts", "Somatic Symbolism"], keywords: ["depth", "subconscious", "dream", "belief", "symbolic", "excavation", "ritual"] },
+            "🧠 Thinking & Cognition": { subcategories: ["Mental Models", "Cognitive Forensics", "Frame Shifting", "Pattern Extraction"], keywords: ["think", "cognition", "mental", "logic", "perspective", "bias", "model", "recursive", "pattern", "reasoning"] },
+            "🎭 Identity & Self": { subcategories: ["Symbolic Self-Analysis", "Personal Mythology", "Evolution Tracking", "Self-Image Deconstruction"], keywords: ["identity", "self", "archetype", "symbolic", "role", "transformation", "review", "shadow", "ego", "persona"] },
+            "📜 Storytelling & Narrative Design": { subcategories: ["Plot Mechanics", "Character Construction", "Genre Remixing", "Meta-Narratives"], keywords: ["story", "narrative", "worldbuilding", "plot", "hero", "myth", "character", "genre", "fiction"] },
+            "🔮 Insight & Analysis": { subcategories: ["Comparative Intelligence", "Systems Thinking", "Root Cause Mining", "Multi-Lens Synthesis"], keywords: ["insight", "analysis", "pattern", "diagnostic", "deep dive", "compare", "system", "detect"] },
+            "🧩 Creativity & Concept Generation": { subcategories: ["Idea Remixing", "Metaphor Construction", "Constraint-Based Innovation", "Oblique Approaches"], keywords: ["creativity", "concept", "idea", "remix", "metaphor", "juxtaposition", "generate", "invent"] },
+            "🛠️ Problem Solving & Strategy": { subcategories: ["Tradeoff Framing", "Adversarial Prompting", "Heuristic Building", "Opportunity Scanning"], keywords: ["problem", "solving", "strategy", "tradeoff", "adversarial", "decision", "mirror", "plan"] },
+            "🔥 Emotional & Existential Work": { subcategories: ["Grief/Trauma Alchemy", "Desire Mapping", "Shadow Integration", "Spiritual Compression"], keywords: ["emotional", "existential", "grief", "trauma", "desire", "interrogation", "feeling", "shame", "guilt"] },
+            "📈 Productivity & Action": { subcategories: ["Prompt Chains / Scaffolds", "Execution Support", "Motivation Triggers", "Outcome Rehearsal"], keywords: ["productivity", "action", "scaffold", "plan", "generator", "success", "drill", "habit"] },
+            "🎙️ Expression & Communication": { subcategories: ["Voice Tuning", "Conflict Language", "Persuasion Techniques", "Dialogic Tools"], keywords: ["expression", "communication", "rhetoric", "tone", "dialog", "simulate", "speak", "voice"] },
+            "🎨 Art, Design, & Aesthetic": { subcategories: ["Moodboard Language", "Symbolic Palette Crafting", "Character Vibe Shaping", "Scene Construction"], keywords: ["art", "design", "aesthetic", "visual", "sensory", "moodboard", "motif", "color", "style"] },
+            "👁️‍🗨️ Philosophy & Ontology": { subcategories: ["Thought Experiments", "Ethical Paradoxes", "Ontological Rewrites", "Temporal Disruptions"], keywords: ["philosophy", "ontology", "thought experiment", "reality", "meta", "ethics", "moral"] },
+            "👤 Relationships & Dialogue": { subcategories: ["Perspective Simulation", "Conflict Diagnosis", "Emotional Reconciliation", "Mirror Confrontation"], keywords: ["relationship", "dialogue", "conflict", "reframe", "conversation", "repair", "empathy", "interpersonal"] },
+            "📂 Frameworks & Systems": { subcategories: ["Recursive Skeletons", "Multimodal Prompt Design", "Meta-System Builders", "Scalable Reuse Patterns"], keywords: ["framework", "system", "schema", "recursive", "model", "template", "structure"] },
+            "🕳️ Depth & Subconscious": { subcategories: ["Dream Analysis", "Hidden Belief Surfacing", "Ritualized Prompts", "Somatic Symbolism"], keywords: ["depth", "subconscious", "dream", "belief", "symbolic", "excavation", "ritual", "unconscious"] },
         };
 
-        // --- Data Fetching and Processing ---
         async function fetchPrompts() {
             try {
-                // IMPORTANT: Using the correct raw content URL for the fetch request.
                 const response = await fetch('https://raw.githubusercontent.com/RehanRC/RehanRC/main/Interesting_Prompt_Use_Cases_2/prompts.json');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
                 const prompts = await response.json();
                 allPrompts = prompts.map(prompt => assignCategories(prompt));
                 displayUI();
             } catch (error) {
-                console.error("Failed to fetch or process prompts:", error);
-                promptGrid.innerHTML = `<p style="color: var(--secondary-glow);">Error: Could not load prompt data. Please check the console for details.</p>`;
+                console.error("Failed to fetch prompts:", error);
+                promptGrid.innerHTML = `<p style="color: var(--secondary-glow);">Error: Could not load prompt data.</p>`;
             }
         }
 
         function assignCategories(prompt) {
-            // Heuristic to assign categories based on keywords since JSON lacks this data.
-            const textToScan = `${prompt.title.toLowerCase()} ${prompt.description.toLowerCase()}`;
+            const textToScan = `${prompt.title.toLowerCase()} ${prompt.description.toLowerCase()} ${prompt.transformation.toLowerCase()}`;
             let bestMatch = { category: "Uncategorized", subcategory: "Uncategorized", score: 0 };
 
             for (const [catName, catData] of Object.entries(CATEGORY_DATA)) {
                 let score = 0;
                 catData.keywords.forEach(kw => {
-                    if (textToScan.includes(kw)) {
-                        score++;
-                    }
+                    if (textToScan.includes(kw)) score++;
                 });
-
                 if (score > bestMatch.score) {
-                    bestMatch = { category: catName, score: score, subcategory: "Uncategorized" }; // Default subcategory
+                    bestMatch = { category: catName, score: score, subcategory: "Uncategorized" };
                 }
             }
             
-            // Assign subcategory based on keywords within the best-matched main category
             if (bestMatch.category !== "Uncategorized") {
                  const mainCatData = CATEGORY_DATA[bestMatch.category];
                  let bestSubMatch = { subcategory: mainCatData.subcategories[0] || "General", score: 0 };
-                 
                  mainCatData.subcategories.forEach(subCatName => {
                      let subScore = 0;
                      subCatName.split(' ').forEach(kw => {
-                         if(textToScan.includes(kw.toLowerCase().replace(/[/]/g, ''))) {
-                             subScore++;
-                         }
+                         if(textToScan.includes(kw.toLowerCase().replace(/[/]/g, ''))) subScore++;
                      });
                      if (subScore > bestSubMatch.score) {
                          bestSubMatch = { subcategory: subCatName, score: subScore };
@@ -483,12 +385,9 @@
                  });
                  bestMatch.subcategory = bestSubMatch.subcategory;
             }
-
-
             return { ...prompt, assignedCategory: bestMatch.category, assignedSubcategory: bestMatch.subcategory };
         }
         
-        // --- UI Display and Rendering ---
         function displayUI() {
             renderMainCategories();
             renderPrompts();
@@ -503,10 +402,7 @@
         
         function renderSubcategories() {
             subcategoriesContainer.innerHTML = '';
-            if (activeMainCategory === 'All' || !CATEGORY_DATA[activeMainCategory]) {
-                return;
-            }
-            
+            if (activeMainCategory === 'All' || !CATEGORY_DATA[activeMainCategory]) return;
             const subcategories = ['All', ...CATEGORY_DATA[activeMainCategory].subcategories];
             subcategoriesContainer.innerHTML = subcategories.map(sub => 
                 `<button class="filter-btn ${sub === activeSubcategory ? 'active' : ''}" data-subcategory="${sub}">${sub}</button>`
@@ -517,18 +413,17 @@
             promptGrid.innerHTML = '';
             const fragment = document.createDocumentFragment();
             const searchTerm = searchInput.value.toLowerCase();
+            let visibleCount = 0;
 
             allPrompts
                 .filter(p => (activeMainCategory === 'All' || p.assignedCategory === activeMainCategory))
                 .filter(p => (activeSubcategory === 'All' || p.assignedSubcategory === activeSubcategory))
-                .filter(p => {
-                    const textToSearch = `${p.title.toLowerCase()} ${p.description.toLowerCase()}`;
-                    return textToSearch.includes(searchTerm);
-                })
-                .forEach((prompt, index) => {
+                .filter(p => `${p.title.toLowerCase()} ${p.description.toLowerCase()}`.includes(searchTerm))
+                .forEach(prompt => {
                     const card = document.createElement('div');
                     card.className = 'prompt-card';
-                    card.style.animationDelay = `${index * 0.03}s`;
+                    card.style.animationDelay = `${visibleCount * 0.03}s`;
+                    visibleCount++;
                     
                     card.innerHTML = `
                         <div>
@@ -547,7 +442,7 @@
                             <h3>Transformation</h3>
                             <p>${prompt.transformation}</p>
                         </div>
-                        <button class="copy-btn" data-instructions="${escapeHTML(prompt.instructions)}">Copy Instructions</button>
+                        <button class="copy-btn" data-instructions="${escapeHTML(prompt.instructions)}">Copy</button>
                     `;
                     fragment.appendChild(card);
                 });
@@ -555,11 +450,10 @@
             promptGrid.appendChild(fragment);
         }
 
-        // --- Event Handlers ---
         mainCategoriesContainer.addEventListener('click', e => {
             if (e.target.classList.contains('filter-btn')) {
                 activeMainCategory = e.target.dataset.category;
-                activeSubcategory = 'All'; // Reset subcategory when main changes
+                activeSubcategory = 'All';
                 renderMainCategories();
                 renderSubcategories();
                 renderPrompts();
@@ -569,7 +463,6 @@
         subcategoriesContainer.addEventListener('click', e => {
             if (e.target.classList.contains('filter-btn')) {
                 activeSubcategory = e.target.dataset.subcategory;
-                // No need to re-render main categories
                 renderSubcategories();
                 renderPrompts();
             }
@@ -579,39 +472,34 @@
 
         promptGrid.addEventListener('click', e => {
             if (e.target.classList.contains('copy-btn')) {
-                const instructions = e.target.dataset.instructions;
-                copyToClipboard(instructions, e.target);
+                copyToClipboard(e.target.dataset.instructions, e.target);
             }
         });
 
         function copyToClipboard(text, button) {
-            // Use a textarea element to preserve formatting
             const textArea = document.createElement('textarea');
             textArea.value = text;
-            textArea.style.position = 'fixed'; // Avoid scrolling to bottom
+            textArea.style.position = 'fixed';
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
             try {
                 document.execCommand('copy');
                 button.textContent = 'Copied!';
-                setTimeout(() => {
-                    button.textContent = 'Copy Instructions';
-                }, 2000);
+                setTimeout(() => { button.textContent = 'Copy'; }, 2000);
             } catch (err) {
-                console.error('Fallback: Oops, unable to copy', err);
-                button.textContent = 'Copy Failed';
+                console.error('Copy failed', err);
+                button.textContent = 'Failed';
             }
             document.body.removeChild(textArea);
         }
         
         function escapeHTML(str) {
             const p = document.createElement("p");
-            p.appendChild(document.createTextNode(str));
+            p.textContent = str;
             return p.innerHTML;
         }
 
-        // --- Initial Load ---
         fetchPrompts();
     });
     </script>

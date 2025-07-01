@@ -1,0 +1,260 @@
+/* style.css - Creative Prompt Library */
+
+/* ----- Global Resets and Base Styles ----- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #12121a; /* Dark base for Vanta to overlay */
+    color: #e0e0e0; /* Light grey for text */
+    line-height: 1.6;
+    overflow-x: hidden; /* Prevent horizontal scroll */
+}
+
+/* ----- Vanta.js Background Container ----- */
+#vanta-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0; /* Behind page content */
+}
+
+/* ----- Page Content Wrapper ----- */
+.page-content {
+    position: relative; /* To sit above the fixed background */
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2em;
+    min-height: 100vh; /* Ensure it takes at least full viewport height */
+    display: flex;
+    flex-direction: column;
+}
+
+/* ----- Typography ----- */
+h1, h2, h3 {
+    color: #ffffff; /* White for titles */
+    margin-bottom: 0.5em;
+    font-weight: 500; /* Medium weight for Inter */
+}
+
+h1 { /* Page Title */
+    font-size: 2.5em; /* Adjusted for modern look */
+    text-align: center;
+    margin-bottom: 1em;
+    font-weight: 700; /* Bolder for main title */
+    letter-spacing: 1px;
+    color: #00ffff; /* Cyan accent */
+}
+
+h2 { /* Prompt Card Titles */
+    font-size: 1.5em;
+    color: #f0f0f0; /* Slightly off-white */
+    margin-bottom: 0.75em;
+}
+
+h3 { /* Section Headings within Cards */
+    font-size: 1.1em;
+    color: #00ffff; /* Cyan accent */
+    margin-bottom: 0.3em;
+    font-weight: 500;
+}
+
+p {
+    font-size: 1em;
+    margin-bottom: 1em;
+    color: #cccccc; /* Lighter gray for paragraph text */
+}
+
+pre {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 1em;
+    border-radius: 4px;
+    border-left: 3px solid #00ffff; /* Cyan accent border */
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* Modern mono stack */
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    color: #d0d0d0;
+    font-size: 0.9em;
+    margin-bottom: 1em;
+}
+
+code {
+    font-family: inherit; /* Inherit from pre */
+}
+
+/* ----- Header ----- */
+.library-header {
+    padding-bottom: 1.5em;
+    margin-bottom: 2em;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2); /* Subtle cyan border */
+}
+
+/* ----- Category Filter Buttons ----- */
+.category-filters {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 2em;
+}
+
+.filter-button {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.95em;
+    font-weight: 500;
+    color: #e0e0e0;
+    background-color: rgba(255, 255, 255, 0.05); /* Slightly transparent background */
+    border: 1px solid rgba(0, 255, 255, 0.3); /* Cyan border */
+    padding: 0.6em 1.2em;
+    border-radius: 20px; /* Pill shape */
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+}
+
+.filter-button:hover {
+    background-color: rgba(0, 255, 255, 0.1); /* Cyan tint on hover */
+    color: #ffffff;
+    border-color: #00ffff;
+}
+
+.filter-button.active {
+    background-color: #00ffff; /* Solid cyan */
+    color: #12121a; /* Dark text for contrast */
+    font-weight: 700;
+    border-color: #00ffff;
+}
+
+/* ----- Prompt Grid ----- */
+.prompt-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); /* Responsive grid */
+    gap: 1.5em;
+    flex-grow: 1; /* Takes available space */
+}
+
+/* ----- Prompt Card ----- */
+.prompt-card {
+    background-color: rgba(30, 30, 46, 0.7); /* Darker card background: #1e1e2e with alpha */
+    backdrop-filter: blur(5px); /* Subtle blur for cards over Vanta */
+    border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle light border */
+    border-radius: 8px; /* Slight border-radius */
+    padding: 1.5em;
+    transition: border-color 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+}
+
+.prompt-card:hover {
+    border-color: #00ffff; /* Cyan border on hover */
+    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.15); /* Cyan glow/shadow on hover */
+}
+
+.prompt-card .prompt-details {
+    flex-grow: 1; /* Ensures details take space, pushing button down */
+}
+
+.prompt-section {
+    margin-bottom: 1em;
+}
+.prompt-section:last-child {
+    margin-bottom: 0;
+}
+
+
+/* ----- Copy Button ----- */
+.copy-button {
+    font-family: 'Inter', sans-serif;
+    font-size: 0.9em;
+    font-weight: 500;
+    color: #00ffff; /* Cyan text */
+    background-color: transparent;
+    border: 1px solid #00ffff; /* Cyan border */
+    padding: 0.5em 1em;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    margin-top: 1.5em; /* Space above the button */
+    align-self: flex-start; /* Align to the start of the card */
+}
+
+.copy-button:hover {
+    background-color: rgba(0, 255, 255, 0.1); /* Light cyan background */
+    color: #ffffff;
+}
+
+.copy-button.copied {
+    background-color: #00bfa5; /* A slightly different shade of cyan/teal for "copied" state */
+    color: #12121a;
+    border-color: #00bfa5;
+    pointer-events: none; /* Disable button briefly */
+}
+
+/* ----- Footer ----- */
+.library-footer {
+    text-align: center;
+    padding: 1.5em 0;
+    margin-top: 2em;
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.5);
+    border-top: 1px solid rgba(0, 255, 255, 0.1);
+}
+
+/* ----- Utility Classes ----- */
+.error-message, .no-results-message {
+    color: #ff6b6b; /* A soft red for errors */
+    text-align: center;
+    padding: 2em;
+    font-size: 1.1em;
+    grid-column: 1 / -1; /* Span full grid if inside */
+}
+
+/* ----- Responsive Adjustments ----- */
+@media (max-width: 768px) {
+    .page-content {
+        padding: 1.5em;
+    }
+    h1 {
+        font-size: 2em;
+    }
+    .prompt-grid {
+        grid-template-columns: 1fr; /* Single column on smaller screens */
+    }
+    .filter-button {
+        font-size: 0.9em;
+        padding: 0.5em 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-content {
+        padding: 1em;
+    }
+    h1 {
+        font-size: 1.8em;
+    }
+    .filter-button {
+        width: calc(50% - 5px); /* Two buttons per row */
+        text-align: center;
+    }
+    .copy-button {
+        width: 100%;
+        text-align: center;
+    }
+}
+
+/* Accessibility: Focus visible for keyboard navigation */
+.filter-button:focus-visible,
+.copy-button:focus-visible {
+    outline: 2px solid #00ffff; /* Cyan outline */
+    outline-offset: 2px;
+}

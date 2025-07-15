@@ -111,65 +111,67 @@
                     <div class="bg-slate-900/70 rounded-xl p-4 text-sm overflow-x-auto">
                         <pre class="prompt-text whitespace-pre-wrap"><code>**Deploy the Scholar Function**
 
-Examine **only** the immediately preceding turn in full. Diagnose—do not alter—its clarity, logical coherence, and communicative fitness.
+**Scope**
+Examine only the immediately preceding turn in its entirety. Produce a diagnostic report—no edits, no recommendations.
 
 #### 1 · Semantic Mapping
 
-Identify the subject’s **core structure, intent, and assumptions**. Decompose into functional layers labeled `L1, L2, L3…` (no upper limit on layers).
+Decompose the subject’s structure, intent, and assumptions into labeled layers `L1, L2, L3…`. Use as many layers as required.
 
 #### 2 · Structural Integrity Audit
 
-For each load‑bearing claim, assign one tag:
+For every load‑bearing claim, assign a clarity tag:
 
-* `VALID` – logically coherent and scaffolded.
-* `FAULT` – hidden assumption, contradiction, or missing support.
-  Quote a representative excerpt for each; excerpt length is flexible—only quote what is necessary.
+* `VALID` — coherent, well‑supported.
+* `FAULT` — hidden assumption, contradiction, unsupported leap.
+  After each tag, quote the exact text needed to illustrate the judgment (quote length unrestricted).
 
 #### 3 · Language Diagnostics
 
-Flag any instance of:
-`AMBIG` (ambiguity) ‑ `JARG` (jargon inflation) ‑ `TONE` (tone drift) ‑ `PREC` (precision loss).
-Provide excerpts of any length required for clarity.
+Flag any excerpts exhibiting:
+`AMBIG` (ambiguous meaning) — `JARG` (excessive jargon) — `TONE` (tone drift) — `PREC` (precision loss).
+Provide enough quotation to show the issue; no length constraints.
 
 #### 4 · Purpose Alignment Check
 
-Quote the subject’s **declared purpose**.
-Render a binary verdict:
-
-* `ALIGNED` – form effectively serves purpose.
-* `MISALIGNED` – divergence detected.
-  Add a concise justification.
+Quote the subject’s declared purpose. State a binary verdict:
+`ALIGNED` — content serves declared purpose.
+`MISALIGNED` — divergence present.
+Add a concise, factual justification.
 
 ---
 
 **Execution Safeguards**
 
-* **Context Isolation** – ignore all content outside the target turn.
-* **No Meta‑Leakage** – omit any mention of analytic roles or protocol mechanics.
-* **Zero Prescription** – supply findings only; propose no fixes.
-* **Neutral Diction** – descriptive verbs; no moral judgment.
-* **Flexible Quotation** – quote as much or as little text as needed; avoid distortion.
-* **Output Format**
+* **Context Isolation** — analyze only the target turn.
+* **No Meta‑Leakage** — omit any reference to analysis roles or protocol mechanics.
+* **Zero Prescription** — report findings; suggest no fixes.
+* **Neutral Diction** — use descriptive verbs; avoid moral judgment or evaluation language.
+* **Flexible Quotation** — quote as much or as little as necessary to avoid distortion.
 
-  ```
-  Part 1 – Scholar’s Blueprint  
-  1. Semantic Mapping  
-     L1: …  
-     L2: …  
-  2. Structural Integrity Audit  
-     VALID: “…”  
-     FAULT: “…”  
-  3. Language Diagnostics  
-     AMBIG: “…”  
-     JARG: “…”  
-     TONE: “…”  
-     PREC: “…”  
-  4. Purpose Alignment Check  
-     Declared Purpose: “…”  
-     Verdict: ALIGNED | MISALIGNED – reason  
-  ```
+**Output Format**
 
-Outputs deviating from these parameters are invalid.
+```
+Part 1 – Scholar’s Blueprint  
+1. Semantic Mapping  
+   L1: …  
+   L2: …  
+   …  
+2. Structural Integrity Audit  
+   VALID: “…”  
+   FAULT: “…”  
+   …  
+3. Language Diagnostics  
+   AMBIG: “…”  
+   JARG: “…”  
+   TONE: “…”  
+   PREC: “…”  
+4. Purpose Alignment Check  
+   Declared Purpose: “…”  
+   Verdict: ALIGNED | MISALIGNED – justification  
+```
+
+Outputs diverging from this structure or safeguards are invalid.
 </code></pre>
                     </div>
                     <button class="copy-button mt-6 w-full sm:w-auto self-end bg-sky-500/10 border border-sky-500/30 text-sky-400 font-semibold py-2 px-6 rounded-lg hover:bg-sky-500/20 transition-all flex items-center justify-center">
@@ -195,27 +197,28 @@ Outputs deviating from these parameters are invalid.
                     <div class="bg-slate-900/70 rounded-xl p-4 text-sm overflow-x-auto">
                         <pre class="prompt-text whitespace-pre-wrap"><code>**Deploy the Trickster Function**
 
-Target: **the same single turn** just diagnosed. Your mission is controlled destabilization—expose hidden assumptions, structural fragilities, and latent harms **without proposing remedies**.
+**Scope**
+Analyze only the same single turn previously diagnosed. Conduct controlled destabilization—surface hidden premises, structural fragilities, and latent harms **without proposing remedies**.
 
 #### 1 · Assumption Reversal
 
 For each detected assumption:
 
-* Quote the assumption (any length sufficient for clarity).
-* State an **Inverse Statement**—a credible counter‑premise.
-* Provide a **Breakdown Scenario** explaining (with whatever length is necessary) how the inverse could outperform or invalidate the original.
+* Quote the assumption (length as needed).
+* Provide an **Inverse Statement**—a plausible counter‑premise.
+* Supply a **Breakdown Scenario** explaining how the inverse could outperform or invalidate the original premise (no length limit).
 
 #### 2 · Risk Surface Mapping
 
-For each vulnerability identified:
+For each vulnerability:
 
-* **Vector** — choose one descriptor: Ethical, Epistemic, Technological, Coercive, Procedural, Social, or Legal.
-* **Mechanism** — describe how harm could emerge.
-* **Impact** — concise summary of potential severity.
+* **Vector** — one of: Ethical, Epistemic, Technological, Coercive, Procedural, Social, Legal.
+* **Mechanism** — describe how the harm could emerge.
+* **Impact** — concise statement of potential severity or consequence.
 
 #### 3 · Premise Stress Test
 
-* Quote the **central premise**.
+* Quote the **central premise** of the target text.
 * List up to three **Pressure Points** where circularity, fragility, or normative dependence appear.
 * Provide a **High‑Risk Reframe** describing system state if the premise collapses.
 
@@ -223,11 +226,11 @@ For each vulnerability identified:
 
 **Execution Safeguards**
 
-* **Context Isolation** – analyze only the target turn.
-* **No Meta‑Leakage** – omit any mention of analytic roles or prompting protocol.
-* **Neutral Diction** – use descriptive language; avoid moral judgment.
-* **Zero Prescription** – report findings only; recommend no fixes.
-* **Flexible Length** – content may be as long as necessary to fulfill diagnostic depth.
+* **Context Isolation** — examine only the target turn.
+* **No Meta‑Leakage** — omit any reference to analysis roles or protocol mechanics.
+* **Neutral Diction** — descriptive language; no moral judgment.
+* **Zero Prescription** — report findings; suggest no fixes.
+* **Unlimited Length** — write as much as necessary for diagnostic depth.
 
 **Output Format**
 
@@ -235,15 +238,17 @@ For each vulnerability identified:
 Part 2 – Trickster’s Interrogation  
 1. Assumption Reversal  
    – “quoted assumption” | Inverse: … | Breakdown: …  
+   …  
 2. Risk Surface Mapping  
    Vector: … | Mechanism: … | Impact: …  
+   …  
 3. Premise Stress Test  
    Central Premise: “…”  
    Pressure Points: 1) … 2) … 3) …  
    High‑Risk Reframe: …  
 ```
 
-Any deviation from safeguards nullifies the Trickster output.
+Outputs straying from format or safeguards are invalid.
 </code></pre>
                     </div>
                     <button class="copy-button mt-6 w-full sm:w-auto self-end bg-rose-500/10 border border-rose-500/30 text-rose-400 font-semibold py-2 px-6 rounded-lg hover:bg-rose-500/20 transition-all flex items-center justify-center">
@@ -274,7 +279,7 @@ Project the **same text already examined** into its highest‑potential form. Ge
 #### 1 · Trajectory Expansion
 
 Identify latent pathways—any number required for full coverage.
-For each pathway, provide:
+For each pathway provide:
 
 * **Name** – concise identifier.
 * **Expansion Sketch** – describe how the pathway extends the subject while preserving core logic.
@@ -282,12 +287,12 @@ For each pathway, provide:
 #### 2 · Symbolic Re‑encoding
 
 Create metaphor(s) that encapsulate the subject’s mechanics.
-For each metaphor, supply a brief sentence explaining its fidelity.
+For each metaphor supply a brief sentence explaining its fidelity.
 
 #### 3 · Perspective Reorientation
 
 Choose one or more lenses—Technological, Sociocultural, Epistemological, Narrative, Economic, etc.
-For each lens, present:
+For each lens present:
 
 * **Lens Name**
 * **Reframed View** – reveal novel alignments, audiences, or use‑contexts while maintaining structural accuracy.
@@ -299,8 +304,8 @@ For each lens, present:
 * **No Role Leakage** – omit all references to analysis roles or process mechanics.
 * **Anchored Projection** – draw only from implications inherent in the subject; introduce no external facts.
 * **Metaphor Discipline** – every metaphor must preserve interpretive fidelity; avoid decorative analogies.
-* **Clarity Priority** – ensure expanded futures remain logically connected to original material; no abstraction drift.
-* **Flexible Length & Count** – produce as many items and as much text as necessary to fulfill the task; no word or item limits.
+* **Clarity Priority** – expanded futures must remain logically connected to original material; no abstraction drift.
+* **Flexible Length & Count** – produce as many items and as much text as necessary; no word or item limits.
 
 **Output Format**
 
@@ -317,7 +322,7 @@ Part 3 – Prophet’s Expansion
    View: …  
 ```
 
-Outputs must follow this structure and safeguards; all other formatting is free.
+Outputs deviating from structure or safeguards are invalid.
 </code></pre>
                     </div>
                     <button class="copy-button mt-6 w-full sm:w-auto self-end bg-amber-500/10 border border-amber-500/30 text-amber-400 font-semibold py-2 px-6 rounded-lg hover:bg-amber-500/20 transition-all flex items-center justify-center">
@@ -346,45 +351,47 @@ Outputs must follow this structure and safeguards; all other formatting is free.
 
 **Inputs**
 
-1. **Subject Text** – the exact passage under synthesis.
-2. **Triptych Bundle** – consolidated findings: structure validation, risk mapping, trajectory expansions.
+1. **Subject Text** — the passage to be superseded.
+2. **Triptych Bundle** — consolidated findings: validated structure, mapped risks, projected trajectories.
 
 **Objective**
-Produce a single, self‑contained artifact that fully replaces the Subject Text. It must:
+Create a **single, self‑contained artifact** that fully replaces the Subject Text. The artifact must:
 
-* Integrate every verified element from the Triptych Bundle.
-* Embed risk acknowledgments inline.
-* Encode future pathways as declarative capability statements.
-* Maintain conceptual hierarchy while reorganizing for clarity if needed.
-* Present contradictions via conditional or scoped framing—never force consensus.
-* Require no external context to interpret or deploy.
+* Integrate every verified element from the Triptych Bundle (each exactly once).
+* Embed risk acknowledgments inline—brief caution clauses.
+* Encode future pathways as declarative capability statements (“The framework can extend to…”).
+* Preserve or improve conceptual hierarchy; reorder only for clarity.
+* Present contradictions using conditional or scoped framing—never force consensus.
+* Stand alone without external context or dependencies.
 
 #### 1 · Integrative Assembly
 
-Combine all Triptych points exactly once. Use implicit traceability—mirror wording or concept without citing or referencing analysis roles.
+Fuse all Triptych points implicitly—mirror wording or concepts; never cite or reference analytic roles.
 
 #### 2 · Contradiction Encoding
 
-Preserve conflicting findings through:
+When findings conflict, preserve both via:
 
-* **Conditional Clauses** – “If condition A holds, then…; otherwise…”
-* **Scoped Contexts** – “Within academic settings…”, “In public policy…”
+* **Conditional Clauses** — “If condition A holds, then…; otherwise….”
+* **Scoped Contexts** — “Within regulated domains…”, “In community settings….”
 
 #### 3 · Finalization Pass
 
-Define technical terms concisely where first used. Insert risk notes as brief in‑sentence cautions. Append or weave future‑path statements (“The framework can extend to…”) into logical positions. Ensure readability and mission readiness.
+Define technical terms concisely upon first use. Embed risks inline. Weave future‑path statements into logically appropriate locations. Ensure the result is mission‑ready for execution, adoption, or citation.
 
 ---
 
 **Execution Safeguards**
 
-* **Zero Meta‑Leakage** – omit all mentions of analytic stages or protocol mechanics.
-* **No Process Reflection** – do not describe how conclusions were reached.
-* **Source Isolation** – use only content from Triptych Bundle; introduce nothing new.
-* **Closed Scope** – artifact must stand alone; no dependencies.
-* **Flexible Length & Format** – no word or formatting limits; paragraphs, bullets, or headings are all acceptable if they enhance clarity.
+* **Zero Meta‑Leakage** — omit all references to roles, stages, or methodology.
+* **No Process Reflection** — do not describe derivation or analysis.
+* **Source Isolation** — rely solely on Triptych Bundle content; introduce nothing new.
+* **Closed Scope** — artifact must be fully interpretable on its own.
+* **Flexible Length & Format** — use paragraphs, headings, or bullets as clarity demands; no word limit.
 
-Outputs diverging from these safeguards are invalid.
+**Output Format** — free, as long as it remains a single coherent artifact adhering to all safeguards.
+
+Outputs breaking any safeguard are invalid.
 </code></pre>
                     </div>
                     <button class="copy-button mt-6 w-full sm:w-auto self-end bg-green-500/10 border border-green-500/30 text-green-400 font-semibold py-2 px-6 rounded-lg hover:bg-green-500/20 transition-all flex items-center justify-center">
